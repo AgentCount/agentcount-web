@@ -53,8 +53,17 @@ export async function get<T>(
 
   let res: Response;
   try {
-    res = await fetch(url, { next: { revalidate } });
-  } catch {
+    // A refused connection fails instantly, but a hung upstream (process
+    // stopped, network black hole) does not — without a bound, the request
+    // would wait indefinitely, and on a platform like Vercel that burns the
+    // function to its own execution limit and returns the platform's 504
+    // instead of this app's error panel. Bound it ourselves so the failure is
+    // ours to explain.
+    res = await fetch(url, { next: { revalidate }, signal: AbortSignal.timeout(8000) });
+  } catch (e) {
+    if (e instanceof Error && e.name === "TimeoutError") {
+      throw new UpstreamError(`the Ledgerscope API at ${url} did not answer in time`);
+    }
     throw new UpstreamError(`could not reach the Ledgerscope API at ${url}`);
   }
 
@@ -75,10 +84,20 @@ export async function get<T>(
   return parsed.data;
 }
 
-/** `GET /healthz` returns the bare string `ok`, so it skips the JSON path. */
+/**
+ * `GET /healthz` returns the bare string `ok`, so it skips the JSON path.
+ *
+ * A missing `LEDGERSCOPE_API_URL` is a configuration mistake in this repo, not
+ * a statement about the API's health — `baseUrl()` is called outside the
+ * try/catch on purpose, so that error propagates instead of being folded into
+ * the same `false` as "could not reach the API". Conflating the two would
+ * make `pnpm check:api` print a misleading "API unreachable" when the real
+ * problem is an unset env var.
+ */
 export async function pingApi(): Promise<boolean> {
+  const url = baseUrl();
   try {
-    const res = await fetch(`${baseUrl()}/healthz`, { cache: "no-store" });
+    const res = await fetch(`${url}/healthz`, { cache: "no-store" });
     return res.ok && (await res.text()).trim() === "ok";
   } catch {
     return false;

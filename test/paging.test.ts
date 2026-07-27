@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { PAGE_SIZE, buildQuery, offsetFor, pageCount, pageFromParam } from "@/lib/paging";
+import { MAX_PAGE, PAGE_SIZE, buildQuery, offsetFor, pageCount, pageFromParam } from "@/lib/paging";
 
 describe("page numbers map to offsets", () => {
   it("is 1-based and starts at offset 0", () => {
@@ -12,6 +12,14 @@ describe("page numbers map to offsets", () => {
       expect(pageFromParam(v)).toBe(1);
     }
     expect(pageFromParam("7")).toBe(7);
+  });
+
+  it("clamps a page number far beyond MAX_PAGE to a sane integer", () => {
+    expect(pageFromParam("99999999999999999999")).toBe(MAX_PAGE);
+    expect(offsetFor(pageFromParam("99999999999999999999"))).toBe(
+      (MAX_PAGE - 1) * PAGE_SIZE,
+    );
+    expect(String(offsetFor(pageFromParam("99999999999999999999")))).not.toMatch(/e/i);
   });
 
   it("counts pages, and always offers at least one", () => {

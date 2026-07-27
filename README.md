@@ -8,11 +8,12 @@ the same fact differently.
 
 ## Running it
 
-The API must be up first, or every page shows the upstream-unreachable panel:
+The API must be up first, or every page shows the upstream-unreachable panel.
+See the Ledgerscope repo's own README for how to start it — it needs its own
+`DATABASE_URL`, which is that repo's concern, not this one's.
 
 ```sh
 # in the Ledgerscope repo
-export DATABASE_URL=postgres://postgres:dev@localhost:5432/ledgerscope
 cargo run -p api        # http://localhost:8080
 
 # here

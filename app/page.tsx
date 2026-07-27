@@ -3,7 +3,7 @@ import { ChainFilter } from "@/components/ChainFilter";
 import { Pagination } from "@/components/Pagination";
 import { StatusDot } from "@/components/StatusDot";
 import { listAgents, listChains } from "@/lib/api/endpoints";
-import { PAGE_SIZE, buildQuery, offsetFor, pageFromParam } from "@/lib/paging";
+import { PAGE_SIZE, buildQuery, offsetFor, pageCount, pageFromParam } from "@/lib/paging";
 
 export const metadata = { title: "Agent Facts Explorer — Ledgerscope" };
 
@@ -15,10 +15,15 @@ export default async function Explorer({
   const sp = await searchParams;
   const page = pageFromParam(sp.page);
   const sort = sp.sort === "alive" ? "alive" : undefined;
+  // Normalized once, here, and reused for the fetch, the chain-filter chip,
+  // and every link on the page — the Rust side trims and lowercases `chain`
+  // before matching, so a raw `?chain=BASE` filters correctly but, without
+  // this, would highlight no chip because `active` was compared unnormalized.
+  const chain = sp.chain?.trim().toLowerCase() || undefined;
 
   const [agents, chains] = await Promise.all([
     listAgents({
-      chain: sp.chain,
+      chain,
       limit: PAGE_SIZE,
       offset: offsetFor(page),
       sort: sort ?? "registered",
@@ -28,7 +33,7 @@ export default async function Explorer({
 
   const sortLink = (value: string | undefined, label: string) => (
     <Link
-      href={`/${buildQuery({ chain: sp.chain, sort: value })}`}
+      href={`/${buildQuery({ chain, sort: value })}`}
       className={sort === value ? "text-accent" : "text-muted hover:text-text"}
     >
       {label}
@@ -45,7 +50,7 @@ export default async function Explorer({
       </p>
 
       <div className="mt-6 flex flex-wrap items-center justify-between gap-4">
-        <ChainFilter chains={chains} active={sp.chain} sort={sp.sort} />
+        <ChainFilter chains={chains} active={chain} sort={sort} />
         <div className="flex gap-3 text-sm">
           <span className="text-dead">Sort:</span>
           {sortLink(undefined, "newest")}
@@ -53,7 +58,18 @@ export default async function Explorer({
         </div>
       </div>
 
-      {agents.items.length === 0 ? (
+      {agents.items.length === 0 && agents.page.total > 0 ? (
+        <p className="mt-8 rounded-xl bg-panel p-6 text-muted">
+          Page {page} is past the end — {agents.page.total} agents match this
+          filter, across {pageCount(agents.page.total)} pages.{" "}
+          <Link
+            href={`/${buildQuery({ chain, sort, page: pageCount(agents.page.total) })}`}
+            className="text-accent hover:underline"
+          >
+            Go to the last page →
+          </Link>
+        </p>
+      ) : agents.items.length === 0 ? (
         <p className="mt-8 rounded-xl bg-panel p-6 text-muted">
           No agents match this filter.
         </p>
@@ -98,7 +114,7 @@ export default async function Explorer({
       <Pagination
         page={page}
         total={agents.page.total}
-        params={{ chain: sp.chain, sort: sp.sort }}
+        params={{ chain, sort }}
       />
     </>
   );

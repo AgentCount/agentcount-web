@@ -2,6 +2,11 @@ import { StatTile } from "@/components/StatTile";
 import { getMethodology, getStats } from "@/lib/api/endpoints";
 
 export const metadata = { title: "Stats — Ledgerscope" };
+// A build must not depend on the API being reachable: this page fetches live
+// data, so statically prerendering it at build time fails the whole deploy
+// if the API happens to be restarting. The fetch-level `revalidate` still
+// keeps the data fresh at request time.
+export const dynamic = "force-dynamic";
 
 export default async function StatsPage() {
   const [stats, methodology] = await Promise.all([getStats(), getMethodology()]);
@@ -63,7 +68,7 @@ export default async function StatsPage() {
 
       <p className="mt-6 text-sm text-muted">
         Liveness is measured over {methodology.liveness_window_days} days;
-        metadata counts as rotted after {methodology.rot_after_days}.
+        metadata counts as rotted after {methodology.rot_after_days} days.
       </p>
     </>
   );

@@ -8,7 +8,7 @@
     "start": "next start",
     "lint": "eslint",
     "test": "vitest run",
-    "check:api": "tsx scripts/check-api.ts"
+    "check:api": "tsx --env-file=.env.local scripts/check-api.ts"
   },
   "dependencies": {
     "next": "16.2.12",

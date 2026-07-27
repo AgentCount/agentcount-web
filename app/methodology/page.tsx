@@ -1,6 +1,11 @@
 import { getMethodology } from "@/lib/api/endpoints";
 
 export const metadata = { title: "Methodology — Ledgerscope" };
+// A build must not depend on the API being reachable: this page fetches live
+// data, so statically prerendering it at build time fails the whole deploy
+// if the API happens to be restarting. The fetch-level `revalidate` still
+// keeps the data fresh at request time.
+export const dynamic = "force-dynamic";
 
 export default async function MethodologyPage() {
   const m = await getMethodology();
