@@ -30,7 +30,7 @@ export default async function StatsPage() {
         <StatTile
           label="Metadata resolving"
           value={stats.metadata_resolving}
-          note="served a parseable agent card"
+          note="has served a parseable card at least once"
         />
         <StatTile label="Flagged agents" value={stats.flagged_agents} />
       </div>
