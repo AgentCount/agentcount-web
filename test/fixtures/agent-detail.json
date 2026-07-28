@@ -1,1 +1,88 @@
-{"summary":{"chain":"base","agent_id":2,"domain":"https://hackmoney.batikankutluer.com/api/v1/agents/668a4d86-ce86-42cb-b92a-7a10335a007d/metadata","address":"0x6f0fabebc27a866be65336cb64deef9880b5c1ac","registered_at":"2026-02-03T17:36:13Z","endpoint_alive":false,"flag_count":1,"display":{"status":"down","statement":"endpoint unreachable"}},"facts":[{"kind":"registered_since","value":{"chain":"base","registered_at":"2026-02-03T17:36:13Z"},"observed_at":"2026-02-03T17:36:13Z","evidence":[{"type":"tx","chain":"base","tx_hash":"0x78ced2729cced2572d74c0d1a756f73101b3e0118b5009e0714f073b6eaf7a04"}],"display":{"label":"Registered","statement":"since 2026-02-03T17:36:13Z on base","evidence_summary":"tx 0x78ced2729cced2572d74c0d1a756f73101b3e0118b5009e0714f073b6eaf7a04 (base)"}},{"kind":"endpoint_liveness","value":{"alive":0,"probes":1,"window_from":"2026-06-27T12:32:25.618292Z","window_to":"2026-07-27T12:32:25.618292Z"},"observed_at":"2026-07-27T12:32:25.618292Z","evidence":[{"type":"probe_window","from":"2026-06-27T12:32:25.618292Z","to":"2026-07-27T12:32:25.618292Z","probes":1}],"display":{"label":"Endpoint liveness","statement":"answered 0 of 1 probes in the last 30 days","evidence_summary":"1 archived probes"}},{"kind":"metadata_status","value":{"last_checked_at":"2026-07-27T06:59:14.292053Z","last_resolved_at":null,"snapshots_archived":1,"status":"never_resolved"},"observed_at":"2026-07-27T06:59:14.292053Z","evidence":[],"display":{"label":"Metadata","statement":"never_resolved (1 snapshots archived)","evidence_summary":""}},{"kind":"attestations","value":{"total":1},"observed_at":"2026-07-27T12:32:25.618292Z","evidence":[{"type":"registry","chain":"base"}],"display":{"label":"Attestations","statement":"1 recorded on-chain","evidence_summary":"base registry events"}},{"kind":"validation_proofs","value":{"failed":0,"passed":0,"status":"registry_unavailable"},"observed_at":"2026-07-27T12:32:25.618292Z","evidence":[{"type":"registry","chain":"base"}],"display":{"label":"Validation proofs","statement":"registry_unavailable (0 passed, 0 failed)","evidence_summary":"base registry events"}}],"flags":[{"kind":"shared_operator","evidence":{"address":"0x6f0fabebc27a866be65336cb64deef9880b5c1ac","peers":[{"agent_id":1166,"chain":"base"},{"agent_id":1167,"chain":"base"},{"agent_id":1168,"chain":"base"},{"agent_id":1169,"chain":"base"}]},"raised_at":"2026-07-27T06:59:17.220104Z","display":{"label":"shared operator","statement":"operated by the same wallet (0x6f0fabebc27a866be65336cb64deef9880b5c1ac) as 4 other agent(s)"}}]}
+{
+  "run_id": "c817ab28-8157-4925-93d6-2a6e0610020d",
+  "chain": "base",
+  "agent_id": 0,
+  "snapshot": {
+    "token_id": "0",
+    "owner": "0xa1daee3eb47f05f857aca817523f9ff11d95bd71",
+    "agent_uri": "data:application/json;base64,eyJ0eXBlIjoiZXhhbXBsZSJ9",
+    "block_number": 49220816,
+    "observed_at": "2026-07-28T09:29:42.229028Z"
+  },
+  "rungs": [
+    {
+      "rung": 1,
+      "name": "registered",
+      "status": "pass",
+      "evidence": {
+        "block_number": 49220816,
+        "chain_id": 8453,
+        "owner": "0xa1daee3eb47f05f857aca817523f9ff11d95bd71",
+        "registry": "0x8004a169fb4a3325136eb29fa0ceb6d2e539a432",
+        "token_id": "0",
+        "tx_hash": null
+      },
+      "checked_at": "2026-07-28T09:29:42.228636Z"
+    },
+    {
+      "rung": 2,
+      "name": "resolvable",
+      "status": "pass",
+      "evidence": {
+        "bytes": 446,
+        "inline": true,
+        "scheme": "data",
+        "uri": "data:application/json;base64,eyJ0eXBlIjoiZXhhbXBsZSJ9"
+      },
+      "checked_at": "2026-07-28T09:29:42.228636Z"
+    },
+    {
+      "rung": 3,
+      "name": "parseable",
+      "status": "pass",
+      "evidence": {
+        "body_bytes": 446,
+        "body_sha256": "21b1efef0087737aa2847e6b2cc7398e44b23a5aa523ce71e353469baec690f5",
+        "content_type": null
+      },
+      "checked_at": "2026-07-28T09:29:42.228636Z"
+    },
+    {
+      "rung": 4,
+      "name": "conformant",
+      "status": "pass",
+      "evidence": {
+        "fields_found": ["type", "name", "description", "image", "services", "x402Support", "active"],
+        "fields_missing": [],
+        "registrations_checked": 1,
+        "spec_commit": "68fc6765761a10fb26f0692df21c8a6f9d12b1be"
+      },
+      "checked_at": "2026-07-28T09:29:42.228636Z"
+    },
+    {
+      "rung": 5,
+      "name": "bound",
+      "status": "pass",
+      "evidence": {
+        "declared_agent_id": 0,
+        "declared_chain": 8453,
+        "declared_registry": "eip155:8453:0x8004A169FB4a3325136EB29fA0ceB6D2e539a432",
+        "match": true,
+        "registrations_seen": 1
+      },
+      "checked_at": "2026-07-28T09:29:42.228636Z"
+    }
+  ],
+  "archive": {
+    "scheme": "data",
+    "request_url": null,
+    "final_url": null,
+    "http_status": null,
+    "content_type": null,
+    "body_bytes": 446,
+    "body_sha256": "21b1efef0087737aa2847e6b2cc7398e44b23a5aa523ce71e353469baec690f5",
+    "truncated": false,
+    "error": null,
+    "elapsed_ms": 0
+  }
+}

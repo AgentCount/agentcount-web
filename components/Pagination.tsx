@@ -8,7 +8,7 @@ export function Pagination({
 }: {
   page: number;
   total: number;
-  params: Record<string, string | undefined>;
+  params: Record<string, string | number | undefined>;
 }) {
   const last = pageCount(total);
   const href = (p: number) => `/${buildQuery({ ...params, page: p })}`;

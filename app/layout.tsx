@@ -5,7 +5,7 @@ import "./globals.css";
 export const metadata: Metadata = {
   title: "Ledgerscope",
   description:
-    "Independently verified facts about every agent registered under ERC-8004.",
+    "An ERC-8004 conformance census: seven rungs per agent, evidence attached, no score.",
 };
 
 export default function RootLayout({
@@ -22,7 +22,7 @@ export default function RootLayout({
           </Link>
           <nav className="flex gap-4 text-muted">
             <Link href="/" className="hover:text-text">
-              Explorer
+              Directory
             </Link>
             <Link href="/stats" className="hover:text-text">
               Stats
@@ -35,8 +35,8 @@ export default function RootLayout({
         <main className="mx-auto max-w-5xl px-6 py-8">{children}</main>
         <footer className="mx-auto mt-12 max-w-5xl border-t border-line px-6 pt-4 pb-8 text-sm text-muted">
           <p>
-            Ledgerscope — measurements, not judgments. Every claim on this site
-            carries the evidence behind it.
+            Ledgerscope — a conformance census, not a score. Every rung on this
+            site carries the evidence behind it.
           </p>
         </footer>
       </body>

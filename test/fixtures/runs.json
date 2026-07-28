@@ -1,0 +1,41 @@
+[
+  {
+    "run_id": "1c87c4f4-c4c4-45ee-b03a-d8517f4d5d8a",
+    "chain": "base",
+    "pinned_block": 49230618,
+    "started_at": "2026-07-28T14:56:24.984598Z",
+    "finished_at": null,
+    "agent_count": null,
+    "schema_version": 1,
+    "checker_version": "0.2.0",
+    "checker_commit": "6ffb9da8a03063051fe7253d70bcfdd2432b8cd7",
+    "spec_commit": "68fc6765761a10fb26f0692df21c8a6f9d12b1be",
+    "rerun_command": "cargo run -p sweeper -- base   # at block 49230618"
+  },
+  {
+    "run_id": "c817ab28-8157-4925-93d6-2a6e0610020d",
+    "chain": "base",
+    "pinned_block": 49220816,
+    "started_at": "2026-07-28T09:29:39.674369Z",
+    "finished_at": "2026-07-28T12:19:15.931941Z",
+    "agent_count": 60037,
+    "schema_version": 1,
+    "checker_version": "0.2.0",
+    "checker_commit": "96a9bef1a45a7830a25665b0f3b33aad0aa5e447",
+    "spec_commit": "68fc6765761a10fb26f0692df21c8a6f9d12b1be",
+    "rerun_command": "cargo run -p sweeper -- base   # at block 49220816"
+  },
+  {
+    "run_id": "7a0755a0-18f3-4133-94a2-81f3f765bfb2",
+    "chain": "base",
+    "pinned_block": null,
+    "started_at": "2026-07-27T20:31:01.112638Z",
+    "finished_at": "2026-07-27T20:31:05.182331Z",
+    "agent_count": 25,
+    "schema_version": 1,
+    "checker_version": "0.2.0",
+    "checker_commit": "4c60118021497d4e743b66953bd8e5a3a0f44bf6-dirty",
+    "spec_commit": "68fc6765761a10fb26f0692df21c8a6f9d12b1be",
+    "rerun_command": "SWEEP_MAX_AGENTS=25 cargo run -p sweeper -- base   # at block 49197457"
+  }
+]

@@ -1,1 +1,22 @@
-{"liveness_window_days":30,"rot_after_days":7}
+{
+  "spec_commit": "68fc6765761a10fb26f0692df21c8a6f9d12b1be",
+  "checker_version": "0.2.0",
+  "schema_version": 1,
+  "rung4_required_fields": [
+    { "field": "type", "condition": "unconditional" },
+    { "field": "name", "condition": "unconditional" },
+    { "field": "description", "condition": "unconditional" },
+    { "field": "image", "condition": "unconditional" },
+    { "field": "services", "condition": "unconditional" },
+    { "field": "x402Support", "condition": "unconditional" },
+    { "field": "active", "condition": "unconditional" },
+    {
+      "field": "registrations[].agentId",
+      "condition": "required within each entry, when `registrations` is present"
+    },
+    {
+      "field": "registrations[].agentRegistry",
+      "condition": "required within each entry, when `registrations` is present"
+    }
+  ]
+}
