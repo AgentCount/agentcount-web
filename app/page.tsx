@@ -2,6 +2,7 @@ import Link from "next/link";
 import { AgentTable } from "@/components/AgentTable";
 import { CountTile, FindingTile } from "@/components/FindingTile";
 import { RunProvenance } from "@/components/RunProvenance";
+import { Section } from "@/components/Section";
 import { StatusLegend } from "@/components/StatusLegend";
 import {
   getFindings,
@@ -12,7 +13,6 @@ import {
   statusVocabulary,
 } from "@/lib/api/endpoints";
 import type { Finding } from "@/lib/api/schemas";
-import { BRAND } from "@/lib/brand";
 
 // A build must not depend on the API being reachable: this page fetches live
 // data, so statically prerendering it at build time fails the whole deploy if
@@ -62,113 +62,153 @@ export default async function Home({
 
   return (
     <>
-      <h1 className="sr-only">{BRAND.name}</h1>
-      <p className="max-w-prose leading-relaxed text-muted">
-        An independent conformance census of every ERC-8004 agent on{" "}
-        {run.chain}. Seven questions per agent, the evidence behind every
-        answer, and no score anywhere — what the seven answers add up to is the
-        reader&rsquo;s call, not ours.
-      </p>
+      {/* The masthead states the scope and the pinned block on one line — the
+          two facts that qualify every number below it. */}
+      <header className="border-b border-edge pb-6">
+        <h1 className="numeral max-w-[18ch] text-[clamp(2rem,4.2vw,3.25rem)] text-text">
+          What we found when we checked every ERC-8004 agent on {run.chain}
+        </h1>
+        <div className="mt-5 flex flex-wrap items-baseline gap-x-6 gap-y-2 font-mono text-xs text-dead">
+          <span>
+            <span className="text-muted">
+              {run.agent_count?.toLocaleString("en-US") ?? "—"}
+            </span>{" "}
+            agents
+          </span>
+          <span className="text-line">|</span>
+          <span>
+            block{" "}
+            <span className="text-muted">
+              {run.pinned_block !== null
+                ? run.pinned_block.toLocaleString("en-US")
+                : "—"}
+            </span>
+          </span>
+          <span className="text-line">|</span>
+          <span>
+            run <span className="text-muted">{run.run_id.slice(0, 8)}</span>
+          </span>
+          <span className="text-line">|</span>
+          <span>no score, no ranking, no aggregate</span>
+        </div>
+      </header>
 
-      <section aria-label="What this run found" className="mt-8">
-        <div className="grid grid-cols-1 gap-8 md:grid-cols-2 xl:grid-cols-4">
-          <FindingTile finding={unreachable}>
+      <section aria-label="What this run found" className="mt-12">
+        <div className="grid grid-cols-1 gap-x-10 gap-y-12 md:grid-cols-2 xl:grid-cols-4">
+          <FindingTile index={1} finding={unreachable}>
             of valid registration documents declare no way to reach the agent —
-            no <code className="rounded bg-panel px-1">services</code> entry at
+            no <code className="font-mono text-text">services</code> entry at
             all, or one with nothing in it.
           </FindingTile>
 
-          <FindingTile finding={unclaimed}>
+          <FindingTile index={2} finding={unclaimed}>
             of conforming documents never say which agent they belong to. The
             registration entry that would bind a document to its on-chain id is
             only recommended, so most omit it and rung 5 records{" "}
-            <em>unclaimed</em> — neither a pass nor a fail.
+            <em className="not-italic text-claim">unclaimed</em> — neither a
+            pass nor a fail.
           </FindingTile>
 
-          <FindingTile finding={attested}>
+          <FindingTile index={3} finding={attested}>
             have at least one on-chain feedback entry — and those agents are{" "}
-            <em>less</em> likely to have a document that resolves than agents
-            with none: {pct(attestedResolvable)} against{" "}
-            {pct(unattestedResolvable)}.
+            <em className="not-italic text-text">less</em> likely to have a
+            document that resolves than agents with none:{" "}
+            {pct(attestedResolvable)} against {pct(unattestedResolvable)}.
           </FindingTile>
 
           <CountTile
+            index={4}
             value={mustCount}
-            source={`spec commit ${methodology.spec_commit.slice(0, 12)}, checker ${methodology.checker_version}`}
+            source={`spec ${methodology.spec_commit.slice(0, 12)} · checker ${methodology.checker_version}`}
           >
             the number of MUST requirements ERC-8004 places on a registration
             file
             {allConditional && (
               <>
-                {mustCount === 1 ? " — and it is conditional" : " — all of them conditional"},
-                so a document that omits{" "}
-                <code className="rounded bg-panel px-1">registrations</code>{" "}
+                {mustCount === 1
+                  ? " — and it is conditional"
+                  : " — all of them conditional"}
+                , so a document that omits{" "}
+                <code className="font-mono text-text">registrations</code>{" "}
                 entirely has nothing it must do at all.
               </>
             )}
           </CountTile>
         </div>
 
-        <p className="mt-8 max-w-prose text-sm leading-relaxed text-muted">
+        <p className="mt-12 max-w-prose border-l-2 border-edge pl-5 text-sm leading-relaxed text-muted">
           On that third number: a separate investigation sampled 300 of the{" "}
-          {attested.numerator.toLocaleString("en-US")} agents carrying feedback
+          {attested.numerator.toLocaleString("en-US")}
+          {" agents carrying feedback "}
           and read the Reputation Registry directly at this run&rsquo;s pinned
           block. It estimates that one client address accounts for 42–53% of
           them, and six addresses for the large majority. That is a{" "}
-          <strong className="text-text">sample with a confidence interval</strong>
-          , not a count like the four numbers above — which is exactly why it is
+          <span className="text-text">sample with a confidence interval</span>,
+          not a count like the four numbers above — which is exactly why it is
           not printed as one.
         </p>
       </section>
 
-      <section aria-label="What a directory row looks like" className="mt-14">
-        <h2 className="text-sm font-semibold uppercase tracking-wide text-muted">
-          Every agent, seven rungs, side by side
-        </h2>
-        <p className="mt-1 max-w-prose text-sm leading-relaxed text-muted">
-          The first three agents in the registry, exactly as the directory
-          renders them. A rung with no row was never reached this run — rung 6
-          is not yet implemented, so it reads as not checked for everyone,
-          never as a failure.
-        </p>
-        <div className="mt-3 max-w-4xl">
-          <AgentTable agents={sample.items} />
-        </div>
-        <div className="mt-3 max-w-4xl">
+      <Section
+        title="One agent, seven rungs"
+        aside="first three in the registry"
+        className="mt-20 max-w-5xl"
+        intro={
+          <>
+            Exactly as the directory renders them. A rung with no row was never
+            reached this run — rung 6 is not yet implemented, so it reads as
+            not checked for everyone, never as a failure.
+          </>
+        }
+      >
+        <AgentTable agents={sample.items} />
+        <div className="mt-5">
           <StatusLegend statuses={statusVocabulary(rates)} />
         </div>
-        <p className="mt-4 text-sm">
-          <Link href="/directory" className="text-accent hover:underline">
+        <p className="mt-6 flex flex-wrap gap-x-8 gap-y-2 font-mono text-xs uppercase tracking-[0.1em]">
+          <Link
+            href="/directory"
+            className="text-muted underline decoration-line underline-offset-4 transition-colors hover:text-text hover:decoration-edge"
+          >
             Search all {run.agent_count?.toLocaleString("en-US") ?? ""} agents →
           </Link>
-          <span className="mx-3 text-dead">·</span>
-          <Link href="/working" className="text-accent hover:underline">
-            Agents that passed every check we run →
+          <Link
+            href="/working"
+            className="text-muted underline decoration-line underline-offset-4 transition-colors hover:text-text hover:decoration-edge"
+          >
+            Agents that passed every check →
           </Link>
         </p>
-      </section>
+      </Section>
 
-      <section aria-label="Run provenance" className="mt-14 max-w-4xl">
-        <h2 className="text-sm font-semibold uppercase tracking-wide text-muted">
-          This run
-        </h2>
-        <p className="mt-1 max-w-prose text-sm leading-relaxed text-muted">
-          Every number on this page comes from one sweep, pinned to one block.
-          The command below reproduces it.
-        </p>
-        <div className="mt-3 rounded-lg border border-line bg-panel/60 px-4 py-3">
-          <RunProvenance run={run} />
-        </div>
-        <p className="mt-4 text-sm">
-          <Link href="/census" className="text-accent hover:underline">
-            Base rates for every rung →
+      <Section
+        title="Provenance"
+        aside="reproducible"
+        className="mt-20 max-w-3xl"
+        intro={
+          <>
+            Every number on this page comes from one sweep, pinned to one
+            block. A result you cannot recompute is an opinion; this is the
+            command that recomputes it.
+          </>
+        }
+      >
+        <RunProvenance run={run} />
+        <p className="mt-6 flex flex-wrap gap-x-8 gap-y-2 font-mono text-xs uppercase tracking-[0.1em]">
+          <Link
+            href="/census"
+            className="text-muted underline decoration-line underline-offset-4 transition-colors hover:text-text hover:decoration-edge"
+          >
+            Base rates per rung →
           </Link>
-          <span className="mx-3 text-dead">·</span>
-          <Link href="/methodology" className="text-accent hover:underline">
-            Methodology →
+          <Link
+            href="/methodology"
+            className="text-muted underline decoration-line underline-offset-4 transition-colors hover:text-text hover:decoration-edge"
+          >
+            How each rung is measured →
           </Link>
         </p>
-      </section>
+      </Section>
     </>
   );
 }

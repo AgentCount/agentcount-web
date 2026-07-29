@@ -82,19 +82,38 @@ export async function AgentDirectory({
 
   return (
     <>
-      <h1 className="text-2xl font-bold">{title}</h1>
-      <div className="mt-2 max-w-prose text-sm leading-relaxed text-muted">{intro}</div>
-
-      <p className="mt-2 font-mono text-xs text-dead">
-        run {run.run_id.slice(0, 8)}… · {run.chain} · block{" "}
-        {run.pinned_block !== null ? run.pinned_block.toLocaleString("en-US") : "—"} ·{" "}
-        <Link href="/census" className="text-accent hover:underline">
-          provenance
-        </Link>
-      </p>
+      <header className="border-b border-edge pb-5">
+        <h1 className="numeral max-w-[24ch] text-[clamp(1.75rem,3.2vw,2.5rem)] text-text">
+          {title}
+        </h1>
+        <div className="mt-4 max-w-prose text-sm leading-relaxed text-muted">{intro}</div>
+        <p className="mt-4 flex flex-wrap items-baseline gap-x-5 gap-y-1 font-mono text-xs text-dead">
+          <span>
+            run <span className="text-muted">{run.run_id.slice(0, 8)}</span>
+          </span>
+          <span className="text-line">|</span>
+          <span className="text-muted">{run.chain}</span>
+          <span className="text-line">|</span>
+          <span>
+            block{" "}
+            <span className="text-muted">
+              {run.pinned_block !== null
+                ? run.pinned_block.toLocaleString("en-US")
+                : "—"}
+            </span>
+          </span>
+          <span className="text-line">|</span>
+          <Link
+            href="/census"
+            className="underline decoration-line underline-offset-4 transition-colors hover:text-text"
+          >
+            provenance
+          </Link>
+        </p>
+      </header>
 
       {!lockedFacets && (
-        <div className="mt-5 max-w-5xl">
+        <div className="mt-6 max-w-5xl">
           <DirectoryControls
             rates={rates}
             facets={facets}
@@ -105,23 +124,21 @@ export async function AgentDirectory({
         </div>
       )}
 
-      <div className="mt-5">
-        <StatusLegend statuses={validStatuses} />
-      </div>
-
       {agents.items.length === 0 ? (
-        <p className="mt-6 rounded-lg border border-line bg-panel/60 px-4 py-6 text-muted">
-          No agents match this filter in run {run.run_id.slice(0, 8)}….{" "}
+        <p className="mt-8 max-w-prose border-l-2 border-edge pl-5 text-sm leading-relaxed text-muted">
+          No agents match this filter in run {run.run_id.slice(0, 8)}.{" "}
           {facets.length > 0 && (
             <>
               Every one of the {facets.length} rung conditions has to hold at
-              once ({serialiseFacets(facets)}).
+              once (
+              <span className="font-mono text-text">{serialiseFacets(facets)}</span>
+              ).
             </>
           )}
         </p>
       ) : (
         <>
-          <div className="mt-5">
+          <div className="mt-8">
             <AgentTable agents={agents.items} />
           </div>
           <div className="mt-5">
@@ -132,10 +149,17 @@ export async function AgentDirectory({
               basePath={basePath}
             />
           </div>
+          <div className="mt-8 max-w-5xl">
+            <StatusLegend statuses={validStatuses} />
+          </div>
         </>
       )}
 
-      {footer && <div className="mt-8 max-w-prose text-sm text-muted">{footer}</div>}
+      {footer && (
+        <div className="mt-10 max-w-prose border-l-2 border-edge pl-5 text-sm leading-relaxed text-muted">
+          {footer}
+        </div>
+      )}
     </>
   );
 }

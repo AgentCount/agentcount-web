@@ -19,15 +19,15 @@ import { BRAND } from "@/lib/brand";
  */
 export default function Error({ error }: { error: Error & { digest?: string } }) {
   return (
-    <div className="rounded-xl bg-panel p-8">
-      <h1 className="text-xl font-bold">This page could not be loaded</h1>
-      <p className="mt-2 max-w-2xl text-muted">
+    <div className="max-w-prose border-l-2 border-fail/40 pl-6">
+      <h1 className="numeral text-3xl text-text">This page could not be loaded</h1>
+      <p className="mt-3 text-sm leading-relaxed text-muted">
         The site did not get an answer it could use from the {BRAND.name} API —
         either the API is down, or it answered in a shape this site does not
         recognise. The server log says which.
       </p>
       {error.digest && (
-        <p className="mt-4 text-sm text-dead">Reference: {error.digest}</p>
+        <p className="mt-5 font-mono text-xs text-dead">Reference: {error.digest}</p>
       )}
     </div>
   );

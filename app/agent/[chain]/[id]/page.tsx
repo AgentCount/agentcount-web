@@ -4,6 +4,7 @@ import { notFound } from "next/navigation";
 import { RungLadder } from "@/components/RungLadder";
 import { RungStrip } from "@/components/RungStrip";
 import { RunProvenance } from "@/components/RunProvenance";
+import { Section } from "@/components/Section";
 import { StatusLegend } from "@/components/StatusLegend";
 import {
   getAgent,
@@ -98,137 +99,160 @@ export default async function AgentDetail({
 
   return (
     <>
-      <div className="max-w-5xl">
-        {/* Identity is the document's own name, falling back to the id — never
-            the URI, which is frequently a multi-kilobyte base64 blob or an
-            empty string and makes an unreadable headline. */}
-        <h1 className="text-2xl font-bold">
-          {agent.name ?? <span className="text-muted">Agent #{agent.agent_id}</span>}
-        </h1>
-        <p className="mt-1 font-mono text-sm text-muted">
-          {agent.chain} · id {agent.agent_id} · owner {snapshot.owner}
-        </p>
+      {/* Identity is the document's own name, falling back to the id — never
+          the URI, which is frequently a multi-kilobyte base64 blob or an empty
+          string and makes an unreadable headline. */}
+      <header className="border-b border-edge pb-6">
+        <div className="flex flex-wrap items-end justify-between gap-x-10 gap-y-6">
+          <div className="min-w-0">
+            <span className="label">Agent</span>
+            <h1 className="numeral mt-2 max-w-[20ch] break-words text-[clamp(2rem,4vw,3rem)] text-text">
+              {agent.name ?? (
+                <span className="font-mono text-dead">Agent #{agent.agent_id}</span>
+              )}
+            </h1>
+            <p className="mt-3 flex flex-wrap items-baseline gap-x-5 gap-y-1 font-mono text-xs text-dead">
+              <span className="text-muted">{agent.chain}</span>
+              <span className="text-line">|</span>
+              <span>
+                id <span className="text-muted">{agent.agent_id}</span>
+              </span>
+              <span className="text-line">|</span>
+              <span className="break-all">
+                owner <span className="text-muted">{snapshot.owner}</span>
+              </span>
+            </p>
+          </div>
+
+          {/* The strip is the headline here — the one thing someone following
+              a shared link came to read. */}
+          <div>
+            <span className="label">Rungs 1–7</span>
+            <div className="mt-2">
+              <RungStrip rungs={agent.rungs} size="md" />
+            </div>
+          </div>
+        </div>
+
         {agent.description && (
-          <p className="mt-3 max-w-prose text-sm leading-relaxed text-muted">
+          <p className="mt-6 max-w-prose text-sm leading-relaxed text-muted">
             {agent.description}
           </p>
         )}
 
-        <div className="mt-4">
-          <RungStrip rungs={agent.rungs} size="md" />
-        </div>
-        <div className="mt-4">
+        <div className="mt-6 max-w-5xl">
           <StatusLegend statuses={statusVocabulary(rates)} />
         </div>
-      </div>
+      </header>
 
-      <div className="mt-8 grid grid-cols-1 gap-8 xl:grid-cols-[minmax(0,2fr)_minmax(0,1fr)]">
-        <section aria-label="The seven rungs">
-          <h2 className="text-sm font-semibold uppercase tracking-wide text-muted">
-            The seven rungs, with their evidence
-          </h2>
-          <p className="mt-1 max-w-prose text-sm leading-relaxed text-muted">
-            Every field the checker recorded, rendered in full rather than
-            summarised, with the timestamp it was recorded at.
-          </p>
-          <div className="mt-3">
-            <RungLadder rungs={agent.rungs} />
-          </div>
-        </section>
+      <div className="mt-10 grid grid-cols-1 gap-x-14 gap-y-16 xl:grid-cols-[minmax(0,1.9fr)_minmax(0,1fr)]">
+        <Section
+          title="The seven rungs, with their evidence"
+          aside={`${agent.rungs.length} recorded`}
+          intro={
+            <>
+              Every field the checker recorded, rendered in full rather than
+              summarised, with the timestamp it was recorded at.
+            </>
+          }
+        >
+          <RungLadder rungs={agent.rungs} />
+        </Section>
 
-        <div className="space-y-8">
-          <section aria-label="On-chain snapshot">
-            <h2 className="text-sm font-semibold uppercase tracking-wide text-muted">
-              On-chain snapshot
-            </h2>
-            <dl className="mt-3 grid grid-cols-[max-content_1fr] gap-x-4 gap-y-1 rounded-lg border border-line bg-panel/60 px-4 py-3 text-sm">
-              <dt className="text-muted">token id</dt>
-              <dd className="font-mono text-xs">{snapshot.token_id}</dd>
-              <dt className="text-muted">owner</dt>
-              <dd className="break-all font-mono text-xs">{snapshot.owner}</dd>
-              <dt className="text-muted">block</dt>
-              <dd className="font-mono text-xs tabular-nums">
+        <div className="space-y-16">
+          <Section title="On-chain snapshot" aside={agent.chain}>
+            <dl className="grid grid-cols-1 sm:grid-cols-[7.5rem_1fr]">
+              <dt className="label border-t border-line py-2 sm:pr-4">token id</dt>
+              <dd className="border-line pb-2 font-mono text-xs text-muted sm:border-t sm:py-2">
+                {snapshot.token_id}
+              </dd>
+              <dt className="label border-t border-line py-2 sm:pr-4">owner</dt>
+              <dd className="break-all border-line pb-2 font-mono text-xs text-muted sm:border-t sm:py-2">
+                {snapshot.owner}
+              </dd>
+              <dt className="label border-t border-line py-2 sm:pr-4">block</dt>
+              <dd className="border-line pb-2 font-mono text-xs text-muted sm:border-t sm:py-2">
                 {snapshot.block_number.toLocaleString("en-US")}
               </dd>
-              <dt className="text-muted">observed at</dt>
-              <dd className="font-mono text-xs">{snapshot.observed_at}</dd>
+              <dt className="label border-t border-line py-2 sm:pr-4">observed</dt>
+              <dd className="border-line pb-2 font-mono text-xs text-muted sm:border-t sm:py-2">
+                {snapshot.observed_at}
+              </dd>
             </dl>
-            <p className="mt-3 text-sm text-muted">tokenURI</p>
-            <div className="mt-1 max-h-40 overflow-auto break-all rounded-lg border border-line bg-panel/60 px-3 py-2 font-mono text-xs text-muted">
-              {snapshot.agent_uri || <span className="italic">(empty)</span>}
+            <div className="mt-4 border-t border-line pt-3">
+              <span className="label">tokenURI</span>
+              <div className="mt-2 max-h-40 overflow-auto break-all border-l-2 border-edge bg-panel px-3 py-2 font-mono text-xs text-muted">
+                {snapshot.agent_uri || <span className="text-dead">(empty)</span>}
+              </div>
             </div>
-          </section>
+          </Section>
 
-          <section aria-label="HTTP archive">
-            <h2 className="text-sm font-semibold uppercase tracking-wide text-muted">
-              What the fetch saw
-            </h2>
+          <Section
+            title="What the fetch saw"
+            aside={archive?.scheme ?? "no archive"}
+          >
             {archive === null ? (
-              <p className="mt-3 rounded-lg border border-line bg-panel/60 px-4 py-3 text-sm text-muted">
+              <p className="border-l-2 border-edge pl-4 text-sm text-muted">
                 No archive row exists for this agent in this run.
               </p>
             ) : (
-              <dl className="mt-3 grid grid-cols-[max-content_1fr] gap-x-4 gap-y-1 rounded-lg border border-line bg-panel/60 px-4 py-3 text-sm">
-                <dt className="text-muted">scheme</dt>
-                <dd className="font-mono text-xs">{archive.scheme}</dd>
-                <dt className="text-muted">request URL</dt>
-                <dd className="break-all font-mono text-xs">
-                  {archive.request_url ?? "—"}
-                </dd>
-                <dt className="text-muted">final URL</dt>
-                <dd className="break-all font-mono text-xs">
-                  {archive.final_url ?? "—"}
-                </dd>
-                <dt className="text-muted">HTTP status</dt>
-                <dd className="font-mono text-xs">{archive.http_status ?? "—"}</dd>
-                <dt className="text-muted">content type</dt>
-                <dd className="break-all font-mono text-xs">
-                  {archive.content_type ?? "—"}
-                </dd>
-                <dt className="text-muted">size</dt>
-                <dd className="font-mono text-xs tabular-nums">
-                  {archive.body_bytes !== null
-                    ? `${archive.body_bytes.toLocaleString("en-US")} bytes`
-                    : "—"}
-                  {archive.truncated ? " (truncated)" : ""}
-                </dd>
-                <dt className="text-muted">sha256</dt>
-                <dd className="break-all font-mono text-xs">
-                  {archive.body_sha256 ?? "—"}
-                </dd>
-                <dt className="text-muted">elapsed</dt>
-                <dd className="font-mono text-xs tabular-nums">
-                  {archive.elapsed_ms !== null
-                    ? `${archive.elapsed_ms.toLocaleString("en-US")} ms`
-                    : "—"}
-                </dd>
-                {archive.error && (
-                  <>
-                    <dt className="text-muted">error</dt>
-                    <dd className="break-all font-mono text-xs">{archive.error}</dd>
-                  </>
-                )}
+              <dl className="grid grid-cols-1 sm:grid-cols-[7.5rem_1fr]">
+                {(
+                  [
+                    ["scheme", archive.scheme],
+                    ["request url", archive.request_url ?? "—"],
+                    ["final url", archive.final_url ?? "—"],
+                    ["http status", archive.http_status?.toString() ?? "—"],
+                    ["content type", archive.content_type ?? "—"],
+                    [
+                      "size",
+                      archive.body_bytes !== null
+                        ? `${archive.body_bytes.toLocaleString("en-US")} bytes${
+                            archive.truncated ? " (truncated)" : ""
+                          }`
+                        : "—",
+                    ],
+                    ["sha256", archive.body_sha256 ?? "—"],
+                    [
+                      "elapsed",
+                      archive.elapsed_ms !== null
+                        ? `${archive.elapsed_ms.toLocaleString("en-US")} ms`
+                        : "—",
+                    ],
+                    ...(archive.error ? [["error", archive.error] as const] : []),
+                  ] as [string, string][]
+                ).map(([label, value]) => (
+                  <div key={label} className="contents">
+                    <dt className="label border-t border-line py-2 sm:pr-4">{label}</dt>
+                    <dd className="break-all border-line pb-2 font-mono text-xs text-muted sm:border-t sm:py-2">
+                      {value}
+                    </dd>
+                  </div>
+                ))}
               </dl>
             )}
-          </section>
+          </Section>
 
-          <section aria-label="Run provenance">
-            <h2 className="text-sm font-semibold uppercase tracking-wide text-muted">
-              This run
-            </h2>
-            <p className="mt-1 text-sm leading-relaxed text-muted">
-              Every status above is scoped to this sweep, at this block. Rerun
-              it and you should get these answers back.
-            </p>
-            <div className="mt-3 rounded-lg border border-line bg-panel/60 px-4 py-3">
-              <RunProvenance run={run} />
-            </div>
-            <p className="mt-3 text-sm">
-              <Link href="/methodology" className="text-accent hover:underline">
+          <Section
+            title="This run"
+            aside="reproducible"
+            intro={
+              <>
+                Every status above is scoped to this sweep, at this block.
+                Rerun it and you should get these answers back.
+              </>
+            }
+          >
+            <RunProvenance run={run} />
+            <p className="mt-6">
+              <Link
+                href="/methodology"
+                className="font-mono text-xs uppercase tracking-[0.1em] text-muted underline decoration-line underline-offset-4 transition-colors hover:text-text hover:decoration-edge"
+              >
                 What each rung measures →
               </Link>
             </p>
-          </section>
+          </Section>
         </div>
       </div>
     </>

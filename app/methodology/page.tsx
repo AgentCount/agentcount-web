@@ -12,7 +12,7 @@ export default async function MethodologyPage() {
 
   return (
     <>
-      <h1 className="text-2xl font-bold">What we measure</h1>
+      <h1 className="numeral text-[clamp(1.75rem,3.2vw,2.5rem)] text-text">What we measure</h1>
 
       {/* The summary block. Five bullets, before the long-form detail, for the
           reader who arrived from a shared agent link and wants to know what
@@ -21,11 +21,9 @@ export default async function MethodologyPage() {
           arrives sooner. */}
       <section
         aria-label="In short"
-        className="mt-4 max-w-prose rounded-lg border border-line bg-panel/60 px-5 py-4"
+        className="mt-8 max-w-prose border-l-2 border-edge pl-6"
       >
-        <h2 className="text-sm font-semibold uppercase tracking-wide text-muted">
-          In short
-        </h2>
+        <h2 className="label">In short</h2>
         <ul className="mt-3 list-disc space-y-2 pl-5 text-sm leading-relaxed">
           <li>
             Every agent registered under ERC-8004 gets the{" "}
@@ -70,39 +68,39 @@ export default async function MethodologyPage() {
         Reaching your own conclusion from the seven answers is the point.
       </p>
 
-      <section className="mt-6 rounded-xl bg-panel p-6">
-        <h2 className="text-lg font-semibold">The seven rungs</h2>
-        <dl className="mt-2 space-y-4">
-          <div>
-            <dt className="font-semibold text-muted">1 · registered</dt>
-            <dd>
+      <section className="mt-14 max-w-4xl">
+        <h2 className="font-mono text-sm uppercase tracking-[0.12em] text-text">The seven rungs</h2>
+        <dl className="mt-4">
+          <div className="grid grid-cols-1 gap-x-8 border-t border-line py-4 sm:grid-cols-[10rem_1fr]">
+            <dt className="font-mono text-xs uppercase tracking-[0.1em] text-muted">1 · registered</dt>
+            <dd className="mt-2 max-w-prose text-sm leading-relaxed text-muted sm:mt-0">
               The agent id exists in the on-chain Identity Registry with an
-              <code className="mx-1 rounded bg-bg px-1">agentURI</code>
+              <code className="mx-1 font-mono text-text">agentURI</code>
               recorded against it.
             </dd>
           </div>
-          <div>
-            <dt className="font-semibold text-muted">2 · resolvable</dt>
-            <dd>
+          <div className="grid grid-cols-1 gap-x-8 border-t border-line py-4 sm:grid-cols-[10rem_1fr]">
+            <dt className="font-mono text-xs uppercase tracking-[0.1em] text-muted">2 · resolvable</dt>
+            <dd className="mt-2 max-w-prose text-sm leading-relaxed text-muted sm:mt-0">
               That URI can be fetched and returns a body — a strict 2xx over
-              HTTP, or a successfully decoded <code className="rounded bg-bg px-1">data:</code> URI.
+              HTTP, or a successfully decoded <code className="font-mono text-text">data:</code> URI.
               An HTTP 402 does not count as resolving.
             </dd>
           </div>
-          <div>
-            <dt className="font-semibold text-muted">3 · parseable</dt>
-            <dd>The fetched body parses as JSON.</dd>
+          <div className="grid grid-cols-1 gap-x-8 border-t border-line py-4 sm:grid-cols-[10rem_1fr]">
+            <dt className="font-mono text-xs uppercase tracking-[0.1em] text-muted">3 · parseable</dt>
+            <dd className="mt-2 max-w-prose text-sm leading-relaxed text-muted sm:mt-0">The fetched body parses as JSON.</dd>
           </div>
-          <div>
-            <dt className="font-semibold text-muted">4 · conformant</dt>
-            <dd>
+          <div className="grid grid-cols-1 gap-x-8 border-t border-line py-4 sm:grid-cols-[10rem_1fr]">
+            <dt className="font-mono text-xs uppercase tracking-[0.1em] text-muted">4 · conformant</dt>
+            <dd className="mt-2 max-w-prose text-sm leading-relaxed text-muted sm:mt-0">
               The parsed document contains every field the spec pinned below
               requires — see the exact list underneath.
             </dd>
           </div>
-          <div>
-            <dt className="font-semibold text-muted">5 · bound</dt>
-            <dd>
+          <div className="grid grid-cols-1 gap-x-8 border-t border-line py-4 sm:grid-cols-[10rem_1fr]">
+            <dt className="font-mono text-xs uppercase tracking-[0.1em] text-muted">5 · bound</dt>
+            <dd className="mt-2 max-w-prose text-sm leading-relaxed text-muted sm:mt-0">
               The document&rsquo;s own registration entry names the same agent
               id, registry, and chain that the on-chain lookup used to find
               it — the card and the registry entry agree about who this is.
@@ -113,19 +111,19 @@ export default async function MethodologyPage() {
               means&rdquo; below.
             </dd>
           </div>
-          <div>
-            <dt className="font-semibold text-muted">6 · live</dt>
-            <dd>
+          <div className="grid grid-cols-1 gap-x-8 border-t border-line py-4 sm:grid-cols-[10rem_1fr]">
+            <dt className="font-mono text-xs uppercase tracking-[0.1em] text-muted">6 · live</dt>
+            <dd className="mt-2 max-w-prose text-sm leading-relaxed text-muted sm:mt-0">
               Whether the endpoints the card declares in{" "}
-              <code className="rounded bg-bg px-1">services[]</code> actually
+              <code className="font-mono text-text">services[]</code> actually
               respond. Not yet implemented — every agent currently shows no
               row for this rung, rendered on this site as &ldquo;not
               checked&rdquo;, never as a guessed status.
             </dd>
           </div>
-          <div>
-            <dt className="font-semibold text-muted">7 · attested</dt>
-            <dd>
+          <div className="grid grid-cols-1 gap-x-8 border-t border-line py-4 sm:grid-cols-[10rem_1fr]">
+            <dt className="font-mono text-xs uppercase tracking-[0.1em] text-muted">7 · attested</dt>
+            <dd className="mt-2 max-w-prose text-sm leading-relaxed text-muted sm:mt-0">
               Whether this agent has received at least one Reputation
               Registry feedback entry, from any client address at all.
               Runs for every agent that passes rung 1 — it does not depend on
@@ -139,7 +137,7 @@ export default async function MethodologyPage() {
               impossible to submit in the first place, so there is nothing
               here for this rung to detect. It answers only &ldquo;did anyone
               at all vouch for this agent&rdquo;, not &ldquo;was it
-              independent&rdquo; — renamed from <code className="rounded bg-bg px-1">independent</code> on
+              independent&rdquo; — renamed from <code className="font-mono text-text">independent</code> on
               2026-07-29 for exactly that reason.
             </dd>
           </div>
@@ -151,19 +149,19 @@ export default async function MethodologyPage() {
           sending when rung 4 was split by RFC 2119 severity — so every load of
           this page threw a ContractError and showed the error panel instead.
           Every list below is read from the API, never restated here. */}
-      <section className="mt-6 rounded-xl bg-panel p-6">
-        <h2 className="text-lg font-semibold">
+      <section className="mt-14 max-w-4xl">
+        <h2 className="font-mono text-sm uppercase tracking-[0.12em] text-text">
           Rung 4&rsquo;s fields, by severity
         </h2>
         <p className="mt-2 max-w-prose text-muted">
           The spec invokes RFC 2119, so MUST, SHOULD and MAY are three
           different promises and rung 4 keeps them apart. Pinned against spec
           commit{" "}
-          <code className="break-all rounded bg-bg px-1 text-sm">{m.spec_commit}</code>
+          <code className="break-all font-mono text-xs text-text">{m.spec_commit}</code>
           , checker version {m.checker_version} (schema {m.schema_version}).
         </p>
 
-        <h3 className="mt-5 font-semibold">
+        <h3 className="mt-7 font-mono text-xs uppercase tracking-[0.12em] text-muted">
           MUST — the only fields whose absence fails the rung
         </h3>
         <p className="mt-1 max-w-prose text-sm text-muted">
@@ -174,11 +172,11 @@ export default async function MethodologyPage() {
         </p>
         <table className="mt-3 w-full border-collapse text-left text-sm">
           <thead>
-            <tr className="text-xs uppercase tracking-wide text-muted">
-              <th scope="col" className="border-b border-line px-3 py-2 font-semibold">
+            <tr >
+              <th scope="col" className="label border-b border-edge px-3 py-2 font-normal">
                 Field
               </th>
-              <th scope="col" className="border-b border-line px-3 py-2 font-semibold">
+              <th scope="col" className="label border-b border-edge px-3 py-2 font-normal">
                 Condition
               </th>
             </tr>
@@ -186,10 +184,10 @@ export default async function MethodologyPage() {
           <tbody>
             {m.rung4_must_fields.map((f) => (
               <tr key={f.field}>
-                <td className="border-b border-line px-3 py-2 font-mono text-xs">
+                <td className="border-b border-line px-3 py-2 font-mono text-xs text-text">
                   {f.field}
                 </td>
-                <td className="border-b border-line px-3 py-2 text-muted">
+                <td className="border-b border-line px-3 py-2 text-sm text-muted">
                   {f.condition}
                 </td>
               </tr>
@@ -197,26 +195,26 @@ export default async function MethodologyPage() {
           </tbody>
         </table>
 
-        <h3 className="mt-6 font-semibold">
+        <h3 className="mt-8 font-mono text-xs uppercase tracking-[0.12em] text-muted">
           SHOULD — recorded as a gap, never a failure
         </h3>
         <ul className="mt-2 flex flex-wrap gap-2">
           {m.rung4_should_fields.map((f) => (
             <li
               key={f}
-              className="rounded border border-line px-2 py-0.5 font-mono text-xs text-muted"
+              className="border border-line px-2 py-0.5 font-mono text-[0.6875rem] text-muted"
             >
               {f}
             </li>
           ))}
         </ul>
 
-        <h3 className="mt-6 font-semibold">MAY — purely informational</h3>
+        <h3 className="mt-8 font-mono text-xs uppercase tracking-[0.12em] text-muted">MAY — purely informational</h3>
         <ul className="mt-2 flex flex-wrap gap-2">
           {m.rung4_may_fields.map((f) => (
             <li
               key={f}
-              className="rounded border border-line px-2 py-0.5 font-mono text-xs text-muted"
+              className="border border-line px-2 py-0.5 font-mono text-[0.6875rem] text-muted"
             >
               {f}
             </li>
@@ -224,8 +222,8 @@ export default async function MethodologyPage() {
         </ul>
       </section>
 
-      <section className="mt-6 rounded-xl bg-panel p-6">
-        <h2 className="text-lg font-semibold">What a status means</h2>
+      <section className="mt-14 max-w-4xl">
+        <h2 className="font-mono text-sm uppercase tracking-[0.12em] text-text">What a status means</h2>
         <p className="mt-2 text-muted">
           Each rung answers with one of a small fixed vocabulary, always in
           the checker&rsquo;s own words: <em>pass</em>, <em>fail</em>,{" "}
@@ -255,8 +253,8 @@ export default async function MethodologyPage() {
         </p>
       </section>
 
-      <section className="mt-6 rounded-xl bg-panel p-6">
-        <h2 className="text-lg font-semibold">What this does not tell you</h2>
+      <section className="mt-14 max-w-4xl">
+        <h2 className="font-mono text-sm uppercase tracking-[0.12em] text-text">What this does not tell you</h2>
         <p className="mt-2 text-muted">
           A pass on every rung is not a safety guarantee, and a fail is not
           proof of bad intent — the rungs measure conformance to a spec, not

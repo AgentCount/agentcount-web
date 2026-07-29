@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { RateBar } from "@/components/RateBar";
 import { RunProvenance } from "@/components/RunProvenance";
+import { Section } from "@/components/Section";
 import { StatusLegend } from "@/components/StatusLegend";
 import { getRates, resolveRun, statusVocabulary } from "@/lib/api/endpoints";
 
@@ -21,45 +22,60 @@ export default async function CensusPage({
 
   return (
     <>
-      <h1 className="text-2xl font-bold">Census</h1>
-      <p className="mt-2 max-w-prose leading-relaxed text-muted">
-        Base rates per rung. Every agent gets the same seven questions; these
-        are population counts, not a score for any one of them. A rung&rsquo;s
-        segments never sum to the whole population when an earlier failure
-        stopped the pipeline — that gap is drawn as its own &ldquo;not
-        checked&rdquo; segment rather than folded into whichever status happens
-        to render widest.
-      </p>
-
-      <div className="mt-5 max-w-5xl">
-        <StatusLegend statuses={statusVocabulary(rates)} />
-      </div>
-
-      <section className="mt-6 max-w-5xl space-y-7">
-        {rates.rungs.map((r) => (
-          <RateBar key={r.rung} rung={r} total={rates.agent_count} />
-        ))}
-      </section>
-
-      <section className="mt-12 max-w-4xl">
-        <h2 className="text-lg font-semibold">Provenance</h2>
-        <p className="mt-1 max-w-prose text-sm leading-relaxed text-muted">
-          A result you cannot recompute is an opinion. This is everything
-          needed to recompute the numbers above.
+      <header className="border-b border-edge pb-5">
+        <h1 className="numeral text-[clamp(1.75rem,3.2vw,2.5rem)] text-text">Census</h1>
+        <p className="mt-4 max-w-prose text-sm leading-relaxed text-muted">
+          Base rates per rung. Every agent gets the same seven questions; these
+          are population counts, not a score for any one of them. A rung&rsquo;s
+          segments never sum to the whole population when an earlier failure
+          stopped the pipeline — that gap is drawn as its own &ldquo;not
+          checked&rdquo; segment rather than folded into whichever status
+          happens to render widest.
         </p>
-        <div className="mt-3 rounded-lg border border-line bg-panel/60 px-4 py-3">
-          <RunProvenance run={run} />
+      </header>
+
+      <Section
+        title="Base rates"
+        aside={`${rates.rungs.length} of 7 rungs implemented`}
+        className="mt-10 max-w-5xl"
+      >
+        <div className="space-y-8">
+          {rates.rungs.map((r) => (
+            <RateBar key={r.rung} rung={r} total={rates.agent_count} />
+          ))}
         </div>
-        <p className="mt-4 text-sm">
-          <Link href="/methodology" className="text-accent hover:underline">
+        <div className="mt-10">
+          <StatusLegend statuses={statusVocabulary(rates)} />
+        </div>
+      </Section>
+
+      <Section
+        title="Provenance"
+        aside="reproducible"
+        className="mt-20 max-w-3xl"
+        intro={
+          <>
+            A result you cannot recompute is an opinion. This is everything
+            needed to recompute the numbers above.
+          </>
+        }
+      >
+        <RunProvenance run={run} />
+        <p className="mt-6 flex flex-wrap gap-x-8 gap-y-2 font-mono text-xs uppercase tracking-[0.1em]">
+          <Link
+            href="/methodology"
+            className="text-muted underline decoration-line underline-offset-4 transition-colors hover:text-text hover:decoration-edge"
+          >
             What each rung measures →
           </Link>
-          <span className="mx-3 text-dead">·</span>
-          <Link href="/directory" className="text-accent hover:underline">
+          <Link
+            href="/directory"
+            className="text-muted underline decoration-line underline-offset-4 transition-colors hover:text-text hover:decoration-edge"
+          >
             Browse the agents behind these counts →
           </Link>
         </p>
-      </section>
+      </Section>
     </>
   );
 }

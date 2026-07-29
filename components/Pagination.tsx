@@ -23,25 +23,41 @@ export function Pagination({
   const last = pageCount(total);
   const href = (p: number) => `${basePath}${buildQuery({ ...params, page: p })}`;
 
+  const step = "font-mono text-xs uppercase tracking-[0.1em]";
+
   return (
-    <nav aria-label="Pagination" className="flex items-center justify-between text-sm">
+    <nav
+      aria-label="Pagination"
+      className="flex items-center justify-between border-t border-edge pt-3"
+    >
       {page > 1 ? (
-        <Link href={href(page - 1)} rel="prev" className="text-accent hover:underline">
-          ← Previous
+        <Link
+          href={href(page - 1)}
+          rel="prev"
+          className={`${step} text-muted transition-colors hover:text-text`}
+        >
+          ← Prev
         </Link>
       ) : (
-        <span className="text-dead">← Previous</span>
+        <span className={`${step} text-dead`}>← Prev</span>
       )}
-      <span className="tabular-nums text-muted">
-        Page {page.toLocaleString("en-US")} of {last.toLocaleString("en-US")} ·{" "}
-        {total.toLocaleString("en-US")} agents
+      <span className="font-mono text-xs text-dead">
+        <span className="text-text">{page.toLocaleString("en-US")}</span>
+        <span className="mx-1.5">/</span>
+        {last.toLocaleString("en-US")}
+        <span className="mx-2.5 text-line">|</span>
+        <span className="text-muted">{total.toLocaleString("en-US")}</span> agents
       </span>
       {page < last ? (
-        <Link href={href(page + 1)} rel="next" className="text-accent hover:underline">
+        <Link
+          href={href(page + 1)}
+          rel="next"
+          className={`${step} text-muted transition-colors hover:text-text`}
+        >
           Next →
         </Link>
       ) : (
-        <span className="text-dead">Next →</span>
+        <span className={`${step} text-dead`}>Next →</span>
       )}
     </nav>
   );

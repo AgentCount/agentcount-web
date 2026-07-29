@@ -1,7 +1,7 @@
 import Link from "next/link";
 import type { RungFacet } from "@/lib/api/endpoints";
 import type { Rates } from "@/lib/api/schemas";
-import { statusClasses, statusGlyph, statusLabel } from "@/lib/status";
+import { statusClasses, statusGlyph, statusInkClass, statusLabel } from "@/lib/status";
 
 /**
  * Search and rung-facet filtering, as one plain GET form.
@@ -12,7 +12,7 @@ import { statusClasses, statusGlyph, statusLabel } from "@/lib/status";
  * URL-encoded so a filtered view is linkable"), and which a client-side filter
  * would have had to reimplement.
  *
- * ## The grid is built from the run's own rates
+ * ## The grid is a control panel, and it is built from the run's own rates
  *
  * Rows are the rungs this run reported; columns are the statuses that rung
  * actually produced. Nothing is typed here. Two consequences worth keeping:
@@ -23,6 +23,10 @@ import { statusClasses, statusGlyph, statusLabel } from "@/lib/status";
  *   * A checkbox can never offer a status the API would reject, and a status
  *     the checker starts producing tomorrow appears here with no code change —
  *     `unclaimed` did exactly that on 2026-07-29.
+ *
+ * A ticked box takes that status's colour, which is the one place the
+ * interface borrows the data's palette — because the control IS a status, not
+ * chrome about one.
  *
  * The count beside each checkbox is population data straight from the rates
  * endpoint. It tells a reader how big a filter's result will be before they
@@ -47,50 +51,52 @@ export function DirectoryControls({
   const hasFilter = facets.length > 0 || q.length > 0;
 
   return (
-    <form method="get" action={action} className="rounded-lg border border-line bg-panel/60">
+    <form method="get" action={action} className="border border-edge bg-panel/40">
       <input type="hidden" name="run" value={run} />
 
-      <div className="flex flex-wrap items-center gap-3 border-b border-line px-4 py-3">
-        <label className="flex flex-1 items-center gap-2 min-w-64">
-          <span className="text-xs font-semibold uppercase tracking-wide text-muted">
-            Search
-          </span>
+      <div className="flex flex-wrap items-center gap-x-4 gap-y-3 border-b border-line px-4 py-3">
+        <label className="flex min-w-72 flex-1 items-center gap-3">
+          <span className="label">Find</span>
           <input
             type="search"
             name="q"
             defaultValue={q}
             placeholder="name, description, or owner address"
-            className="w-full rounded border border-line bg-bg px-3 py-1.5 text-sm placeholder:text-dead focus:border-accent focus:outline-none"
+            className="w-full border-b border-line bg-transparent pb-1 font-mono text-sm text-text placeholder:text-dead focus:border-edge focus:outline-none"
           />
         </label>
         <button
           type="submit"
-          className="rounded border border-accent px-4 py-1.5 text-sm text-accent hover:bg-accent/10"
+          className="border border-edge px-4 py-1.5 font-mono text-xs uppercase tracking-[0.1em] text-text transition-colors hover:bg-raised"
         >
           Apply
         </button>
         {hasFilter && (
           <Link
             href={`${action}?run=${run}`}
-            className="text-sm text-muted hover:text-text"
+            className="font-mono text-xs uppercase tracking-[0.1em] text-dead transition-colors hover:text-text"
           >
-            Clear
+            Reset
           </Link>
         )}
       </div>
 
       <fieldset className="px-4 py-3">
-        <legend className="text-xs font-semibold uppercase tracking-wide text-muted">
-          Rung filters
-          <span className="ml-2 font-normal normal-case tracking-normal text-dead">
-            every box ticked must hold — tick nothing to see all agents
+        <legend className="sr-only">Rung filters</legend>
+        <div className="mb-2 flex items-baseline gap-3">
+          <span className="label">Rungs</span>
+          <span className="text-[0.6875rem] text-dead">
+            every ticked box must hold — tick nothing to see all agents
           </span>
-        </legend>
-        <div className="mt-2 space-y-1">
+        </div>
+        <div className="space-y-px">
           {rates.rungs.map((r) => (
-            <div key={r.rung} className="flex flex-wrap items-baseline gap-x-3 gap-y-1">
-              <span className="w-40 shrink-0 font-mono text-xs text-muted">
-                {r.rung} · {r.name}
+            <div
+              key={r.rung}
+              className="flex flex-wrap items-center gap-x-2 gap-y-1 border-t border-line/60 py-1.5"
+            >
+              <span className="w-36 shrink-0 font-mono text-[0.6875rem] uppercase tracking-[0.08em] text-muted">
+                <span className="text-dead">{r.rung}</span> {r.name}
               </span>
               {r.counts.map((c) => {
                 const value = `${r.rung}:${c.status}`;
@@ -99,8 +105,15 @@ export function DirectoryControls({
                   <label
                     key={c.status}
                     title={`rung ${r.rung}, ${r.name}: ${statusLabel(c.status)}`}
-                    className={`inline-flex cursor-pointer items-center gap-1.5 rounded border px-2 py-0.5 text-xs ${
-                      isOn ? statusClasses(c.status) : "border-line text-muted hover:border-dead"
+                    // The input itself is `sr-only` — the chip IS the control,
+                    // and a native checkbox beside it would be a second thing
+                    // to look at. `has-[:focus-visible]` puts the focus ring
+                    // back on the label, so keyboard focus stays visible even
+                    // though the box it belongs to is not.
+                    className={`inline-flex cursor-pointer items-baseline gap-1.5 border px-2 py-0.5 font-mono text-[0.6875rem] transition-colors has-[:focus-visible]:outline has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-accent ${
+                      isOn
+                        ? `${statusClasses(c.status)} bg-raised`
+                        : "border-line text-dead hover:border-edge hover:text-muted"
                     }`}
                   >
                     <input
@@ -108,13 +121,16 @@ export function DirectoryControls({
                       name="facet"
                       value={value}
                       defaultChecked={isOn}
-                      className="h-3 w-3 accent-accent"
+                      className="sr-only"
                     />
-                    <span aria-hidden="true" className="font-mono">
+                    <span
+                      aria-hidden="true"
+                      className={isOn ? "" : statusInkClass(c.status)}
+                    >
                       {statusGlyph(c.status)}
                     </span>
                     <span>{c.status}</span>
-                    <span className="tabular-nums text-dead">
+                    <span className={isOn ? "opacity-70" : "text-dead"}>
                       {c.count.toLocaleString("en-US")}
                     </span>
                   </label>

@@ -37,15 +37,18 @@ export const contentType = "image/png";
 export const alt = "Conformance record: seven rungs, with the status of each";
 
 const COLOR = {
-  bg: "#0f1115",
-  panel: "#1a1d24",
-  line: "#262a33",
-  text: "#e6e6e6",
-  muted: "#9aa0aa",
-  live: "#3fb950",
-  dead: "#6e7681",
-  warn: "#d29922",
-  fail: "#f85149",
+  bg: "#08090b",
+  panel: "#101317",
+  line: "#1c2128",
+  edge: "#2b323b",
+  text: "#e8e4dc",
+  muted: "#99a0a9",
+  dead: "#5f666f",
+  live: "#3ddc84",
+  fail: "#ff5f56",
+  warn: "#f2b035",
+  dim: "#646c78",
+  claim: "#8b9ac4",
 };
 
 function statusColor(status: string | undefined): string {
@@ -57,7 +60,9 @@ function statusColor(status: string | undefined): string {
     case "error":
       return COLOR.warn;
     case "skipped":
-      return COLOR.dead;
+      return COLOR.dim;
+    case "unclaimed":
+      return COLOR.claim;
     default:
       return COLOR.muted;
   }
@@ -138,7 +143,7 @@ export default async function Image({
           {/* One interpolation, not three text nodes: Satori throws on any
               element that has multiple children without `display: flex`, and
               `{chain} - id {id}` is three children. */}
-          <div style={{ fontSize: 28, color: COLOR.muted, marginTop: 12 }}>
+          <div style={{ fontSize: 28, color: COLOR.dead, marginTop: 14 }}>
             {`${chain} - id ${id}`}
           </div>
         </div>
@@ -159,7 +164,7 @@ export default async function Image({
                     gap: 4,
                     width: 132,
                     height: 108,
-                    borderRadius: 10,
+                    borderRadius: 2,
                     border: `3px ${r ? "solid" : "dashed"} ${color}`,
                     background: COLOR.panel,
                     color,
@@ -179,7 +184,7 @@ export default async function Image({
               justifyContent: "space-between",
               marginTop: 28,
               paddingTop: 20,
-              borderTop: `2px solid ${COLOR.line}`,
+              borderTop: `1px solid ${COLOR.edge}`,
               fontSize: 24,
               color: COLOR.muted,
             }}
