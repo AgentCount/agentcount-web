@@ -2,9 +2,11 @@
 
 The Ledgerscope frontend: a Next.js App Router site that renders an ERC-8004
 conformance census. Every agent gets seven rungs — `registered`,
-`resolvable`, `parseable`, `conformant`, `bound`, `live`, `independent` —
-each `pass` / `fail` / `skipped` / `error`, with structured evidence. **There
-is no score, grade, tier, or ranking anywhere in this product.** That is the
+`resolvable`, `parseable`, `conformant`, `bound`, `live`, `attested`
+(renamed from `independent` 2026-07-29) — each `pass` / `fail` / `skipped` /
+`error`, and — `bound` only, added 2026-07-29 — `unclaimed`, with structured
+evidence. **There is no score, grade, tier, or ranking anywhere in this
+product.** That is the
 whole differentiation from every competitor that compresses an agent to a
 single 0–100 number, and this UI must never smuggle one back in — no "N of 7
 passed", no per-agent percentage, no sort by how many rungs passed.
