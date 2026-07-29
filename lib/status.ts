@@ -136,7 +136,11 @@ export function statusBgClasses(status: string): string {
  * differs from every solid-bordered status by outline as well as by glyph. */
 export const notCheckedClasses = "border-dashed border-line text-dead";
 export const NOT_CHECKED_GLYPH = "·";
-export const NOT_CHECKED_LABEL = "not checked — this run never reached this rung";
+// Worded to be true wherever it appears. The census means "this run never
+// reached it"; the pre-flight checker means "a draft cannot answer it". Both
+// are "never asked", and the specific reason is carried per rung by
+// `RungLadder`'s `notApplicable`.
+export const NOT_CHECKED_LABEL = "not checked — this rung was never asked";
 
 /**
  * A repeating-stripe overlay for the rate bars, so a stacked bar is readable

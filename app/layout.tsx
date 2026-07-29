@@ -46,6 +46,7 @@ const NAV = [
   { href: "/", label: "Findings" },
   { href: "/directory", label: "Directory" },
   { href: "/working", label: "Working" },
+  { href: "/preflight", label: "Pre-flight" },
   { href: "/census", label: "Census" },
   { href: "/methodology", label: "Method" },
 ];

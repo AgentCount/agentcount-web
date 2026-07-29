@@ -206,6 +206,42 @@ export type RungDetail = z.infer<typeof rungDetailSchema>;
 export type Snapshot = z.infer<typeof snapshotSchema>;
 export type Archive = z.infer<typeof archiveSchema>;
 export type AgentDetail = z.infer<typeof agentDetailSchema>;
+/**
+ * The pre-flight checker's answer.
+ *
+ * `rungs` carries only the rungs that could be asked of a draft — a rung
+ * ABSENT from it was not checked, which is the same vocabulary the census uses
+ * for a rung a run never reached. `not_applicable` says why each absent one is
+ * absent, in the API's words rather than this app's.
+ */
+export const validateRungSchema = z.object({
+  rung: z.number(),
+  name: z.string(),
+  status: z.string(),
+  evidence: z.record(z.string(), z.unknown()),
+  checked_at: z.string(),
+});
+
+export const notApplicableSchema = z.object({
+  rung: z.number(),
+  name: z.string(),
+  reason: z.string(),
+});
+
+export const validateResponseSchema = z.object({
+  checker_version: z.string(),
+  schema_version: z.number(),
+  spec_commit: z.string(),
+  body_bytes: z.number(),
+  body_sha256: z.string(),
+  rungs: z.array(validateRungSchema),
+  not_applicable: z.array(notApplicableSchema),
+});
+
+export type ValidateRung = z.infer<typeof validateRungSchema>;
+export type NotApplicable = z.infer<typeof notApplicableSchema>;
+export type ValidateResponse = z.infer<typeof validateResponseSchema>;
+
 export type Rung4Field = z.infer<typeof rung4FieldSchema>;
 export type MustRequirement = z.infer<typeof mustRequirementSchema>;
 export type Methodology = z.infer<typeof methodologySchema>;

@@ -25,13 +25,33 @@ const LADDER_SIZE = 7;
  * show, and it is exactly the granularity an argument about an agent tends to
  * need.
  */
-export function RungLadder({ rungs, chain }: { rungs: RungDetail[]; chain: string }) {
+export function RungLadder({
+  rungs,
+  chain,
+  notApplicable,
+}: {
+  rungs: RungDetail[];
+  chain: string;
+  /**
+   * Why a rung is absent, in the API's own words, when the caller knows.
+   *
+   * The census's reason for an absent rung ("this run never reached it") is
+   * not the pre-flight checker's reason ("no on-chain agent id exists until
+   * the document is minted") — there is no run and no agent in that context.
+   * Rather than have this component guess which situation it is in, the caller
+   * passes the reasons it was given. Absent → the census wording, which is the
+   * only case that existed before.
+   */
+  notApplicable?: { rung: number; name: string; reason: string }[];
+}) {
   const byRung = new Map(rungs.map((r) => [r.rung, r]));
+  const naByRung = new Map((notApplicable ?? []).map((n) => [n.rung, n]));
 
   return (
     <ol>
       {Array.from({ length: LADDER_SIZE }, (_, i) => i + 1).map((n) => {
         const r = byRung.get(n);
+        const na = naByRung.get(n);
         const label = r ? statusLabel(r.status) : NOT_CHECKED_LABEL;
         return (
           <li
@@ -49,7 +69,7 @@ export function RungLadder({ rungs, chain }: { rungs: RungDetail[]; chain: strin
             <div className="min-w-0">
               <div className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-2">
                 <h3 className="font-mono text-sm uppercase tracking-[0.1em] text-text">
-                  {r ? r.name : "—"}
+                  {r?.name ?? na?.name ?? "—"}
                 </h3>
                 <span
                   title={label}
@@ -74,7 +94,7 @@ export function RungLadder({ rungs, chain }: { rungs: RungDetail[]; chain: strin
                 </>
               ) : (
                 <p className="mt-3 text-sm text-muted">
-                  This run never reached this rung for this agent.
+                  {na?.reason ?? "This run never reached this rung for this agent."}
                 </p>
               )}
             </div>

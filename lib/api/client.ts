@@ -19,6 +19,18 @@ export class UpstreamError extends Error {
   }
 }
 
+/**
+ * The caller's input was rejected, and the API said why in words meant for a
+ * human. Distinct from `UpstreamError`: nothing is wrong with the service, and
+ * showing "the API may be down" for a malformed paste would be a lie.
+ */
+export class SubmissionError extends Error {
+  constructor(message: string) {
+    super(message);
+    this.name = "SubmissionError";
+  }
+}
+
 export class ContractError extends Error {
   constructor(
     readonly path: string,
@@ -75,6 +87,59 @@ export async function get<T>(
 
   const body = await res.json();
   const parsed = schema.safeParse(body);
+  if (!parsed.success) {
+    const issues = parsed.error.issues
+      .map((i) => `${i.path.join(".") || "(root)"}: ${i.message}`)
+      .join("; ");
+    console.error(`[ledgerscope] contract mismatch on ${path}`, parsed.error.issues);
+    throw new ContractError(path, issues);
+  }
+  return parsed.data;
+}
+
+/**
+ * POST a raw body and validate the JSON reply.
+ *
+ * Separate from `get` rather than a flag on it: this is the only write-shaped
+ * call the app makes, it never caches, and its body is bytes the caller
+ * supplied rather than anything this app constructed. Keeping the two apart
+ * means the read path cannot accidentally grow a body.
+ */
+export async function postRaw<T>(
+  path: string,
+  body: string,
+  schema: ZodType<T>,
+): Promise<T> {
+  const url = `${baseUrl()}${path}`;
+  let res: Response;
+  try {
+    res = await fetch(url, {
+      method: "POST",
+      // text/plain, not application/json: the whole question rung 3 answers is
+      // whether these bytes parse, so they must reach the checker untouched.
+      headers: { "content-type": "text/plain" },
+      body,
+      cache: "no-store",
+      signal: AbortSignal.timeout(8000),
+    });
+  } catch (e) {
+    if (e instanceof Error && e.name === "TimeoutError") {
+      throw new UpstreamError(`the ${BRAND.name} API at ${url} did not answer in time`);
+    }
+    throw new UpstreamError(`could not reach the ${BRAND.name} API at ${url}`);
+  }
+
+  // 400 is the API telling us the SUBMISSION is wrong, not that the API is
+  // broken — it carries a message meant for the person who pasted the
+  // document, so it is surfaced rather than swallowed as an upstream fault.
+  if (res.status === 400) {
+    throw new SubmissionError((await res.text()).trim());
+  }
+  if (!res.ok) {
+    throw new UpstreamError(`the ${BRAND.name} API returned ${res.status}`, res.status);
+  }
+
+  const parsed = schema.safeParse(await res.json());
   if (!parsed.success) {
     const issues = parsed.error.issues
       .map((i) => `${i.path.join(".") || "(root)"}: ${i.message}`)

@@ -2,7 +2,7 @@
  * One function per endpoint. Pages call these, never `get()` directly, so the
  * URL shapes and their schemas stay paired in one file.
  */
-import { get } from "./client";
+import { get, postRaw } from "./client";
 import {
   agentDetailSchema,
   agentPageSchema,
@@ -10,12 +10,14 @@ import {
   methodologySchema,
   ratesSchema,
   runsSchema,
+  validateResponseSchema,
   type AgentDetail,
   type AgentPage,
   type Findings,
   type Methodology,
   type Rates,
   type Run,
+  type ValidateResponse,
 } from "./schemas";
 
 export { pingApi } from "./client";
@@ -163,6 +165,33 @@ export function statusVocabulary(rates: Rates): string[] {
   return Array.from(
     new Set(rates.rungs.flatMap((r) => r.counts.map((c) => c.status))),
   ).sort();
+}
+
+/** The identity a builder intends to register under. All three or none — the
+ * API rejects a partial one rather than half-applying it. */
+export type IntendedIdentity = {
+  agentId: string;
+  chainId: string;
+  registry: string;
+};
+
+/**
+ * Judge a draft registration document. Rung 5 is only answered when an
+ * intended identity is supplied; without one the API omits that rung entirely
+ * and the UI renders it "not checked", same as any rung a run never reached.
+ */
+export async function validateDocument(
+  document: string,
+  intended?: IntendedIdentity,
+): Promise<ValidateResponse> {
+  const q = new URLSearchParams();
+  if (intended) {
+    q.set("agent_id", intended.agentId);
+    q.set("chain_id", intended.chainId);
+    q.set("registry", intended.registry);
+  }
+  const qs = q.toString();
+  return postRaw(`/api/validate${qs ? `?${qs}` : ""}`, document, validateResponseSchema);
 }
 
 /** Cached for an hour — `spec_commit` and the field list change only when the
