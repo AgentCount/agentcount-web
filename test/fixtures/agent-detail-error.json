@@ -1,63 +1,95 @@
 {
-  "run_id": "c817ab28-8157-4925-93d6-2a6e0610020d",
-  "chain": "base",
-  "agent_id": 1179,
-  "snapshot": {
-    "token_id": "1179",
-    "owner": "0x2911d75eaa80c5aac5d98f654efa335644b84422",
-    "agent_uri": "https://entity0.com/.well-known/agent-registration.json",
-    "block_number": 49220816,
-    "observed_at": "2026-07-28T09:31:50.034138Z"
-  },
-  "rungs": [
-    {
-      "rung": 1,
-      "name": "registered",
-      "status": "pass",
-      "evidence": {
-        "block_number": 49220816,
-        "chain_id": 8453,
-        "owner": "0x2911d75eaa80c5aac5d98f654efa335644b84422",
-        "registry": "0x8004a169fb4a3325136eb29fa0ceb6d2e539a432",
+    "run_id": "cfbfcc01-fdaf-409f-9bed-abf706d865c7",
+    "chain": "base",
+    "agent_id": 1179,
+    "name": null,
+    "description": null,
+    "snapshot": {
         "token_id": "1179",
-        "tx_hash": null
-      },
-      "checked_at": "2026-07-28T09:31:50.033625Z"
+        "owner": "0x2911d75eaa80c5aac5d98f654efa335644b84422",
+        "agent_uri": "https://entity0.com/.well-known/agent-registration.json",
+        "block_number": 49262617,
+        "observed_at": "2026-07-29T08:47:27.001147Z"
     },
-    {
-      "rung": 2,
-      "name": "resolvable",
-      "status": "error",
-      "evidence": {
-        "elapsed_ms": 5052,
-        "reason": "robots_unavailable: timeout fetching robots.txt",
-        "request_url": "https://entity0.com/.well-known/agent-registration.json",
+    "rungs": [
+        {
+            "rung": 1,
+            "name": "registered",
+            "status": "pass",
+            "evidence": {
+                "block_number": 49262617,
+                "chain_id": 8453,
+                "owner": "0x2911d75eaa80c5aac5d98f654efa335644b84422",
+                "registry": "0x8004a169fb4a3325136eb29fa0ceb6d2e539a432",
+                "token_id": "1179",
+                "tx_hash": null
+            },
+            "checked_at": "2026-07-29T08:47:26.863186Z"
+        },
+        {
+            "rung": 2,
+            "name": "resolvable",
+            "status": "error",
+            "evidence": {
+                "elapsed_ms": 6128,
+                "reason": "robots_unavailable: timeout fetching robots.txt",
+                "request_url": "https://entity0.com/.well-known/agent-registration.json",
+                "scheme": "https",
+                "uri": "https://entity0.com/.well-known/agent-registration.json"
+            },
+            "checked_at": "2026-07-29T08:47:26.863186Z"
+        },
+        {
+            "rung": 3,
+            "name": "parseable",
+            "status": "skipped",
+            "evidence": {
+                "skipped_because_rung": 2,
+                "skipped_because_status": "error"
+            },
+            "checked_at": "2026-07-29T08:47:26.863186Z"
+        },
+        {
+            "rung": 4,
+            "name": "conformant",
+            "status": "skipped",
+            "evidence": {
+                "skipped_because_rung": 2,
+                "skipped_because_status": "error"
+            },
+            "checked_at": "2026-07-29T08:47:26.863186Z"
+        },
+        {
+            "rung": 5,
+            "name": "bound",
+            "status": "skipped",
+            "evidence": {
+                "skipped_because_rung": 2,
+                "skipped_because_status": "error"
+            },
+            "checked_at": "2026-07-29T08:47:26.863186Z"
+        },
+        {
+            "rung": 7,
+            "name": "attested",
+            "status": "pass",
+            "evidence": {
+                "distinct_authors": 2,
+                "feedback_count": 6
+            },
+            "checked_at": "2026-07-29T08:47:26.863186Z"
+        }
+    ],
+    "archive": {
         "scheme": "https",
-        "uri": "https://entity0.com/.well-known/agent-registration.json"
-      },
-      "checked_at": "2026-07-28T09:31:50.033625Z"
-    },
-    {
-      "rung": 3,
-      "name": "parseable",
-      "status": "skipped",
-      "evidence": {
-        "skipped_because_rung": 2,
-        "skipped_because_status": "error"
-      },
-      "checked_at": "2026-07-28T09:31:50.033625Z"
+        "request_url": "https://entity0.com/.well-known/agent-registration.json",
+        "final_url": null,
+        "http_status": null,
+        "content_type": null,
+        "body_bytes": null,
+        "body_sha256": null,
+        "truncated": false,
+        "error": "robots_unavailable: timeout fetching robots.txt",
+        "elapsed_ms": 6128
     }
-  ],
-  "archive": {
-    "scheme": "https",
-    "request_url": "https://entity0.com/.well-known/agent-registration.json",
-    "final_url": null,
-    "http_status": null,
-    "content_type": null,
-    "body_bytes": null,
-    "body_sha256": null,
-    "truncated": false,
-    "error": "robots_unavailable: timeout fetching robots.txt",
-    "elapsed_ms": 5052
-  }
 }

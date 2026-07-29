@@ -1,5 +1,7 @@
 "use client";
 
+import { BRAND } from "@/lib/brand";
+
 /**
  * The only client component in this app — Next requires it for error
  * boundaries. It used to branch on `error.message` to tell "the API is
@@ -20,7 +22,7 @@ export default function Error({ error }: { error: Error & { digest?: string } })
     <div className="rounded-xl bg-panel p-8">
       <h1 className="text-xl font-bold">This page could not be loaded</h1>
       <p className="mt-2 max-w-2xl text-muted">
-        The site did not get an answer it could use from the Ledgerscope API —
+        The site did not get an answer it could use from the {BRAND.name} API —
         either the API is down, or it answered in a shape this site does not
         recognise. The server log says which.
       </p>

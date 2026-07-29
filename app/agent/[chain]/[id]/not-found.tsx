@@ -8,8 +8,8 @@ export default function NotFound() {
         Nothing is registered under that chain and id — or it has not been
         indexed yet.
       </p>
-      <Link href="/" className="mt-4 inline-block text-accent hover:underline">
-        ← Back to the explorer
+      <Link href="/directory" className="mt-4 inline-block text-accent hover:underline">
+        ← Search the directory
       </Link>
     </div>
   );

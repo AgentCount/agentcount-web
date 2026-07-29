@@ -47,6 +47,10 @@ export const rateCountSchema = z.object({
 
 export const rungRateSchema = z.object({
   rung: z.number(),
+  /** The checker's own word for this rung. Read, never typed here: rung 7 was
+   * `independent` until 2026-07-29, and anything holding a literal copy would
+   * still be showing the retracted name. */
+  name: z.string(),
   counts: z.array(rateCountSchema),
 });
 
@@ -73,6 +77,10 @@ export const agentSummarySchema = z.object({
   agent_uri: z.string(),
   block_number: z.number(),
   observed_at: z.string(),
+  /** What the document called itself. `null` when it declared no usable name
+   * or never parsed — the API never sends "" and never sends a synthesised
+   * "Agent #N", so the fallback is this app's to render. */
+  name: z.string().nullable(),
   rungs: z.array(rungSummarySchema),
 });
 
@@ -111,16 +119,24 @@ export const archiveSchema = z.object({
   body_sha256: z.string().nullable(),
   truncated: z.boolean(),
   error: z.string().nullable(),
-  elapsed_ms: z.number(),
+  // `Option<i32>` in the Rust `ArchiveSummary`, so nullable here. It was
+  // declared non-nullable until 2026-07-29, which would have thrown a
+  // ContractError — and shown "the API may be down" — for any archive row
+  // that recorded no elapsed time.
+  elapsed_ms: z.number().nullable(),
 });
 
 export const agentDetailSchema = z.object({
   run_id: z.string(),
   chain: z.string(),
   agent_id: z.number(),
+  name: z.string().nullable(),
+  description: z.string().nullable(),
   snapshot: snapshotSchema,
   rungs: z.array(rungDetailSchema),
-  archive: archiveSchema,
+  // `Option<ArchiveSummary>` in Rust: an agent with no archive row at all
+  // sends `null`. Same drift as `elapsed_ms` above, same consequence.
+  archive: archiveSchema.nullable(),
 });
 
 export const rung4FieldSchema = z.object({
@@ -128,11 +144,55 @@ export const rung4FieldSchema = z.object({
   condition: z.string(),
 });
 
+/** One MUST rule from the spec, with the fields it covers. Counted as
+ * REQUIREMENTS, not fields: the current pin has one rule covering two fields,
+ * and rendering "2" would read as two unconditional obligations when there are
+ * none. The API decides this, never this app. */
+export const mustRequirementSchema = z.object({
+  requirement: z.string(),
+  fields: z.array(z.string()),
+  conditional: z.boolean(),
+});
+
+/**
+ * Rung 4's three severity buckets.
+ *
+ * This schema asked for `rung4_required_fields` until 2026-07-29 — a field the
+ * API stopped sending when P0 FIX 3 split rung 4 by RFC 2119 severity. Every
+ * load of /methodology threw a ContractError as a result. The lesson is the
+ * one this file's header already claims: a shape mismatch fails loudly and
+ * names the field, which is exactly what happened — nobody was looking.
+ */
 export const methodologySchema = z.object({
   spec_commit: z.string(),
   checker_version: z.string(),
   schema_version: z.number(),
-  rung4_required_fields: z.array(rung4FieldSchema),
+  rung4_must_fields: z.array(rung4FieldSchema),
+  rung4_should_fields: z.array(z.string()),
+  rung4_may_fields: z.array(z.string()),
+  rung4_must_requirements: z.array(mustRequirementSchema),
+});
+
+/**
+ * A headline census number, as the populations behind it.
+ *
+ * `percent` is computed by the API rather than here on purpose: a percentage
+ * derived in this app is a second implementation of the census's arithmetic,
+ * free to drift from the published report. This app formats; it does not
+ * divide. `null` when the denominator is zero — a rate over nobody is
+ * undefined, not 0%.
+ */
+export const findingSchema = z.object({
+  key: z.string(),
+  numerator: z.number(),
+  denominator: z.number(),
+  percent: z.number().nullable(),
+  denominator_label: z.string(),
+});
+
+export const findingsSchema = z.object({
+  run_id: z.string(),
+  findings: z.array(findingSchema),
 });
 
 export type Run = z.infer<typeof runSchema>;
@@ -147,4 +207,7 @@ export type Snapshot = z.infer<typeof snapshotSchema>;
 export type Archive = z.infer<typeof archiveSchema>;
 export type AgentDetail = z.infer<typeof agentDetailSchema>;
 export type Rung4Field = z.infer<typeof rung4FieldSchema>;
+export type MustRequirement = z.infer<typeof mustRequirementSchema>;
 export type Methodology = z.infer<typeof methodologySchema>;
+export type Finding = z.infer<typeof findingSchema>;
+export type Findings = z.infer<typeof findingsSchema>;

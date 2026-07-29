@@ -11,7 +11,7 @@ export default function NotFound() {
         There is nothing at that address.
       </p>
       <Link href="/" className="mt-4 inline-block text-accent hover:underline">
-        ← Back to the explorer
+        ← Back to the census
       </Link>
     </div>
   );

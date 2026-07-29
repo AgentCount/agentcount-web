@@ -1,6 +1,7 @@
 import { getMethodology } from "@/lib/api/endpoints";
+import { BRAND } from "@/lib/brand";
 
-export const metadata = { title: "Methodology — Ledgerscope" };
+export const metadata = { title: "Methodology" };
 // A build must not depend on the API being reachable: this page fetches live
 // data, so statically prerendering it at build time fails the whole deploy
 // if the API happens to be restarting.
@@ -12,8 +13,54 @@ export default async function MethodologyPage() {
   return (
     <>
       <h1 className="text-2xl font-bold">What we measure</h1>
-      <p className="mt-2 max-w-3xl text-muted">
-        Ledgerscope is a conformance census, not a rating agency. Every agent
+
+      {/* The summary block. Five bullets, before the long-form detail, for the
+          reader who arrived from a shared agent link and wants to know what
+          they are looking at without reading two thousand words first. Every
+          claim here is restated in full below — this adds no new fact, it just
+          arrives sooner. */}
+      <section
+        aria-label="In short"
+        className="mt-4 max-w-prose rounded-lg border border-line bg-panel/60 px-5 py-4"
+      >
+        <h2 className="text-sm font-semibold uppercase tracking-wide text-muted">
+          In short
+        </h2>
+        <ul className="mt-3 list-disc space-y-2 pl-5 text-sm leading-relaxed">
+          <li>
+            Every agent registered under ERC-8004 gets the{" "}
+            <strong>same seven questions</strong>, called rungs, and every
+            answer carries the evidence collected to reach it.
+          </li>
+          <li>
+            An answer is one of{" "}
+            <em>pass</em>, <em>fail</em>, <em>skipped</em>, <em>error</em>, or —
+            rung 5 only — <em>unclaimed</em>. A rung with no row at all was
+            never reached, which this site shows as{" "}
+            <strong>not checked</strong>: a different claim from any of the
+            five.
+          </li>
+          <li>
+            <strong>Rung 6 (<em>live</em>) is not implemented.</strong> It shows
+            as not checked for every agent, never as a failure — the question is
+            not being asked of anyone yet.
+          </li>
+          <li>
+            There is <strong>no score, grade, tier, or ranking</strong> anywhere
+            in this product, and no count of how many rungs an agent passed.
+            Compressing seven independent questions into one number is the move
+            this census exists to refuse.
+          </li>
+          <li>
+            Rungs measure <strong>conformance to a spec</strong> — not safety,
+            intent, or quality. Passing everything is not an endorsement, and
+            failing is not proof of bad intent.
+          </li>
+        </ul>
+      </section>
+
+      <p className="mt-6 max-w-prose leading-relaxed text-muted">
+        {BRAND.name} is a conformance census, not a rating agency. Every agent
         registered under ERC-8004 gets the same seven yes/no/skip/error
         questions, called rungs, and every answer carries the evidence the
         checker collected to reach it. There is deliberately no score, grade,
@@ -99,29 +146,82 @@ export default async function MethodologyPage() {
         </dl>
       </section>
 
+      {/* Rung 4's three severity buckets. This section read
+          `m.rung4_required_fields` until 2026-07-29 — a field the API stopped
+          sending when rung 4 was split by RFC 2119 severity — so every load of
+          this page threw a ContractError and showed the error panel instead.
+          Every list below is read from the API, never restated here. */}
       <section className="mt-6 rounded-xl bg-panel p-6">
-        <h2 className="text-lg font-semibold">Rung 4&rsquo;s required fields</h2>
-        <p className="mt-2 text-muted">
-          Pinned against spec commit{" "}
-          <code className="break-all rounded bg-bg px-1 text-sm">{m.spec_commit}</code>,
-          checker version {m.checker_version} (schema {m.schema_version}).
+        <h2 className="text-lg font-semibold">
+          Rung 4&rsquo;s fields, by severity
+        </h2>
+        <p className="mt-2 max-w-prose text-muted">
+          The spec invokes RFC 2119, so MUST, SHOULD and MAY are three
+          different promises and rung 4 keeps them apart. Pinned against spec
+          commit{" "}
+          <code className="break-all rounded bg-bg px-1 text-sm">{m.spec_commit}</code>
+          , checker version {m.checker_version} (schema {m.schema_version}).
         </p>
-        <table className="mt-4 w-full border-collapse text-left text-sm">
+
+        <h3 className="mt-5 font-semibold">
+          MUST — the only fields whose absence fails the rung
+        </h3>
+        <p className="mt-1 max-w-prose text-sm text-muted">
+          {m.rung4_must_requirements.length === 1 ? "One requirement" : `${m.rung4_must_requirements.length} requirements`}
+          {m.rung4_must_requirements.every((r) => r.conditional) &&
+            ", and conditional — a document carrying no registrations array has nothing it must do"}
+          .
+        </p>
+        <table className="mt-3 w-full border-collapse text-left text-sm">
           <thead>
             <tr className="text-xs uppercase tracking-wide text-muted">
-              <th className="border-b border-line px-3 py-2 font-semibold">Field</th>
-              <th className="border-b border-line px-3 py-2 font-semibold">Condition</th>
+              <th scope="col" className="border-b border-line px-3 py-2 font-semibold">
+                Field
+              </th>
+              <th scope="col" className="border-b border-line px-3 py-2 font-semibold">
+                Condition
+              </th>
             </tr>
           </thead>
           <tbody>
-            {m.rung4_required_fields.map((f) => (
+            {m.rung4_must_fields.map((f) => (
               <tr key={f.field}>
-                <td className="border-b border-line px-3 py-2 font-mono text-xs">{f.field}</td>
-                <td className="border-b border-line px-3 py-2 text-muted">{f.condition}</td>
+                <td className="border-b border-line px-3 py-2 font-mono text-xs">
+                  {f.field}
+                </td>
+                <td className="border-b border-line px-3 py-2 text-muted">
+                  {f.condition}
+                </td>
               </tr>
             ))}
           </tbody>
         </table>
+
+        <h3 className="mt-6 font-semibold">
+          SHOULD — recorded as a gap, never a failure
+        </h3>
+        <ul className="mt-2 flex flex-wrap gap-2">
+          {m.rung4_should_fields.map((f) => (
+            <li
+              key={f}
+              className="rounded border border-line px-2 py-0.5 font-mono text-xs text-muted"
+            >
+              {f}
+            </li>
+          ))}
+        </ul>
+
+        <h3 className="mt-6 font-semibold">MAY — purely informational</h3>
+        <ul className="mt-2 flex flex-wrap gap-2">
+          {m.rung4_may_fields.map((f) => (
+            <li
+              key={f}
+              className="rounded border border-line px-2 py-0.5 font-mono text-xs text-muted"
+            >
+              {f}
+            </li>
+          ))}
+        </ul>
       </section>
 
       <section className="mt-6 rounded-xl bg-panel p-6">

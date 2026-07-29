@@ -1,0 +1,40 @@
+{
+    "run_id": "cfbfcc01-fdaf-409f-9bed-abf706d865c7",
+    "findings": [
+        {
+            "key": "services_absent_or_empty",
+            "numerator": 18327,
+            "denominator": 30031,
+            "percent": 61.026938829875796,
+            "denominator_label": "documents that parsed and reached rung 4"
+        },
+        {
+            "key": "registration_unclaimed",
+            "numerator": 25182,
+            "denominator": 29778,
+            "percent": 84.5657868224864,
+            "denominator_label": "documents that passed rung 4 (conformant)"
+        },
+        {
+            "key": "attested",
+            "numerator": 29570,
+            "denominator": 60097,
+            "percent": 49.203787210676076,
+            "denominator_label": "agents in this run"
+        },
+        {
+            "key": "attested_resolvable",
+            "numerator": 13832,
+            "denominator": 29570,
+            "percent": 46.77713899222184,
+            "denominator_label": "agents with on-chain feedback"
+        },
+        {
+            "key": "unattested_resolvable",
+            "numerator": 17875,
+            "denominator": 30527,
+            "percent": 58.55472204933338,
+            "denominator_label": "agents without on-chain feedback"
+        }
+    ]
+}

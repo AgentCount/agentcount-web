@@ -1,22 +1,39 @@
 {
-  "spec_commit": "68fc6765761a10fb26f0692df21c8a6f9d12b1be",
-  "checker_version": "0.2.0",
-  "schema_version": 1,
-  "rung4_required_fields": [
-    { "field": "type", "condition": "unconditional" },
-    { "field": "name", "condition": "unconditional" },
-    { "field": "description", "condition": "unconditional" },
-    { "field": "image", "condition": "unconditional" },
-    { "field": "services", "condition": "unconditional" },
-    { "field": "x402Support", "condition": "unconditional" },
-    { "field": "active", "condition": "unconditional" },
-    {
-      "field": "registrations[].agentId",
-      "condition": "required within each entry, when `registrations` is present"
-    },
-    {
-      "field": "registrations[].agentRegistry",
-      "condition": "required within each entry, when `registrations` is present"
-    }
-  ]
+    "spec_commit": "68fc6765761a10fb26f0692df21c8a6f9d12b1be",
+    "checker_version": "0.5.0",
+    "schema_version": 5,
+    "rung4_must_fields": [
+        {
+            "field": "registrations[].agentId",
+            "condition": "required within each entry, only when `registrations` is present"
+        },
+        {
+            "field": "registrations[].agentRegistry",
+            "condition": "required within each entry, only when `registrations` is present"
+        }
+    ],
+    "rung4_should_fields": [
+        "type",
+        "name",
+        "description",
+        "image",
+        "services",
+        "registrations",
+        "services[].version"
+    ],
+    "rung4_may_fields": [
+        "x402Support",
+        "active",
+        "supportedTrust"
+    ],
+    "rung4_must_requirements": [
+        {
+            "requirement": "every entry in `registrations` must carry both `agentId` and `agentRegistry`",
+            "fields": [
+                "registrations[].agentId",
+                "registrations[].agentRegistry"
+            ],
+            "conditional": true
+        }
+    ]
 }

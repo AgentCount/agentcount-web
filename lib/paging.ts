@@ -35,7 +35,7 @@ export function pageCount(total: number): number {
 }
 
 export function buildQuery(
-  params: Record<string, string | number | undefined>,
+  params: Record<string, string | number | string[] | undefined>,
 ): string {
   const q = new URLSearchParams();
   for (const [k, v] of Object.entries(params)) {
@@ -43,6 +43,15 @@ export function buildQuery(
     // Page 1 is the default; omitting it keeps a page-1 link bare instead of
     // carrying a redundant `?page=1`.
     if (k === "page" && v === 1) continue;
+    // Repeated keys, not a comma-joined value: `facet=2:pass&facet=5:pass` is
+    // what the filter form itself emits, so a "next page" link built here is
+    // byte-identical to the URL the reader already has. Two spellings of the
+    // same filter would still work — both parse — but they would look like
+    // different pages in a log, a cache key, and a shared link.
+    if (Array.isArray(v)) {
+      for (const item of v) if (item !== "") q.append(k, item);
+      continue;
+    }
     q.set(k, String(v));
   }
   const s = q.toString();

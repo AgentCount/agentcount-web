@@ -1,40 +1,110 @@
 {
-  "run_id": "c817ab28-8157-4925-93d6-2a6e0610020d",
-  "agent_count": 60037,
-  "rungs": [
-    { "rung": 1, "counts": [{ "status": "pass", "count": 60037 }] },
-    {
-      "rung": 2,
-      "counts": [
-        { "status": "error", "count": 2478 },
-        { "status": "fail", "count": 25498 },
-        { "status": "pass", "count": 32061 }
-      ]
-    },
-    {
-      "rung": 3,
-      "counts": [
-        { "status": "error", "count": 11 },
-        { "status": "fail", "count": 2046 },
-        { "status": "pass", "count": 30004 },
-        { "status": "skipped", "count": 27976 }
-      ]
-    },
-    {
-      "rung": 4,
-      "counts": [
-        { "status": "fail", "count": 25811 },
-        { "status": "pass", "count": 4193 },
-        { "status": "skipped", "count": 253 }
-      ]
-    },
-    {
-      "rung": 5,
-      "counts": [
-        { "status": "fail", "count": 2768 },
-        { "status": "pass", "count": 1425 },
-        { "status": "skipped", "count": 26064 }
-      ]
-    }
-  ]
+    "run_id": "cfbfcc01-fdaf-409f-9bed-abf706d865c7",
+    "agent_count": 60097,
+    "rungs": [
+        {
+            "rung": 1,
+            "name": "registered",
+            "counts": [
+                {
+                    "status": "pass",
+                    "count": 60097
+                }
+            ]
+        },
+        {
+            "rung": 2,
+            "name": "resolvable",
+            "counts": [
+                {
+                    "status": "error",
+                    "count": 3026
+                },
+                {
+                    "status": "fail",
+                    "count": 25364
+                },
+                {
+                    "status": "pass",
+                    "count": 31707
+                }
+            ]
+        },
+        {
+            "rung": 3,
+            "name": "parseable",
+            "counts": [
+                {
+                    "status": "error",
+                    "count": 11
+                },
+                {
+                    "status": "fail",
+                    "count": 1665
+                },
+                {
+                    "status": "pass",
+                    "count": 30031
+                },
+                {
+                    "status": "skipped",
+                    "count": 28390
+                }
+            ]
+        },
+        {
+            "rung": 4,
+            "name": "conformant",
+            "counts": [
+                {
+                    "status": "fail",
+                    "count": 253
+                },
+                {
+                    "status": "pass",
+                    "count": 29778
+                },
+                {
+                    "status": "skipped",
+                    "count": 30066
+                }
+            ]
+        },
+        {
+            "rung": 5,
+            "name": "bound",
+            "counts": [
+                {
+                    "status": "fail",
+                    "count": 789
+                },
+                {
+                    "status": "pass",
+                    "count": 3807
+                },
+                {
+                    "status": "skipped",
+                    "count": 30319
+                },
+                {
+                    "status": "unclaimed",
+                    "count": 25182
+                }
+            ]
+        },
+        {
+            "rung": 7,
+            "name": "attested",
+            "counts": [
+                {
+                    "status": "fail",
+                    "count": 30527
+                },
+                {
+                    "status": "pass",
+                    "count": 29570
+                }
+            ]
+        }
+    ]
 }

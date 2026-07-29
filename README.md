@@ -36,26 +36,51 @@ pnpm dev                # http://localhost:3000
 
 | Path | What |
 |------|------|
+| `lib/brand.ts` | **The product name, domain and contact address — in one place.** The pending rename is a one-line change here, not a find-replace. |
 | `lib/api/` | Zod schemas, the fetch client, and one function per endpoint. |
 | `lib/paging.ts` | Page-number ↔ offset maths. |
-| `lib/status.ts` | Status → colour class mapping. The status *word* is never chosen here — only its colour. |
+| `lib/status.ts` | Status → colour, glyph, and spelled-out label. The status *word* is never chosen here — only how it is drawn. |
 | `app/` | Routes. Every page is a Server Component (the one exception, `app/error.tsx`, is required by Next for error boundaries). |
 | `components/` | Presentational pieces only. |
 | `scripts/check-api.ts` | Validates every endpoint against a live API. |
 
 ## The pages
 
-- **`/`** — the directory. Identity is `Agent #{id} · {chain} · {owner}`,
-  never the URI (which is frequently a multi-kilobyte base64 blob or an
-  empty string). Each row shows all seven rung statuses as small chips, and
-  the list can be filtered by rung + status.
-- **`/agent/[chain]/[id]`** — the ladder vertically, one rung per section,
-  each with its status and its evidence rendered in full (not summarised),
-  plus the archive summary and the agent's on-chain snapshot.
-- **`/stats`** — leads with population base rates per rung, then the run's
-  provenance (pinned block, `checker_commit`, `spec_commit`).
-- **`/methodology`** — prose plus the live `spec_commit` and rung-4
-  required-field list, both read from the API rather than duplicated here.
+- **`/`** — the homepage: what this run found, as four numbers, each with the
+  population behind it. Every figure comes from
+  `GET /api/runs/{id}/findings` or `/api/methodology` — none is typed here,
+  and none is derived here either (the API returns the percentage already
+  computed, so this app formats rather than divides).
+- **`/directory`** — every agent, searchable by name, description or owner
+  prefix, and filterable on any combination of rung statuses. Identity is the
+  document's own `name`, falling back to `Agent #{id}` only when there is
+  none — never the URI, which is frequently a multi-kilobyte base64 blob or an
+  empty string. Filters live in the URL, so a filtered view is linkable.
+- **`/working`** — the agents for which every rung this run actually ran came
+  back `pass`. The same component as the directory with its facets fixed.
+  Which rungs count is read from the run's own rates, so rung 6 is not
+  required of anyone and joins automatically when it ships.
+- **`/agent/[chain]/[id]`** — the permalink. The ladder vertically, one rung
+  per section, each with its status and its evidence rendered in full (not
+  summarised), plus the archive summary, the on-chain snapshot, and the run's
+  full provenance. Rendered on demand with ISR — 60k pages cannot be built at
+  deploy time — with a per-agent OG image so a shared link previews as a data
+  card.
+- **`/census`** — population base rates per rung, then the run's provenance
+  (pinned block, `checker_commit`, `spec_commit`). Was `/stats`; that path
+  now 308s here.
+- **`/methodology`** — a five-bullet summary, then the long-form detail, plus
+  the live `spec_commit` and rung-4 MUST/SHOULD/MAY lists, all read from the
+  API rather than duplicated here.
+
+## Accessibility
+
+Rung badges encode status in **three** channels: the rung number, a glyph
+(`✓ ✗ ! – ○ ·`), and colour. Colour alone excluded red-green colourblind
+readers — roughly 8% of men — from the densest information on the site, and
+`pass`/`fail` were the two statuses rendered most similarly. Every badge also
+carries a `title` and `aria-label` spelling the status out in words, and a
+status legend appears on every page that shows a badge or a bar.
 
 A rung with **no row** for a given agent was never reached this run (a
 short-circuited pipeline, or — currently — rung 6, not yet implemented). The
@@ -76,6 +101,16 @@ type.
 
 Run `pnpm check:api` against a live API after any change to `crates/api`. It
 is the only thing that catches a drift between the two repos.
+
+**Fixtures are captured, not hand-written.** Everything in `test/fixtures/`
+except `runs.json` is the literal body of a real request. This is not
+fastidiousness: the fixtures used to be maintained by hand, and when rung 4
+was split by RFC 2119 severity the API stopped sending
+`rung4_required_fields` while the fixture kept it — so the schema suite went
+on passing while `/methodology` threw a `ContractError` on every real load. A
+fixture that is not refreshed from the thing it models tests only itself.
+`runs.json` stays hand-written because it carries an in-flight run and a run
+with a null `pinned_block`, shapes the live API has no current example of.
 
 **No claim wording lives here.** Every status word rendered is the string
 the API sent for that rung. Where a filter or a colour mapping needs to

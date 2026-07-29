@@ -7,6 +7,7 @@
  * invisible, and the second one is the one that silently misrenders data.
  */
 import type { ZodType } from "zod";
+import { BRAND } from "../brand";
 
 export class UpstreamError extends Error {
   constructor(
@@ -62,14 +63,14 @@ export async function get<T>(
     res = await fetch(url, { next: { revalidate }, signal: AbortSignal.timeout(8000) });
   } catch (e) {
     if (e instanceof Error && e.name === "TimeoutError") {
-      throw new UpstreamError(`the Ledgerscope API at ${url} did not answer in time`);
+      throw new UpstreamError(`the ${BRAND.name} API at ${url} did not answer in time`);
     }
-    throw new UpstreamError(`could not reach the Ledgerscope API at ${url}`);
+    throw new UpstreamError(`could not reach the ${BRAND.name} API at ${url}`);
   }
 
   if (res.status === 404 && allow404) return null;
   if (!res.ok) {
-    throw new UpstreamError(`the Ledgerscope API returned ${res.status}`, res.status);
+    throw new UpstreamError(`the ${BRAND.name} API returned ${res.status}`, res.status);
   }
 
   const body = await res.json();
