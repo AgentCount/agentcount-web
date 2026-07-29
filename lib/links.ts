@@ -43,9 +43,19 @@ export type Explorer = { name: string; base: string };
  */
 const EXPLORERS: Record<string, Explorer> = {
   base: { name: "BaseScan", base: "https://basescan.org" },
+  // `mainnet` is the key, because a chain's name here must match the
+  // `chains.chain` column, which in turn must match `RPC_URL_<CHAIN>` — see
+  // `crates/indexer`'s `rpc_env_var()`. `ethereum` is kept as an alias so a
+  // hand-written link or a future rename does not silently lose its explorer.
+  mainnet: { name: "Etherscan", base: "https://etherscan.io" },
   ethereum: { name: "Etherscan", base: "https://etherscan.io" },
   bsc: { name: "BscScan", base: "https://bscscan.com" },
   celo: { name: "Celoscan", base: "https://celoscan.io" },
+  // Deliberately absent: `robinhood` (chain id 4663). Both ERC-8004 registries
+  // are deployed there, but I could not verify a public block explorer for it,
+  // and a guessed URL would put a confident link to nowhere on every page for
+  // that chain. Its values render as plain text until a real explorer is
+  // confirmed — which is the intended degradation, not a gap.
 };
 
 export function explorerFor(chain: string): Explorer | null {

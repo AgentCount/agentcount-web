@@ -37,12 +37,14 @@ export function DirectoryControls({
   facets,
   q,
   run,
+  chain,
   action,
 }: {
   rates: Rates;
   facets: RungFacet[];
   q: string;
   run: string;
+  chain: string;
   /** Where the form submits. `/working` posts back to `/directory` because a
    * hand-picked filter is no longer "the agents that pass everything". */
   action: string;
@@ -53,6 +55,8 @@ export function DirectoryControls({
   return (
     <form method="get" action={action} className="border border-edge bg-panel/40">
       <input type="hidden" name="run" value={run} />
+      {/* Without this, applying a filter drops back to the default chain. */}
+      <input type="hidden" name="chain" value={chain} />
 
       <div className="flex flex-wrap items-center gap-x-4 gap-y-3 border-b border-line px-4 py-3">
         <label className="flex min-w-72 flex-1 items-center gap-3">
@@ -73,7 +77,7 @@ export function DirectoryControls({
         </button>
         {hasFilter && (
           <Link
-            href={`${action}?run=${run}`}
+            href={`${action}?chain=${encodeURIComponent(chain)}`}
             className="font-mono text-xs uppercase tracking-[0.1em] text-dead transition-colors hover:text-text"
           >
             Reset

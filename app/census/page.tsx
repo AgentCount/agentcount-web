@@ -1,9 +1,16 @@
 import Link from "next/link";
 import { RateBar } from "@/components/RateBar";
+import { ChainSwitcher } from "@/components/ChainSwitcher";
 import { RunProvenance } from "@/components/RunProvenance";
 import { Section } from "@/components/Section";
 import { StatusLegend } from "@/components/StatusLegend";
-import { getRates, resolveRun, statusVocabulary } from "@/lib/api/endpoints";
+import {
+  chainsWithRuns,
+  getRates,
+  listRuns,
+  resolveRunForRequest,
+  statusVocabulary,
+} from "@/lib/api/endpoints";
 
 export const metadata = { title: "Census" };
 // A build must not depend on the API being reachable: this page fetches live
@@ -14,15 +21,22 @@ export const dynamic = "force-dynamic";
 export default async function CensusPage({
   searchParams,
 }: {
-  searchParams: Promise<{ run?: string }>;
+  searchParams: Promise<{ run?: string; chain?: string }>;
 }) {
-  const { run: runParam } = await searchParams;
-  const run = await resolveRun(runParam);
-  const rates = await getRates(run.run_id);
+  const sp = await searchParams;
+  const run = await resolveRunForRequest(sp);
+  const [rates, allRuns] = await Promise.all([getRates(run.run_id), listRuns()]);
 
   return (
     <>
       <header className="border-b border-edge pb-5">
+        <div className="mb-6">
+          <ChainSwitcher
+            chains={chainsWithRuns(allRuns)}
+            current={run.chain}
+            basePath="/census"
+          />
+        </div>
         <h1 className="numeral text-[clamp(1.75rem,3.2vw,2.5rem)] text-text">Census</h1>
         <p className="mt-4 max-w-prose text-sm leading-relaxed text-muted">
           Base rates per rung. Every agent gets the same seven questions; these

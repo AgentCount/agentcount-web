@@ -32,3 +32,25 @@ export const BRAND = {
 export function pageTitle(page: string): string {
   return `${page} — ${BRAND.name}`;
 }
+
+/**
+ * Census-wide product choices that are not branding.
+ *
+ * `defaultChain` exists because "the newest completed run" stopped being a
+ * safe default the moment a second chain was swept. Runs are ordered by start
+ * time across all chains, so a 400-agent proof sweep of one chain finishing
+ * after a 60,097-agent sweep of another silently became the homepage — every
+ * headline number changed chain with nothing on the page saying so.
+ *
+ * A configured default is the honest fix: the site leads with one chain on
+ * purpose, and says which, rather than leading with whichever sweep happened
+ * to finish last. Readers reach the others through the chain switcher, and
+ * `?chain=` is in the URL either way.
+ *
+ * If this chain has no completed run, pages fall back to the newest completed
+ * run on any chain rather than erroring — an empty site is worse than a
+ * different one, as long as the header names the chain it is showing.
+ */
+export const CENSUS = {
+  defaultChain: "base",
+} as const;

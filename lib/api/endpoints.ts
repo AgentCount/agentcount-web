@@ -3,6 +3,7 @@
  * URL shapes and their schemas stay paired in one file.
  */
 import { get, postRaw } from "./client";
+import { CENSUS } from "../brand";
 import {
   agentDetailSchema,
   agentPageSchema,
@@ -36,17 +37,58 @@ export async function listRuns(): Promise<Run[]> {
  * other fetch it makes, so a paginated listing or a stats page reads
  * consistently even if another run finishes while the reader is on the page.
  */
-export async function resolveRun(preferRunId?: string): Promise<Run> {
+export async function resolveRun(preferRunId?: string, chain?: string): Promise<Run> {
   const runs = await listRuns();
   if (preferRunId) {
     const match = runs.find((r) => r.run_id === preferRunId);
     if (match) return match;
   }
-  const completed = runs.find((r) => r.finished_at !== null);
-  if (!completed) {
+  // Scoped to one chain when asked. Without this, "the newest completed run"
+  // silently means "whichever chain finished sweeping most recently" — so
+  // adding a second chain would make the homepage's numbers change chain
+  // underneath the reader with no visible cause.
+  const pool = chain ? runs.filter((r) => r.chain === chain) : runs;
+  const completed = pool.find((r) => r.finished_at !== null);
+  if (completed) return completed;
+
+  // A chain that was asked for but has never finished a sweep falls back to
+  // whatever HAS been swept, rather than erroring: an empty site is worse than
+  // a different one, and every page names the chain it is showing.
+  const anyCompleted = runs.find((r) => r.finished_at !== null);
+  if (!anyCompleted) {
     throw new Error("no completed run is available yet");
   }
-  return completed;
+  return anyCompleted;
+}
+
+/**
+ * The run a page should show, given an optional `?chain=` and `?run=`.
+ *
+ * Centralised so no page reinvents the default. Reading `?chain=` on one page
+ * and not another is how a chain switcher quietly stops working on half the
+ * site.
+ */
+export async function resolveRunForRequest(params: {
+  run?: string;
+  chain?: string;
+}): Promise<Run> {
+  return resolveRun(params.run, params.chain ?? CENSUS.defaultChain);
+}
+
+/**
+ * The chains that have something to show, newest run first.
+ *
+ * Derived from the runs themselves rather than from a chain list: a chain
+ * configured but never swept has no census to display, and offering it in a
+ * switcher would lead to an error page. A chain appears here the moment its
+ * first sweep finishes, with no code change.
+ */
+export function chainsWithRuns(runs: Run[]): string[] {
+  const seen: string[] = [];
+  for (const r of runs) {
+    if (r.finished_at !== null && !seen.includes(r.chain)) seen.push(r.chain);
+  }
+  return seen;
 }
 
 export type ListAgentsParams = {

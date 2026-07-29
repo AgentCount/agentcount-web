@@ -1,15 +1,18 @@
 import Link from "next/link";
 import { AgentTable } from "@/components/AgentTable";
 import { CountTile, FindingTile } from "@/components/FindingTile";
+import { ChainSwitcher } from "@/components/ChainSwitcher";
 import { RunProvenance } from "@/components/RunProvenance";
 import { Section } from "@/components/Section";
 import { StatusLegend } from "@/components/StatusLegend";
 import {
+  chainsWithRuns,
   getFindings,
   getMethodology,
   getRates,
   listAgents,
-  resolveRun,
+  listRuns,
+  resolveRunForRequest,
   statusVocabulary,
 } from "@/lib/api/endpoints";
 import type { Finding } from "@/lib/api/schemas";
@@ -39,15 +42,16 @@ function pick(findings: Finding[], key: string): Finding {
 export default async function Home({
   searchParams,
 }: {
-  searchParams: Promise<{ run?: string }>;
+  searchParams: Promise<{ run?: string; chain?: string }>;
 }) {
-  const { run: runParam } = await searchParams;
-  const run = await resolveRun(runParam);
-  const [{ findings }, methodology, rates, sample] = await Promise.all([
+  const sp = await searchParams;
+  const run = await resolveRunForRequest(sp);
+  const [{ findings }, methodology, rates, sample, allRuns] = await Promise.all([
     getFindings(run.run_id),
     getMethodology(),
     getRates(run.run_id),
     listAgents({ run: run.run_id, limit: 3 }),
+    listRuns(),
   ]);
 
   const unreachable = pick(findings, "services_absent_or_empty");
@@ -65,6 +69,13 @@ export default async function Home({
       {/* The masthead states the scope and the pinned block on one line — the
           two facts that qualify every number below it. */}
       <header className="border-b border-edge pb-6">
+        <div className="mb-6">
+          <ChainSwitcher
+            chains={chainsWithRuns(allRuns)}
+            current={run.chain}
+            basePath="/"
+          />
+        </div>
         <h1 className="numeral max-w-[18ch] text-[clamp(2rem,4.2vw,3.25rem)] text-text">
           What we found when we checked every ERC-8004 agent on {run.chain}
         </h1>

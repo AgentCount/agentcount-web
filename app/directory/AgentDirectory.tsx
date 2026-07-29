@@ -1,13 +1,16 @@
 import Link from "next/link";
 import { AgentTable } from "@/components/AgentTable";
+import { ChainSwitcher } from "@/components/ChainSwitcher";
 import { DirectoryControls } from "@/components/DirectoryControls";
 import { Pagination } from "@/components/Pagination";
 import { StatusLegend } from "@/components/StatusLegend";
 import {
+  chainsWithRuns,
   getRates,
   listAgents,
+  listRuns,
   parseFacets,
-  resolveRun,
+  resolveRunForRequest,
   rungVocabulary,
   serialiseFacets,
   statusVocabulary,
@@ -18,6 +21,7 @@ import { PAGE_SIZE, offsetFor, pageFromParam } from "@/lib/paging";
 export type DirectorySearchParams = {
   page?: string;
   run?: string;
+  chain?: string;
   q?: string;
   facet?: string | string[];
 };
@@ -49,7 +53,8 @@ export async function AgentDirectory({
   footer?: React.ReactNode;
 }) {
   const page = pageFromParam(searchParams.page);
-  const run = await resolveRun(searchParams.run);
+  const run = await resolveRunForRequest(searchParams);
+  const allRuns = await listRuns();
 
   // The rung and status vocabulary come from this run's own rates, never typed
   // here: a filter can then never offer a value the API would reject, and a
@@ -75,6 +80,7 @@ export async function AgentDirectory({
   // to page 2 carries exactly the filter that was actually applied — a URL with
   // a junk facet in it does not keep propagating it.
   const linkParams = {
+    chain: run.chain,
     run: run.run_id,
     q: q || undefined,
     facet: lockedFacets ? undefined : facets.map((f) => `${f.rung}:${f.status}`),
@@ -83,6 +89,13 @@ export async function AgentDirectory({
   return (
     <>
       <header className="border-b border-edge pb-5">
+        <div className="mb-6">
+          <ChainSwitcher
+            chains={chainsWithRuns(allRuns)}
+            current={run.chain}
+            basePath={basePath}
+          />
+        </div>
         <h1 className="numeral max-w-[24ch] text-[clamp(1.75rem,3.2vw,2.5rem)] text-text">
           {title}
         </h1>
@@ -119,6 +132,7 @@ export async function AgentDirectory({
             facets={facets}
             q={q}
             run={run.run_id}
+            chain={run.chain}
             action={basePath}
           />
         </div>
