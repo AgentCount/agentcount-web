@@ -59,6 +59,11 @@ export default async function MethodologyPage() {
               The document&rsquo;s own registration entry names the same agent
               id, registry, and chain that the on-chain lookup used to find
               it — the card and the registry entry agree about who this is.
+              Since a registration entry is only recommended, not required
+              (rung 4), a document can pass conformance while making no
+              binding claim at all — that case is neither a pass nor a fail;
+              it renders as <em>unclaimed</em>. See &ldquo;What a status
+              means&rdquo; below.
             </dd>
           </div>
           <div>
@@ -72,11 +77,23 @@ export default async function MethodologyPage() {
             </dd>
           </div>
           <div>
-            <dt className="font-semibold text-muted">7 · independent</dt>
+            <dt className="font-semibold text-muted">7 · attested</dt>
             <dd>
-              Whether at least one Reputation Registry feedback entry for this
-              agent comes from an address other than the agent&rsquo;s own —
-              a floor check against an agent attesting only to itself.
+              Whether this agent has received at least one Reputation
+              Registry feedback entry, from any client address at all.
+              Runs for every agent that passes rung 1 — it does not depend on
+              whether the document itself ever resolved, parsed, conformed,
+              or bound.{" "}
+              <strong>
+                This rung does not, and cannot, check whether the feedback
+                came from the agent&rsquo;s own owner
+              </strong>
+              : the registry&rsquo;s own rules make owner self-feedback
+              impossible to submit in the first place, so there is nothing
+              here for this rung to detect. It answers only &ldquo;did anyone
+              at all vouch for this agent&rdquo;, not &ldquo;was it
+              independent&rdquo; — renamed from <code className="rounded bg-bg px-1">independent</code> on
+              2026-07-29 for exactly that reason.
             </dd>
           </div>
         </dl>
@@ -110,16 +127,31 @@ export default async function MethodologyPage() {
       <section className="mt-6 rounded-xl bg-panel p-6">
         <h2 className="text-lg font-semibold">What a status means</h2>
         <p className="mt-2 text-muted">
-          Each rung answers with one of four words, always in the checker&rsquo;s
-          own vocabulary: <em>pass</em>, <em>fail</em>, <em>skipped</em> (an
-          earlier rung&rsquo;s failure made this one moot — for example, an
-          agent that fails rung 2 cannot meaningfully be asked rung 3), or{" "}
+          Each rung answers with one of a small fixed vocabulary, always in
+          the checker&rsquo;s own words: <em>pass</em>, <em>fail</em>,{" "}
+          <em>skipped</em> (a rung this one depends on didn&rsquo;t pass, so
+          this question could not be meaningfully asked — for example, an
+          agent that fails rung 2 cannot meaningfully be asked rung 3;
+          dependencies run within a rung&rsquo;s own track, not across every
+          rung number in order — rung 7 depends only on rung 1, so a rung-2
+          failure never skips it), or{" "}
           <em>error</em> (the check itself could not complete — a timeout, a
           malformed response — which is a different claim from a clean
           fail). A rung with no row at all was never reached this run, which
           this site renders as &ldquo;not checked&rdquo; — distinct from
           <em> skipped</em>, since &ldquo;not checked&rdquo; and &ldquo;we
           couldn&rsquo;t ask&rdquo; are different claims.
+        </p>
+        <p className="mt-2 text-muted">
+          <strong>Rung 5 alone</strong> can also answer <em>unclaimed</em>,
+          added 2026-07-29: the document made no binding claim (no
+          registration entry, or an empty one) for this rung to check. That
+          is neither a pass (nothing was verified) nor a fail (a
+          merely-recommended field, not a broken one) — it is its own,
+          honest word for &ldquo;there was nothing here to check&rdquo;. Any
+          status word this site does not recognise renders with neutral
+          styling and the verbatim text the API sent, never guessed at as one
+          of the words above.
         </p>
       </section>
 
