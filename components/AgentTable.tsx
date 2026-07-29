@@ -1,5 +1,7 @@
 import Link from "next/link";
 import type { AgentSummary } from "@/lib/api/schemas";
+import { addressUrl } from "@/lib/links";
+import { OutboundLink } from "./OutboundLink";
 import { RungStrip } from "./RungStrip";
 
 /**
@@ -85,7 +87,14 @@ export function AgentTable({ agents }: { agents: AgentSummary[] }) {
                   half-address is not something a reader can check against
                   anything. */}
               <td className="whitespace-nowrap px-3 py-1.5 font-mono text-[0.8125rem] text-dead">
-                {a.owner}
+                {(() => {
+                  const href = addressUrl(a.chain, a.owner);
+                  return href ? (
+                    <OutboundLink href={href}>{a.owner}</OutboundLink>
+                  ) : (
+                    a.owner
+                  );
+                })()}
               </td>
               <td className="whitespace-nowrap px-3 py-1.5">
                 <RungStrip rungs={a.rungs} />

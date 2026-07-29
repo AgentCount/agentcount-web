@@ -25,7 +25,7 @@ const LADDER_SIZE = 7;
  * show, and it is exactly the granularity an argument about an agent tends to
  * need.
  */
-export function RungLadder({ rungs }: { rungs: RungDetail[] }) {
+export function RungLadder({ rungs, chain }: { rungs: RungDetail[]; chain: string }) {
   const byRung = new Map(rungs.map((r) => [r.rung, r]));
 
   return (
@@ -67,7 +67,7 @@ export function RungLadder({ rungs }: { rungs: RungDetail[] }) {
 
               {r ? (
                 <>
-                  <EvidenceTable evidence={r.evidence} />
+                  <EvidenceTable evidence={r.evidence} chain={chain} />
                   <p className="mt-4 font-mono text-[0.6875rem] text-dead">
                     checked at {r.checked_at}
                   </p>

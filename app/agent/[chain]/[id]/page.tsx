@@ -5,6 +5,7 @@ import { RungLadder } from "@/components/RungLadder";
 import { RungStrip } from "@/components/RungStrip";
 import { RunProvenance } from "@/components/RunProvenance";
 import { Section } from "@/components/Section";
+import { OutboundLink } from "@/components/OutboundLink";
 import { StatusLegend } from "@/components/StatusLegend";
 import {
   getAgent,
@@ -13,6 +14,7 @@ import {
   statusVocabulary,
 } from "@/lib/api/endpoints";
 import { pageTitle } from "@/lib/brand";
+import { addressUrl, blockUrl, explorerFor, resourceLink, tokenUrl } from "@/lib/links";
 
 // The largest value axum's `Path<(String, i64)>` extractor will accept; a digit
 // run beyond this cannot be an agent id, so it is a bad URL, not an upstream
@@ -97,6 +99,20 @@ export default async function AgentDetail({
   ]);
   const { snapshot, archive } = agent;
 
+  // Outbound targets. Every one of these is `null` when the chain has no
+  // explorer configured or the value is not what it claims to be, and the
+  // field then renders as plain text — see `lib/links.ts`.
+  const explorer = explorerFor(agent.chain);
+  const ownerHref = addressUrl(agent.chain, snapshot.owner);
+  const blockHref = blockUrl(agent.chain, snapshot.block_number);
+  // The registry is on rung 1's evidence, which is where the chain records it.
+  const registry = agent.rungs.find((r) => r.rung === 1)?.evidence?.registry;
+  const tokenHref =
+    typeof registry === "string"
+      ? tokenUrl(agent.chain, registry, snapshot.token_id)
+      : null;
+  const uriLink = resourceLink(snapshot.agent_uri);
+
   return (
     <>
       {/* Identity is the document's own name, falling back to the id — never
@@ -119,7 +135,14 @@ export default async function AgentDetail({
               </span>
               <span className="text-line">|</span>
               <span className="break-all">
-                owner <span className="text-muted">{snapshot.owner}</span>
+                owner{" "}
+                {ownerHref ? (
+                  <OutboundLink href={ownerHref} className="text-muted" title={`View on ${explorer?.name}`}>
+                    {snapshot.owner}
+                  </OutboundLink>
+                ) : (
+                  <span className="text-muted">{snapshot.owner}</span>
+                )}
               </span>
             </p>
           </div>
@@ -156,7 +179,7 @@ export default async function AgentDetail({
             </>
           }
         >
-          <RungLadder rungs={agent.rungs} />
+          <RungLadder rungs={agent.rungs} chain={agent.chain} />
         </Section>
 
         <div className="space-y-16">
@@ -164,15 +187,33 @@ export default async function AgentDetail({
             <dl className="grid grid-cols-1 sm:grid-cols-[7.5rem_1fr]">
               <dt className="label border-t border-line py-2 sm:pr-4">token id</dt>
               <dd className="border-line pb-2 font-mono text-xs text-muted sm:border-t sm:py-2">
-                {snapshot.token_id}
+                {tokenHref ? (
+                  <OutboundLink href={tokenHref} title={`View the token on ${explorer?.name}`}>
+                    {snapshot.token_id}
+                  </OutboundLink>
+                ) : (
+                  snapshot.token_id
+                )}
               </dd>
               <dt className="label border-t border-line py-2 sm:pr-4">owner</dt>
               <dd className="break-all border-line pb-2 font-mono text-xs text-muted sm:border-t sm:py-2">
-                {snapshot.owner}
+                {ownerHref ? (
+                  <OutboundLink href={ownerHref} title={`View on ${explorer?.name}`}>
+                    {snapshot.owner}
+                  </OutboundLink>
+                ) : (
+                  snapshot.owner
+                )}
               </dd>
               <dt className="label border-t border-line py-2 sm:pr-4">block</dt>
               <dd className="border-line pb-2 font-mono text-xs text-muted sm:border-t sm:py-2">
-                {snapshot.block_number.toLocaleString("en-US")}
+                {blockHref ? (
+                  <OutboundLink href={blockHref} title={`View block on ${explorer?.name}`}>
+                    {snapshot.block_number.toLocaleString("en-US")}
+                  </OutboundLink>
+                ) : (
+                  snapshot.block_number.toLocaleString("en-US")
+                )}
               </dd>
               <dt className="label border-t border-line py-2 sm:pr-4">observed</dt>
               <dd className="border-line pb-2 font-mono text-xs text-muted sm:border-t sm:py-2">
@@ -180,7 +221,20 @@ export default async function AgentDetail({
               </dd>
             </dl>
             <div className="mt-4 border-t border-line pt-3">
-              <span className="label">tokenURI</span>
+              <div className="flex items-baseline justify-between gap-4">
+                <span className="label">tokenURI</span>
+                {/* A `data:` URI is the document, inline — there is nowhere to
+                    open, and `lib/links.ts` refuses to make an href of it. */}
+                {uriLink && (
+                  <OutboundLink
+                    href={uriLink.href}
+                    untrusted
+                    className="font-mono text-[0.6875rem] uppercase tracking-[0.08em] text-dead"
+                  >
+                    open{uriLink.via ? ` via ${uriLink.via}` : ""} →
+                  </OutboundLink>
+                )}
+              </div>
               <div className="mt-2 max-h-40 overflow-auto break-all border-l-2 border-edge bg-panel px-3 py-2 font-mono text-xs text-muted">
                 {snapshot.agent_uri || <span className="text-dead">(empty)</span>}
               </div>
@@ -221,14 +275,29 @@ export default async function AgentDetail({
                     ],
                     ...(archive.error ? [["error", archive.error] as const] : []),
                   ] as [string, string][]
-                ).map(([label, value]) => (
-                  <div key={label} className="contents">
-                    <dt className="label border-t border-line py-2 sm:pr-4">{label}</dt>
-                    <dd className="break-all border-line pb-2 font-mono text-xs text-muted sm:border-t sm:py-2">
-                      {value}
-                    </dd>
-                  </div>
-                ))}
+                ).map(([label, value]) => {
+                  // Only the two URL rows are linkable, and only when the
+                  // scheme passes the allowlist — these came from a document a
+                  // stranger registered, so they are `untrusted`.
+                  const link =
+                    label === "request url" || label === "final url"
+                      ? resourceLink(value)
+                      : null;
+                  return (
+                    <div key={label} className="contents">
+                      <dt className="label border-t border-line py-2 sm:pr-4">{label}</dt>
+                      <dd className="break-all border-line pb-2 font-mono text-xs text-muted sm:border-t sm:py-2">
+                        {link ? (
+                          <OutboundLink href={link.href} untrusted>
+                            {value}
+                          </OutboundLink>
+                        ) : (
+                          value
+                        )}
+                      </dd>
+                    </div>
+                  );
+                })}
               </dl>
             )}
           </Section>

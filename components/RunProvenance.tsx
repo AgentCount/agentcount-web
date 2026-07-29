@@ -1,4 +1,6 @@
 import type { Run } from "@/lib/api/schemas";
+import { blockUrl } from "@/lib/links";
+import { OutboundLink } from "./OutboundLink";
 
 /**
  * Everything needed to reproduce a run, as a two-column register.
@@ -18,6 +20,9 @@ import type { Run } from "@/lib/api/schemas";
  * whenever the page happened to be rendered.
  */
 export function RunProvenance({ run }: { run: Run }) {
+  const blockHref =
+    run.pinned_block !== null ? blockUrl(run.chain, run.pinned_block) : null;
+
   const rows: [string, string][] = [
     ["run", run.run_id],
     ["chain", run.chain],
@@ -39,7 +44,11 @@ export function RunProvenance({ run }: { run: Run }) {
           <div key={label} className="contents">
             <dt className="label border-t border-line py-2 sm:pr-4">{label}</dt>
             <dd className="break-all border-line pb-2 font-mono text-xs leading-relaxed text-muted sm:border-t sm:py-2">
-              {value}
+              {label === "pinned block" && blockHref ? (
+                <OutboundLink href={blockHref}>{value}</OutboundLink>
+              ) : (
+                value
+              )}
             </dd>
           </div>
         ))}

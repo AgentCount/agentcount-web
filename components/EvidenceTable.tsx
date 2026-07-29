@@ -1,3 +1,6 @@
+import { OutboundLink } from "./OutboundLink";
+import { evidenceHref } from "@/lib/links";
+
 /**
  * Renders a rung's evidence object key by key.
  *
@@ -24,23 +27,43 @@ function formatValue(v: unknown): string {
   return String(v);
 }
 
-export function EvidenceTable({ evidence }: { evidence: Record<string, unknown> }) {
+export function EvidenceTable({
+  evidence,
+  chain,
+}: {
+  evidence: Record<string, unknown>;
+  /** Needed to resolve an address or a block to the right explorer. Without it
+   * every value renders plain, which is the pre-linking behaviour. */
+  chain?: string;
+}) {
   const keys = Object.keys(evidence);
   if (keys.length === 0) {
     return <p className="mt-3 text-sm text-dead">No evidence recorded.</p>;
   }
   return (
     <dl className="mt-3 grid grid-cols-1 gap-x-6 sm:grid-cols-[minmax(9rem,max-content)_1fr]">
-      {keys.map((k) => (
-        <div key={k} className="contents">
-          <dt className="border-t border-line/60 py-1.5 font-mono text-[0.6875rem] text-dead">
-            {k}
-          </dt>
-          <dd className="break-all border-line/60 pb-1.5 font-mono text-xs text-muted sm:border-t sm:py-1.5">
-            {formatValue(evidence[k])}
-          </dd>
-        </div>
-      ))}
+      {keys.map((k) => {
+        const text = formatValue(evidence[k]);
+        // Additive only: a key with no link, or whose value fails its type
+        // check, renders exactly as it did before.
+        const link = chain ? evidenceHref(chain, k, evidence[k]) : null;
+        return (
+          <div key={k} className="contents">
+            <dt className="border-t border-line/60 py-1.5 font-mono text-[0.6875rem] text-dead">
+              {k}
+            </dt>
+            <dd className="break-all border-line/60 pb-1.5 font-mono text-xs text-muted sm:border-t sm:py-1.5">
+              {link ? (
+                <OutboundLink href={link.href} untrusted={link.untrusted}>
+                  {text}
+                </OutboundLink>
+              ) : (
+                text
+              )}
+            </dd>
+          </div>
+        );
+      })}
     </dl>
   );
 }
