@@ -1,3 +1,4 @@
+import { RoleGlossary } from "@/components/RoleGlossary";
 import { getMethodology } from "@/lib/api/endpoints";
 import { BRAND } from "@/lib/brand";
 
@@ -55,6 +56,19 @@ export default async function MethodologyPage() {
             failing is not proof of bad intent.
           </li>
         </ul>
+      </section>
+
+      {/* Who is who. Placed before the rungs because every rung's wording
+          depends on which of these six parties it is talking about, and the
+          identity-role audit found a published claim that turned on exactly
+          that distinction. */}
+      <section aria-label="Who is who" className="mt-14 max-w-4xl">
+        <h2 className="font-mono text-sm uppercase tracking-[0.12em] text-text">
+          Who is who
+        </h2>
+        <div className="mt-4">
+          <RoleGlossary />
+        </div>
       </section>
 
       <p className="mt-6 max-w-prose leading-relaxed text-muted">
@@ -131,13 +145,22 @@ export default async function MethodologyPage() {
               or bound.{" "}
               <strong>
                 This rung does not, and cannot, check whether the feedback
-                came from the agent&rsquo;s own owner
+                came from the agent&rsquo;s own owner or an approved operator
               </strong>
-              : the registry&rsquo;s own rules make owner self-feedback
-              impossible to submit in the first place, so there is nothing
-              here for this rung to detect. It answers only &ldquo;did anyone
-              at all vouch for this agent&rdquo;, not &ldquo;was it
-              independent&rdquo; — renamed from <code className="font-mono text-text">independent</code> on
+              . The pinned spec (line 217) bans both:{" "}
+              <em>
+                &ldquo;The feedback submitter MUST NOT be the agent owner or an
+                approved operator for agentId.&rdquo;
+              </em>{" "}
+              That is a contract-level invariant — such feedback cannot be
+              submitted in the first place — so there is nothing here for this
+              rung to detect. Note the scope of what we read: the census reads{" "}
+              <code className="font-mono text-text">ownerOf</code> only, and
+              never ERC-721 approvals, so it could not identify an approved
+              operator even if the ban did not exist. It answers only
+              &ldquo;did anyone at all vouch for this agent&rdquo;, not
+              &ldquo;was it independent&rdquo; — renamed from{" "}
+              <code className="font-mono text-text">independent</code> on
               2026-07-29 for exactly that reason.
             </dd>
           </div>
