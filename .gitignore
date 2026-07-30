@@ -40,3 +40,7 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# Design specs live outside the repo — the directory name alone advertises
+# tooling, and a design doc is superseded by the code the moment it ships.
+/docs/
