@@ -100,7 +100,7 @@ async function main() {
   // is drawn from rates), so it is built by hand to prove the API validates
   // rather than silently matching nothing.
   const bad = await fetch(
-    `${process.env.LEDGERSCOPE_API_URL?.replace(/\/$/, "")}/api/agents?facet=2:banana`,
+    `${process.env.AGENTCOUNT_API_URL?.replace(/\/$/, "")}/api/agents?facet=2:banana`,
   );
   if (bad.status !== 400) {
     throw new Error(`an invalid facet status returned ${bad.status}, expected 400`);

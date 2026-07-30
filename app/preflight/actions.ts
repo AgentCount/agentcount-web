@@ -12,7 +12,7 @@ export type PreflightState =
   | { kind: "checked"; result: ValidateResponse; document: string };
 
 /**
- * Runs on the server, so `LEDGERSCOPE_API_URL` never reaches the browser and
+ * Runs on the server, so `AGENTCOUNT_API_URL` never reaches the browser and
  * the pasted document is posted from here rather than from the reader's
  * machine.
  *

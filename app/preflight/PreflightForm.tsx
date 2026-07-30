@@ -18,7 +18,7 @@ import { runPreflight, type PreflightState } from "./actions";
  * paste on every check.
  *
  * The check itself still happens on the server: `runPreflight` is a server
- * action, so `LEDGERSCOPE_API_URL` never reaches the browser and no check
+ * action, so `AGENTCOUNT_API_URL` never reaches the browser and no check
  * logic is shipped to it either. This component renders an answer; it never
  * computes one.
  */

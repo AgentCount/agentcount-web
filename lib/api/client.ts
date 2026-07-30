@@ -42,10 +42,10 @@ export class ContractError extends Error {
 }
 
 function baseUrl(): string {
-  const url = process.env.LEDGERSCOPE_API_URL;
+  const url = process.env.AGENTCOUNT_API_URL;
   if (!url) {
     throw new UpstreamError(
-      "LEDGERSCOPE_API_URL is not set — copy .env.example to .env.local",
+      "AGENTCOUNT_API_URL is not set — copy .env.example to .env.local",
     );
   }
   return url.replace(/\/$/, "");
@@ -91,7 +91,7 @@ export async function get<T>(
     const issues = parsed.error.issues
       .map((i) => `${i.path.join(".") || "(root)"}: ${i.message}`)
       .join("; ");
-    console.error(`[ledgerscope] contract mismatch on ${path}`, parsed.error.issues);
+    console.error(`[agentcount] contract mismatch on ${path}`, parsed.error.issues);
     throw new ContractError(path, issues);
   }
   return parsed.data;
@@ -144,7 +144,7 @@ export async function postRaw<T>(
     const issues = parsed.error.issues
       .map((i) => `${i.path.join(".") || "(root)"}: ${i.message}`)
       .join("; ");
-    console.error(`[ledgerscope] contract mismatch on ${path}`, parsed.error.issues);
+    console.error(`[agentcount] contract mismatch on ${path}`, parsed.error.issues);
     throw new ContractError(path, issues);
   }
   return parsed.data;
@@ -153,7 +153,7 @@ export async function postRaw<T>(
 /**
  * `GET /healthz` returns the bare string `ok`, so it skips the JSON path.
  *
- * A missing `LEDGERSCOPE_API_URL` is a configuration mistake in this repo, not
+ * A missing `AGENTCOUNT_API_URL` is a configuration mistake in this repo, not
  * a statement about the API's health — `baseUrl()` is called outside the
  * try/catch on purpose, so that error propagates instead of being folded into
  * the same `false` as "could not reach the API". Conflating the two would

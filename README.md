@@ -1,6 +1,6 @@
-# ledgerscope-web
+# agentcount-web
 
-The Ledgerscope frontend: a Next.js App Router site that renders an ERC-8004
+The AgentCount frontend: a Next.js App Router site that renders an ERC-8004
 conformance census. Every agent gets seven rungs — `registered`,
 `resolvable`, `parseable`, `conformant`, `bound`, `live`, `attested`
 (renamed from `independent` 2026-07-29) — each `pass` / `fail` / `skipped` /
@@ -19,11 +19,12 @@ wording.
 ## Running it
 
 The API must be up first, or every page shows the upstream-unreachable panel.
-See the Ledgerscope repo's own README for how to start it — it needs its own
-`DATABASE_URL`, which is that repo's concern, not this one's.
+See the [AgentCount](https://github.com/AgentCount/agentcount) repo's own
+README for how to start it — it needs its own `DATABASE_URL`, which is that
+repo's concern, not this one's.
 
 ```sh
-# in the Ledgerscope repo
+# in the AgentCount repo
 cargo run -p api        # http://localhost:8080
 
 # here
@@ -36,7 +37,7 @@ pnpm dev                # http://localhost:3000
 
 | Path | What |
 |------|------|
-| `lib/brand.ts` | **The product name, domain and contact address — in one place.** The pending rename is a one-line change here, not a find-replace. |
+| `lib/brand.ts` | **The product name, domain and contact address — in one place.** The 2026-07-30 rename to AgentCount was a one-line change here, which is what it was built for. |
 | `lib/api/` | Zod schemas, the fetch client, and one function per endpoint. |
 | `lib/paging.ts` | Page-number ↔ offset maths. |
 | `lib/status.ts` | Status → colour, glyph, and spelled-out label. The status *word* is never chosen here — only how it is drawn. |
