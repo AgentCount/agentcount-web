@@ -11,18 +11,34 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+
+      # This project uses pnpm — `pnpm-lock.yaml` is the committed lockfile.
+      # pnpm must be installed BEFORE setup-node, because `cache: pnpm` asks
+      # pnpm where its store is and fails if the binary is not on PATH yet.
+      - uses: pnpm/action-setup@b906affcce14559ad1aafd4ab0e942779e9f58b1 # v4
+        with:
+          version: 11
+
       - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
         with:
           node-version: 22
-          cache: npm
-      - run: npm ci
-      - run: npm run lint
-      - run: npx tsc --noEmit
-      - run: npm test
+          cache: pnpm
+
+      # --frozen-lockfile: fail rather than silently resolve a different tree
+      # than the lockfile pins. A lockfile that no longer matches package.json
+      # is something to surface in CI, not to paper over.
+      - run: pnpm install --frozen-lockfile
+
+      - run: pnpm run lint
+      - run: pnpm exec tsc --noEmit
+      - run: pnpm test
+
       # The build must succeed with NO API reachable. `generateStaticParams`
       # returns empty and every page renders on demand, so a build that needed
-      # a live API would make deploys fail whenever the API was down — which is
-      # exactly when you most want to ship a fix.
-      - run: npm run build
+      # a live API would fail deploys exactly when the API is down — which is
+      # when you most want to ship a fix. The address below is a closed port on
+      # purpose: if the build ever starts depending on the API, this job goes
+      # red instead of quietly passing against a real one.
+      - run: pnpm run build
         env:
-          AGENTCOUNT_API_URL: http://localhost:8080
+          AGENTCOUNT_API_URL: http://127.0.0.1:9
