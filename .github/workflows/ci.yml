@@ -1,0 +1,28 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+jobs:
+  check:
+    name: lint · typecheck · test · build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npm run lint
+      - run: npx tsc --noEmit
+      - run: npm test
+      # The build must succeed with NO API reachable. `generateStaticParams`
+      # returns empty and every page renders on demand, so a build that needed
+      # a live API would make deploys fail whenever the API was down — which is
+      # exactly when you most want to ship a fix.
+      - run: npm run build
+        env:
+          AGENTCOUNT_API_URL: http://localhost:8080

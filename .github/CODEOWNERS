@@ -1,0 +1,14 @@
+# Everything owned by the maintainer.
+*                    @AgentCount/maintainers
+
+# The frontend's two load-bearing modules, called out so a diff to either is
+# never reviewed as routine styling:
+#
+# lib/status.ts decides how the six rung states render. Collapsing two of them
+# — showing `error` as a failure, or `unclaimed` as `fail` — would misreport
+# every agent in that state while looking like a CSS change.
+/lib/status.ts       @AgentCount/maintainers
+# lib/links.ts holds the scheme allowlist for agent-supplied URLs. Agents are
+# anonymous and their documents are hostile input by construction.
+/lib/links.ts        @AgentCount/maintainers
+/.github/            @AgentCount/maintainers
