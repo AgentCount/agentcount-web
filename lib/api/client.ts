@@ -151,7 +151,8 @@ export async function postRaw<T>(
 }
 
 /**
- * `GET /healthz` returns the bare string `ok`, so it skips the JSON path.
+ * `GET /api/healthz` returns the bare string `ok`, so it skips the JSON path.
+ * Not `/healthz`: that path is reserved on Cloud Run and never reaches the API.
  *
  * A missing `AGENTCOUNT_API_URL` is a configuration mistake in this repo, not
  * a statement about the API's health — `baseUrl()` is called outside the
@@ -163,7 +164,7 @@ export async function postRaw<T>(
 export async function pingApi(): Promise<boolean> {
   const url = baseUrl();
   try {
-    const res = await fetch(`${url}/healthz`, { cache: "no-store" });
+    const res = await fetch(`${url}/api/healthz`, { cache: "no-store" });
     return res.ok && (await res.text()).trim() === "ok";
   } catch {
     return false;
