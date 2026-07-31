@@ -1,5 +1,11 @@
-# Everything owned by the maintainer.
-*                    @AgentCount/maintainers
+# Owned by the maintainer.
+#
+# A personal username, not an @AgentCount/team: with one maintainer a team
+# buys nothing and can fail silently — GitHub does not error on a CODEOWNERS
+# reference to a team that does not exist or was renamed, it simply matches
+# nobody, leaving a file that looks like review protection and is not.
+# Switch to a team when there is a second maintainer to put in it.
+*                    @NemboKid
 
 # The frontend's two load-bearing modules, called out so a diff to either is
 # never reviewed as routine styling:
@@ -7,8 +13,8 @@
 # lib/status.ts decides how the six rung states render. Collapsing two of them
 # — showing `error` as a failure, or `unclaimed` as `fail` — would misreport
 # every agent in that state while looking like a CSS change.
-/lib/status.ts       @AgentCount/maintainers
+/lib/status.ts       @NemboKid
 # lib/links.ts holds the scheme allowlist for agent-supplied URLs. Agents are
 # anonymous and their documents are hostile input by construction.
-/lib/links.ts        @AgentCount/maintainers
-/.github/            @AgentCount/maintainers
+/lib/links.ts        @NemboKid
+/.github/            @NemboKid
