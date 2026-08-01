@@ -97,6 +97,10 @@ const NAV = [
   // of the series.
   { href: "/reports", label: "Reports" },
   { href: "/methodology", label: "Method" },
+  // Last, and top-level rather than a footer link. It is the page that makes
+  // the recomputability claim checkable rather than merely stated, so burying
+  // it would undercut the thing it exists to prove.
+  { href: "/data", label: "Data" },
 ];
 
 /**

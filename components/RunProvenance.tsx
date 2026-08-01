@@ -1,5 +1,7 @@
+import Link from "next/link";
 import type { Run } from "@/lib/api/schemas";
 import { blockUrl } from "@/lib/links";
+import { archiveSize, archiveUrl, checksumUrl, publishedRun } from "@/lib/published-runs";
 import { OutboundLink } from "./OutboundLink";
 
 /**
@@ -22,6 +24,7 @@ import { OutboundLink } from "./OutboundLink";
 export function RunProvenance({ run }: { run: Run }) {
   const blockHref =
     run.pinned_block !== null ? blockUrl(run.chain, run.pinned_block) : null;
+  const archive = publishedRun(run.run_id);
 
   const rows: [string, string][] = [
     ["run", run.run_id],
@@ -59,6 +62,34 @@ export function RunProvenance({ run }: { run: Run }) {
           {run.rerun_command}
         </pre>
       </div>
+      {/* The dump, where this run has one.
+
+          Rerunning the command above re-derives the answers from the chain,
+          which is the strongest check and also the slowest — it needs an RPC
+          endpoint, hours, and the same code. The archive is the other half of
+          the same promise: the exact rows this run wrote, at a permanent URL,
+          checkable against a hash committed to git. Most people who want to
+          disagree with a number want the second one.
+
+          Absent for a run not yet published, rather than a dead link. */}
+      {archive && (
+        <div className="mt-4 border-t border-line pt-3">
+          <span className="label">Download this run</span>
+          <p className="mt-2 flex flex-wrap items-baseline gap-x-4 gap-y-1 font-mono text-xs text-dead">
+            <OutboundLink href={archiveUrl(archive)}>{archive.archive}</OutboundLink>
+            <span>{archiveSize(archive.archive_bytes)}</span>
+            <span className="text-line">|</span>
+            <OutboundLink href={checksumUrl(archive)}>sha256</OutboundLink>
+            <span className="text-line">|</span>
+            <Link
+              href="/data"
+              className="underline decoration-line underline-offset-4 transition-colors hover:text-muted"
+            >
+              all runs
+            </Link>
+          </p>
+        </div>
+      )}
     </div>
   );
 }
