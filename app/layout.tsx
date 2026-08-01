@@ -181,13 +181,37 @@ export default function RootLayout({
                 href="/"
                 className="font-display text-2xl font-semibold uppercase tracking-[0.16em] text-text"
               >
-                {/* Inline, on the text baseline, at cap height: the mark is
-                    part of the wordmark's line, not a badge beside it. Green
-                    via the real `text-live` token — the mark is drawn in
-                    `currentColor`, so this is the one saturated colour rule
-                    (`globals.css`) being borrowed, not broken: it is the
-                    status palette's own green, claiming nothing. */}
-                <TallyMark className="mr-2.5 inline-block h-[0.72em] w-[0.72em] text-live" />
+                {/* Inline and on the wordmark's own line, not a badge beside
+                    it. Green via the real `text-live` token — the mark is
+                    drawn in `currentColor`, so this is the one saturated
+                    colour rule (`globals.css`) being borrowed, not broken:
+                    it is the status palette's own green, claiming nothing.
+
+                    Every size below is in `em`, so the lockup is one object
+                    that rescales with the wordmark — change `text-2xl` and
+                    the mark, its spacing and its optical centring all follow.
+
+                    The numbers, since none of them is arbitrary. The strokes
+                    occupy 37 of the mark's 48 viewBox units (0.771), and
+                    Plex Sans Condensed has a cap height of 0.698em, so a 1em
+                    box draws the mark at 0.771em — 1.10x cap height, which
+                    is the small overhang that stops a mark reading as
+                    smaller than the type it sits beside.
+
+                    `align-[-0.15em]`: `inline-block` puts the box's BOTTOM on
+                    the baseline, and the strokes sit 0.115em up from that
+                    edge, which floats the whole mark above the caps. Dropping
+                    the box 0.15em centres the strokes on the caps' own centre
+                    (0.349em), leaving a symmetric ~0.036em overhang top and
+                    bottom.
+
+                    `mr-[0.4em]`: the visible mark is 0.896em wide, so half of
+                    it is 0.448em — less the 0.052em of empty box the viewBox
+                    already carries on its right edge. */}
+                <TallyMark
+                  strokeWidth={6}
+                  className="mr-[0.4em] inline-block h-[1em] w-[1em] align-[-0.15em] text-live"
+                />
                 {BRAND.name}
               </Link>
               <span className="hidden label sm:inline">
