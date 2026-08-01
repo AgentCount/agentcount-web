@@ -66,6 +66,13 @@ export function EmailCapture({
         <label htmlFor="newsletter-email" className="sr-only">
           Email address
         </label>
+        {/* Buttondown's marker for "this came from an embedded form", which is
+            what makes it answer with a human confirmation page instead of a
+            raw API response. Harmless anywhere else — every provider worth
+            using ignores a field it does not know — so it stays unconditional
+            rather than becoming a second environment variable that has to
+            agree with the first one. */}
+        <input type="hidden" name="embed" value="1" />
         <input
           id="newsletter-email"
           type="email"
