@@ -22,6 +22,7 @@ import {
   statusVocabulary,
 } from "@/lib/api/endpoints";
 import type { Finding, Findings } from "@/lib/api/schemas";
+import { chainDisplayName, formatChainList } from "@/lib/chains";
 import { getPublishedRuns } from "@/lib/published-runs";
 import { REPORTS } from "@/lib/reports";
 
@@ -162,21 +163,16 @@ export default async function Home({
    * the agents on these chains, which IS a complete count of a stated
    * population.
    *
-   * The phrasing degrades with the data rather than assuming four. On a day
-   * when one chain's sweep has not finished, or its archive is not yet
-   * published, the sentence names the chains actually summed instead of
-   * saying "four" over three — the runs table directly beneath it lists them,
-   * and a headline that disagrees with the table under it destroys the trust
-   * both exist to build.
+   * The chains are named, always. Until 2026-08-01 this read "the four
+   * largest chains" whenever four were published — a ranking nobody had
+   * verified, and false: counting registrations on every deployed registry
+   * with the census's own ownerOf method put the swept chains at #1, #2, #3
+   * and #8. Naming the chains is the claim that stays true by construction,
+   * and it degrades with the data: an unpublished sweep drops out of the
+   * sentence because it drops out of `censusRuns`, so the headline can never
+   * disagree with the runs table under it.
    */
-  const chainNames = new Intl.ListFormat("en", {
-    style: "long",
-    type: "conjunction",
-  }).format(censusRuns.map((r) => r.chain));
-  const scope =
-    censusRuns.length === 4
-      ? "the four largest chains"
-      : `${chainNames}`;
+  const scope = formatChainList(censusRuns.map((r) => r.chain));
 
   return (
     <>
@@ -184,7 +180,8 @@ export default async function Home({
         {perChain ? (
           <>
             <h1 className="numeral max-w-[18ch] text-[clamp(2rem,4.2vw,3.25rem)] text-text">
-              What we found when we checked every ERC-8004 agent on {run.chain}
+              What we found when we checked every ERC-8004 agent on{" "}
+              {chainDisplayName(run.chain)}
             </h1>
             <div className="mt-5 flex flex-wrap items-baseline gap-x-6 gap-y-2 font-mono text-xs text-dead">
               <span>

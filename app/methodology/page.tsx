@@ -1,6 +1,8 @@
 import { RoleGlossary } from "@/components/RoleGlossary";
 import { getMethodology, getRates, listRuns, statusVocabulary } from "@/lib/api/endpoints";
 import { BRAND } from "@/lib/brand";
+import { formatChainList } from "@/lib/chains";
+import { getPublishedRuns, sweptChains } from "@/lib/published-runs";
 import { CHECKS } from "@/lib/checks";
 import {
   NOT_CHECKED_GLYPH,
@@ -30,6 +32,7 @@ export const dynamic = "force-dynamic";
 
 export default async function MethodologyPage() {
   const m = await getMethodology();
+  const chains = formatChainList(sweptChains(await getPublishedRuns()));
 
   /**
    * The status words to define, taken from a real run rather than typed here.
@@ -61,7 +64,8 @@ export default async function MethodologyPage() {
         <h2 className="label">In short</h2>
         <ul className="mt-3 list-disc space-y-2 pl-5 text-sm leading-relaxed">
           <li>
-            Every agent registered under ERC-8004 gets the{" "}
+            Every agent registered under ERC-8004 on the chains this census
+            sweeps ({chains}) gets the{" "}
             <strong>same seven questions</strong>, called rungs here and{" "}
             <strong>checks 1&ndash;7</strong> everywhere else on the site, and
             every
@@ -109,13 +113,12 @@ export default async function MethodologyPage() {
 
       <p className="mt-6 max-w-prose leading-relaxed text-muted">
         {BRAND.name} is a conformance census, not a rating agency. Every agent
-        registered under ERC-8004 gets the same seven yes/no/skip/error
+        registered under ERC-8004 on the chains this census sweeps (
+        {chains}) gets the same seven yes/no/skip/error
         questions, called rungs, and every answer carries the evidence the
         checker collected to reach it. There is deliberately no score, grade,
-        tier, or ranking anywhere in this product — compressing seven
-        independent questions into one number is exactly the move every
-        competitor makes, and exactly the one this census refuses to make.
-        Reaching your own conclusion from the seven answers is the point.
+        tier, or ranking anywhere in this product. Reaching your own conclusion
+        from the seven answers is the point.
       </p>
 
       <section className="mt-14 max-w-4xl">
