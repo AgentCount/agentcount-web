@@ -7,7 +7,7 @@ import { ChainSwitcher } from "@/components/ChainSwitcher";
 import { RunProvenance } from "@/components/RunProvenance";
 import { Section } from "@/components/Section";
 import { StatusLegend } from "@/components/StatusLegend";
-import { aggregateFinding, latestRunPerChain, totalAgents } from "@/lib/api/aggregate";
+import { aggregateFinding, canonicalRuns, totalAgents } from "@/lib/api/aggregate";
 import {
   chainsWithRuns,
   getFindings,
@@ -19,6 +19,7 @@ import {
   statusVocabulary,
 } from "@/lib/api/endpoints";
 import type { Finding, Findings } from "@/lib/api/schemas";
+import { PUBLISHED_RUNS } from "@/lib/published-runs";
 import { REPORTS } from "@/lib/reports";
 
 // A build must not depend on the API being reachable: this page fetches live
@@ -73,9 +74,14 @@ export default async function Home({
   const allRuns = await listRuns();
   const perChain = sp.chain !== undefined || sp.run !== undefined;
 
-  // One sweep per chain, largest population first. Also the pool the
-  // all-chains view aggregates over.
-  const censusRuns = latestRunPerChain(allRuns);
+  // One sweep per chain, largest population first — restricted to runs whose
+  // archive has been published, because "finished most recently" is not the
+  // same question as "is the census" and the API cannot tell them apart. See
+  // `canonicalRuns`.
+  const censusRuns = canonicalRuns(
+    allRuns,
+    new Set(PUBLISHED_RUNS.map((r) => r.run_id)),
+  );
 
   // The run that the sample table, the rates and the status legend describe.
   // In all-chains mode there is no single run those could honestly be "of",
@@ -129,6 +135,35 @@ export default async function Home({
 
   const report = REPORTS[0];
 
+  /**
+   * How the headline states its own scope — and it must state it.
+   *
+   * "We checked all N registered AI agents" is false, and falsifiable by the
+   * first reader who looks: agents are registered under ERC-8004 on far more
+   * chains than this census sweeps, so "all" over a bare count claims a
+   * completeness nobody has. That is precisely the class of overclaim this
+   * census exists to catch, and it cannot appear in its own H1.
+   *
+   * "All" survives only because the scope is named in the same sentence: all
+   * the agents on these chains, which IS a complete count of a stated
+   * population.
+   *
+   * The phrasing degrades with the data rather than assuming four. On a day
+   * when one chain's sweep has not finished, or its archive is not yet
+   * published, the sentence names the chains actually summed instead of
+   * saying "four" over three — the runs table directly beneath it lists them,
+   * and a headline that disagrees with the table under it destroys the trust
+   * both exist to build.
+   */
+  const chainNames = new Intl.ListFormat("en", {
+    style: "long",
+    type: "conjunction",
+  }).format(censusRuns.map((r) => r.chain));
+  const scope =
+    censusRuns.length === 4
+      ? "the four largest chains"
+      : `${chainNames}`;
+
   return (
     <>
       <header className="border-b border-edge pb-6">
@@ -169,17 +204,19 @@ export default async function Home({
           </>
         ) : (
           <>
-            {/* The population IS the claim, so it is the sentence. The number
-                is interpolated from the runs themselves — never typed — so a
-                fifth chain or a fresh sweep moves it without an edit here. */}
-            <h1 className="numeral max-w-[20ch] text-[clamp(2rem,4.2vw,3.25rem)] text-text">
-              We checked all {population.toLocaleString("en-US")} registered AI
-              agents.
+            {/* The population IS the claim, so it is the sentence — with its
+                scope named in the same breath. See `scope` above for why "all"
+                is only permissible next to the population it is all of. Both
+                the number and the scope come from the runs, never typed, so a
+                fifth chain or an unfinished sweep moves them without an edit
+                here. */}
+            <h1 className="numeral max-w-[22ch] text-[clamp(2rem,4.2vw,3.25rem)] text-text">
+              We checked all {population.toLocaleString("en-US")} AI agents
+              registered on {scope}.
             </h1>
             <p className="mt-5 max-w-prose text-lg leading-relaxed text-muted">
-              Seven yes/no questions per agent, on {censusRuns.length} chains,
-              every answer recomputable. No scores, no rankings —{" "}
-              <span className="text-text">counts</span>.
+              Seven yes/no questions per agent, every answer recomputable. No
+              scores, no rankings — <span className="text-text">counts</span>.
             </p>
             <div className="mt-6">
               <AllRunsProvenance runs={censusRuns} />

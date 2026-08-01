@@ -1,5 +1,10 @@
 import { describe, expect, it } from "vitest";
-import { aggregateFinding, latestRunPerChain, totalAgents } from "@/lib/api/aggregate";
+import {
+  aggregateFinding,
+  canonicalRuns,
+  latestRunPerChain,
+  totalAgents,
+} from "@/lib/api/aggregate";
 import type { Findings, Run } from "@/lib/api/schemas";
 
 const run = (over: Partial<Run>): Run => ({
@@ -33,6 +38,62 @@ describe("latestRunPerChain", () => {
       run({ run_id: "done", chain: "celo", agent_count: 9747 }),
     ];
     expect(latestRunPerChain(runs).map((r) => r.run_id)).toEqual(["done"]);
+  });
+});
+
+describe("canonicalRuns", () => {
+  /**
+   * The case this function exists for, taken from real production data: on
+   * 2026-07-29 a 400-agent proof sweep of bsc completed 93 minutes before the
+   * 244,208-agent census sweep. Had the order been reversed — and nothing in
+   * the API stops it — "latest completed" would have made a proof sweep the
+   * homepage headline.
+   */
+  it("never lets a later proof sweep beat the published census run", () => {
+    const runs = [
+      run({ run_id: "proof", chain: "bsc", started_at: "2026-07-30T09:00:00Z", agent_count: 400 }),
+      run({ run_id: "census", chain: "bsc", started_at: "2026-07-29T19:31:31Z", agent_count: 244208 }),
+    ];
+    // Latest-completed picks the proof sweep. Canonical does not.
+    expect(latestRunPerChain(runs)[0].run_id).toBe("proof");
+    expect(canonicalRuns(runs, new Set(["census"])).map((r) => r.run_id)).toEqual([
+      "census",
+    ]);
+  });
+
+  it("drops a chain whose runs are all unpublished rather than guessing", () => {
+    const runs = [
+      run({ run_id: "pub", chain: "base", agent_count: 60097 }),
+      run({ run_id: "unpub", chain: "newchain", agent_count: 12 }),
+    ];
+    expect(canonicalRuns(runs, new Set(["pub"])).map((r) => r.chain)).toEqual(["base"]);
+  });
+
+  it("takes the newest published run when a chain has several", () => {
+    const runs = [
+      run({ run_id: "older", chain: "base", started_at: "2026-07-01T00:00:00Z", agent_count: 59999 }),
+      run({ run_id: "newer", chain: "base", started_at: "2026-07-29T08:43:02Z", agent_count: 60097 }),
+    ];
+    expect(
+      canonicalRuns(runs, new Set(["older", "newer"])).map((r) => r.run_id),
+    ).toEqual(["newer"]);
+  });
+
+  it("still ignores an in-flight run even if its id is published", () => {
+    const runs = [
+      run({ run_id: "flying", chain: "base", started_at: "2026-08-01T00:00:00Z", finished_at: null, agent_count: 900 }),
+      run({ run_id: "done", chain: "base", agent_count: 60097 }),
+    ];
+    expect(canonicalRuns(runs, new Set(["flying", "done"])).map((r) => r.run_id)).toEqual(
+      ["done"],
+    );
+  });
+
+  it("falls back to latest-completed when nothing is published at all", () => {
+    // A blank homepage is worse than a correctly-labelled degraded one, and
+    // the copy names the chains it actually summed either way.
+    const runs = [run({ run_id: "a", chain: "base", agent_count: 60097 })];
+    expect(canonicalRuns(runs, new Set()).map((r) => r.run_id)).toEqual(["a"]);
   });
 });
 

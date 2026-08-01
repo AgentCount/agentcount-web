@@ -13,17 +13,69 @@
     "rerun_command": "cargo run -p sweeper -- base   # at block 49230618"
   },
   {
-    "run_id": "c817ab28-8157-4925-93d6-2a6e0610020d",
+    "run_id": "9f2c1d40-77ab-4c58-9e13-2b8a4e6d5c02",
     "chain": "base",
-    "pinned_block": 49220816,
-    "started_at": "2026-07-28T09:29:39.674369Z",
-    "finished_at": "2026-07-28T12:19:15.931941Z",
-    "agent_count": 60037,
+    "pinned_block": 49299001,
+    "started_at": "2026-07-31T10:04:12.000000Z",
+    "finished_at": "2026-07-31T10:06:48.000000Z",
+    "agent_count": 400,
     "schema_version": 1,
-    "checker_version": "0.2.0",
-    "checker_commit": "96a9bef1a45a7830a25665b0f3b33aad0aa5e447",
+    "checker_version": "0.5.0",
+    "checker_commit": "72dc9b9c1183d2899dcb92f64b0fb46ed34bb29f",
     "spec_commit": "68fc6765761a10fb26f0692df21c8a6f9d12b1be",
-    "rerun_command": "cargo run -p sweeper -- base   # at block 49220816"
+    "rerun_command": "cargo run -p sweeper -- base --limit 400   # at block 49299001"
+  },
+  {
+    "run_id": "cfbfcc01-fdaf-409f-9bed-abf706d865c7",
+    "chain": "base",
+    "pinned_block": 49262617,
+    "started_at": "2026-07-29T08:43:02.803336+00:00",
+    "finished_at": "2026-07-29T11:51:12.024787+00:00",
+    "agent_count": 60097,
+    "schema_version": 7,
+    "checker_version": "0.6.0",
+    "checker_commit": "72dc9b9c1183d2899dcb92f64b0fb46ed34bb29f",
+    "spec_commit": "68fc6765761a10fb26f0692df21c8a6f9d12b1be",
+    "rerun_command": "cargo run -p sweeper -- base   # at block 49262617"
+  },
+  {
+    "run_id": "f78c7891-e787-43f1-9748-61d5a361e9ff",
+    "chain": "bsc",
+    "pinned_block": 112874357,
+    "started_at": "2026-07-29T19:31:31.986385+00:00",
+    "finished_at": "2026-07-30T06:50:51.109117+00:00",
+    "agent_count": 244208,
+    "schema_version": 7,
+    "checker_version": "0.6.0",
+    "checker_commit": "987ce24581f221a1d54a84b47a72d69100214e88-dirty",
+    "spec_commit": "68fc6765761a10fb26f0692df21c8a6f9d12b1be",
+    "rerun_command": "cargo run -p sweeper -- bsc   # at block 112874357"
+  },
+  {
+    "run_id": "18a25593-9098-40fd-a0d2-75553c6ee31d",
+    "chain": "mainnet",
+    "pinned_block": 25640407,
+    "started_at": "2026-07-29T18:52:29.451983+00:00",
+    "finished_at": "2026-07-29T19:31:31.563707+00:00",
+    "agent_count": 40806,
+    "schema_version": 7,
+    "checker_version": "0.6.0",
+    "checker_commit": "987ce24581f221a1d54a84b47a72d69100214e88-dirty",
+    "spec_commit": "68fc6765761a10fb26f0692df21c8a6f9d12b1be",
+    "rerun_command": "cargo run -p sweeper -- mainnet   # at block 25640407"
+  },
+  {
+    "run_id": "7833fc49-a5b7-477b-99ce-946f650f0064",
+    "chain": "celo",
+    "pinned_block": 73448013,
+    "started_at": "2026-07-29T18:12:51.816459+00:00",
+    "finished_at": "2026-07-29T18:44:19.719309+00:00",
+    "agent_count": 9747,
+    "schema_version": 7,
+    "checker_version": "0.6.0",
+    "checker_commit": "6b98ef4054bb0ad8ce1a51829753a15b7e4a3da8-dirty",
+    "spec_commit": "68fc6765761a10fb26f0692df21c8a6f9d12b1be",
+    "rerun_command": "cargo run -p sweeper -- celo   # at block 73448013"
   },
   {
     "run_id": "7a0755a0-18f3-4133-94a2-81f3f765bfb2",
@@ -37,31 +89,5 @@
     "checker_commit": "4c60118021497d4e743b66953bd8e5a3a0f44bf6-dirty",
     "spec_commit": "68fc6765761a10fb26f0692df21c8a6f9d12b1be",
     "rerun_command": "SWEEP_MAX_AGENTS=25 cargo run -p sweeper -- base   # at block 49197457"
-  },
-  {
-    "run_id": "b51d3a7e-2c44-4f18-9a01-7d6e0f2a1c93",
-    "chain": "bsc",
-    "pinned_block": 44120977,
-    "started_at": "2026-07-28T06:02:11.114820Z",
-    "finished_at": "2026-07-28T11:47:03.220145Z",
-    "agent_count": 244208,
-    "schema_version": 1,
-    "checker_version": "0.2.0",
-    "checker_commit": "96a9bef1a45a7830a25665b0f3b33aad0aa5e447",
-    "spec_commit": "68fc6765761a10fb26f0692df21c8a6f9d12b1be",
-    "rerun_command": "cargo run -p sweeper -- bsc   # at block 44120977"
-  },
-  {
-    "run_id": "ce10a2f5-9b7d-4c31-8e26-3f0a5d8b4711",
-    "chain": "celo",
-    "pinned_block": 31884502,
-    "started_at": "2026-07-28T07:15:44.902313Z",
-    "finished_at": "2026-07-28T08:31:29.556104Z",
-    "agent_count": 9747,
-    "schema_version": 1,
-    "checker_version": "0.2.0",
-    "checker_commit": "96a9bef1a45a7830a25665b0f3b33aad0aa5e447",
-    "spec_commit": "68fc6765761a10fb26f0692df21c8a6f9d12b1be",
-    "rerun_command": "cargo run -p sweeper -- celo   # at block 31884502"
   }
 ]

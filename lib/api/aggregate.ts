@@ -51,6 +51,49 @@ export function latestRunPerChain(runs: Run[]): Run[] {
 }
 
 /**
+ * The runs the headline may quote: newest COMPLETED and PUBLISHED, per chain.
+ *
+ * ## Why "latest completed" is not safe enough for a headline
+ *
+ * `/api/runs` has no field distinguishing a census sweep from a proof sweep,
+ * and no field marking a run superseded or retracted. `latestRunPerChain`
+ * therefore answers "which finished most recently", which is a different
+ * question from "which one is the census" — and production data already
+ * contains the collision: on 2026-07-29 a 400-agent proof sweep of bsc
+ * completed 93 minutes before the 244,208-agent census sweep of the same
+ * chain, and base carries ten runs of which six are sweeps of 25 to 1,998
+ * agents. Nothing but arrival order kept a proof sweep out of the headline,
+ * and arrival order is not a property anyone controls.
+ *
+ * ## Publication is the canonicality signal
+ *
+ * A published run has an archive at a permanent URL and a sha256 committed to
+ * git in the core repository (see `lib/published-runs.ts`). That commit is a
+ * human act, made once per census sweep and never for a proof sweep — which
+ * makes it exactly the marker the API lacks. As of 2026-08-01 the four
+ * published runs are precisely the four the report is built on, and they sum
+ * to its 354,858.
+ *
+ * The cost is staleness rather than error: a genuine new sweep does not reach
+ * the headline until its archive is published. That is the correct direction
+ * to fail for a claim of this weight — a number whose archive anyone can
+ * download, slightly behind, beats a fresher number nobody can check.
+ *
+ * A chain with no published run is DROPPED, not guessed at; the caller's copy
+ * names the chains it actually summed, so the sentence can never claim a
+ * chain the figures do not include.
+ */
+export function canonicalRuns(runs: Run[], publishedIds: ReadonlySet<string>): Run[] {
+  const published = runs.filter((r) => publishedIds.has(r.run_id));
+  const picked = latestRunPerChain(published);
+  // Nothing published at all — a fresh deployment, or a `published-runs.json`
+  // that has fallen out of step with the API's run ids. An empty homepage is
+  // worse than a degraded one, and the copy names what it summed either way,
+  // so this falls back rather than rendering nothing.
+  return picked.length > 0 ? picked : latestRunPerChain(runs);
+}
+
+/**
  * The population the homepage headline counts.
  *
  * A `null` agent_count contributes 0 rather than poisoning the sum to NaN —
