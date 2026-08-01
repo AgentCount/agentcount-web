@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { IBM_Plex_Mono, IBM_Plex_Sans, IBM_Plex_Sans_Condensed } from "next/font/google";
 import Link from "next/link";
+import { OutboundLink } from "@/components/OutboundLink";
 import { BRAND } from "@/lib/brand";
 import "./globals.css";
 
@@ -50,6 +51,47 @@ const NAV = [
   { href: "/census", label: "Census" },
   { href: "/methodology", label: "Method" },
 ];
+
+/**
+ * The two public repositories, linked from the footer.
+ *
+ * Deliberately not in `lib/brand.ts`: that module's own comment records that
+ * repository names are source-control identifiers rather than product
+ * branding, and kept outside it. They sit here beside `NAV` for the same
+ * reason `NAV` does — layout chrome, defined where it is rendered.
+ *
+ * Why the footer at all, rather than a line on the methodology page: this
+ * census asks a reader to re-check every claim against a second source, and
+ * the code that produced the claims is part of what there is to check. A
+ * conformance register that cannot itself be inspected is asking for the
+ * trust it declines to extend. Both repos are public and Apache-2.0.
+ *
+ * Ordered core-first: the Rust crates decide every rung on the site, the
+ * front end only renders what the API already settled.
+ */
+const SOURCE = [
+  {
+    href: "https://github.com/AgentCount/agentcount",
+    label: "Core (Rust)",
+    title: "Indexer, probe and checker — the code behind every rung",
+  },
+  {
+    href: "https://github.com/AgentCount/agentcount-web",
+    label: "This site",
+    title: "The Next.js front end you are reading",
+  },
+];
+
+/**
+ * Apache-2.0, pinned to the file on the default branch rather than to a
+ * `/blob/HEAD/` or bare-repo URL, so the link keeps resolving to the licence
+ * text itself. It points at the web repo because that is the code serving the
+ * page a reader is on; the core repo carries the same licence.
+ */
+const LICENSE = {
+  href: "https://github.com/AgentCount/agentcount-web/blob/main/LICENSE",
+  label: "Apache-2.0",
+};
 
 /**
  * Full-width and dense, in the manner of Etherscan and L2Beat.
@@ -104,11 +146,48 @@ export default function RootLayout({
 
         <footer className="mt-24 border-t border-edge px-5 py-8 sm:px-7">
           <div className="flex flex-wrap items-start justify-between gap-x-12 gap-y-6">
-            <p className="max-w-prose text-sm text-muted">
-              <span className="text-text">{BRAND.name}</span> is a conformance
-              census, not a rating agency. Every rung on this site carries the
-              evidence behind it, and nothing here is compressed into a score.
-            </p>
+            <div className="max-w-prose">
+              <p className="text-sm text-muted">
+                <span className="text-text">{BRAND.name}</span> is a conformance
+                census, not a rating agency. Every rung on this site carries the
+                evidence behind it, and nothing here is compressed into a score.
+              </p>
+              {/* The canonical domain, set as text rather than as a link: a
+                  reader on the canonical domain gains nothing from a link to
+                  where they already are.
+
+                  It earns its place because this page is not only served from
+                  there. It is also reachable on the Netlify deploy URL, and —
+                  being a public register whose whole promise is that claims can
+                  be re-checked — it is the kind of page that gets mirrored,
+                  archived and scraped. A reader holding a copy should be able
+                  to tell where the authoritative one lives. Mono, because it is
+                  an identifier rather than prose. */}
+              <p className="mt-3 font-mono text-xs text-muted">{BRAND.domain}</p>
+            </div>
+            {/* Source before Contact: a reader who wants to check something
+                should meet the code before they meet the inbox. */}
+            <div className="flex flex-col items-start gap-2">
+              <span className="label">Source</span>
+              {SOURCE.map((repo) => (
+                <OutboundLink
+                  key={repo.href}
+                  href={repo.href}
+                  title={repo.title}
+                  className="text-sm text-muted"
+                >
+                  {repo.label}
+                </OutboundLink>
+              ))}
+              <OutboundLink
+                href={LICENSE.href}
+                title="Licence terms for this site and the census code"
+                className="mt-1 text-sm text-muted"
+              >
+                {LICENSE.label}
+              </OutboundLink>
+            </div>
+
             <div className="flex flex-col gap-2">
               <span className="label">Contact</span>
               <a
