@@ -77,6 +77,10 @@ const NAV = [
   { href: "/working", label: "Working" },
   { href: "/preflight", label: "Pre-flight" },
   { href: "/census", label: "Census" },
+  // Top level rather than filed under the census, because it is the join
+  // between two layers this project measures separately and the one number a
+  // reader is most likely to arrive already holding an opinion about.
+  { href: "/linkage", label: "Linkage" },
   // Between the data and the method, because that is what a report is: the
   // long-form argument the census pages summarise. It earns a top-level slot
   // rather than a footer link because a citation resolves here, and a reader

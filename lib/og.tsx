@@ -99,6 +99,26 @@ export function Masthead() {
 }
 
 /**
+ * Shrink a headline figure so it fits one line of its cell.
+ *
+ * Four cells share 1072px of usable width, so each gets roughly 250px. At
+ * weight 700 a digit is about 0.6em wide, which puts the limits below at
+ * roughly the point where a value would otherwise wrap — and wrapping is the
+ * failure mode that matters here, because the cell is a fixed height with the
+ * label pinned to its bottom, so a second line of the VALUE lands on top of
+ * the label rather than pushing it down.
+ *
+ * Found by rendering `1 in 10,437` on the linkage card, where it did exactly
+ * that. `whiteSpace: nowrap` alone would have overflowed the cell instead —
+ * tidier, still wrong.
+ */
+function valueSize(value: string): number {
+  if (value.length <= 7) return 52;
+  if (value.length <= 10) return 42;
+  return 34;
+}
+
+/**
  * Build a card. Returns the `ImageResponse` an `opengraph-image` route exports.
  *
  * Every caller passes strings it has already formatted; nothing here fetches,
@@ -164,7 +184,19 @@ export function ogCard({ title, blurb, stats, note }: CardOptions): ImageRespons
                     paddingLeft: 18,
                   }}
                 >
-                  <div style={{ fontSize: 52, fontWeight: 700, color: COLOR.text }}>
+                  <div
+                    style={{
+                      fontSize: valueSize(s.value),
+                      fontWeight: 700,
+                      color: COLOR.text,
+                      // Satori has no auto-fit and no `text-overflow`, so a
+                      // value too wide for its cell WRAPS — and in a
+                      // fixed-height column that means it wraps over its own
+                      // label. `valueSize` is the whole defence; see there.
+                      lineHeight: 1.05,
+                      whiteSpace: "nowrap",
+                    }}
+                  >
                     {s.value}
                   </div>
                   <div

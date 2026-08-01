@@ -116,6 +116,7 @@ const ROUTES: { path: string; expect: number; card: boolean }[] = [
   { path: "/reports", expect: 200, card: true },
   { path: "/reports/2026-07-census", expect: 200, card: true },
   { path: "/neutrality", expect: 200, card: true },
+  { path: "/linkage", expect: 200, card: true },
   { path: "/agent/base/1", expect: 200, card: true },
   // The `?run=` form is what took the route down: reading it is dynamic usage,
   // and a page declared static may not do it.
