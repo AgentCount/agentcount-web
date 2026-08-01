@@ -3,41 +3,54 @@ import { BRAND } from "@/lib/brand";
 /**
  * "Get each census report by email."
  *
- * ## No backend, deliberately
+ * ## The list is ours, not a provider's
  *
- * A plain HTML form that POSTs straight to a hosted list provider. No API
- * route, no database table, no address ever touching this project's
- * infrastructure — which means there is nothing here to leak, nothing to
- * migrate, and no unsubscribe flow to get wrong. The provider already solves
- * double opt-in, bounce handling and one-click unsubscribe, and solves them
- * better than a weekend's work would.
+ * This posted to a hosted list provider until 2026-08-01. It now posts to
+ * `/api/subscribe` on this origin, which calls the census API server-side,
+ * which writes a row. The reason for the change is that a provider is a
+ * subscription and a configuration to maintain before anyone has shown they
+ * want the reports at all — and the sending side, which is the genuinely hard
+ * part, is not needed until there is something to send.
  *
- * It also needs no JavaScript. This is a server component and the form is a
- * form: it works with scripting disabled, which is a reasonable thing to
- * expect of a page whose whole audience is people who check things.
+ * What that costs is stated on the page rather than glossed: **nothing here
+ * sends mail, so nothing here can run a double opt-in.** Anyone can type
+ * anyone else's address in. Every row is stored unconfirmed and the first send
+ * has to confirm before it goes anywhere — see migration 0017 and
+ * `crates/api/src/routes/subscribe.rs`.
  *
- * ## It renders NOTHING until it is configured
+ * It still needs no JavaScript. A plain form, posting to a route handler that
+ * answers with a 303 to a real page: the back button behaves, a refresh does
+ * not resubmit, and none of it depends on script. That seems the least a page
+ * can offer an audience whose reason for being here is checking things.
  *
- * `NEWSLETTER_ACTION` is the provider's subscribe endpoint. Unset — which is
- * the state until someone creates the list — this component returns `null`
- * rather than a form. A form that silently posts nowhere is worse than no
- * form: a reader believes they subscribed, and finds out they did not when
- * the report they were waiting for never arrives.
+ * ## It renders NOTHING until it is switched on
  *
- * **Setting it needs a redeploy, not just an environment change.** This
+ * `NEWSLETTER_ENABLED` must be `true`. Unset — which is the state until
+ * someone decides to collect addresses — this returns `null` rather than a
+ * form. A form that records nothing is worse than no form: a reader believes
+ * they subscribed and finds out otherwise when the report never arrives.
+ *
+ * A flag rather than the provider URL it replaced, because there is no longer
+ * a URL to configure. It is still an environment variable rather than a
+ * constant so that collecting addresses stays a deliberate act with a date on
+ * it, and so a preview deploy can be left inert.
+ *
+ * **Switching it on needs a redeploy, not just an environment change.** This
  * renders on `/` (dynamic, reads the variable per request) and on `/reports`
  * (static, reads it at build time). Changing the value without rebuilding
- * would show the form on one and not the other — which is the sort of
- * half-configured state that gets noticed by a reader rather than by us.
+ * would show the form on one and not the other — the sort of half-configured
+ * state that gets noticed by a reader rather than by us.
  */
 export function EmailCapture({
   /** Small variant for the foot of a long page; `lead` for the homepage. */
   variant = "lead",
+  /** Which page this instance is on, recorded so the two can be compared. */
+  source,
 }: {
   variant?: "lead" | "quiet";
+  source?: string;
 }) {
-  const action = process.env.NEWSLETTER_ACTION;
-  if (!action) return null;
+  if (process.env.NEWSLETTER_ENABLED !== "true") return null;
 
   const lead = variant === "lead";
   return (
@@ -54,25 +67,30 @@ export function EmailCapture({
         them.
       </p>
       <form
-        action={action}
+        action="/api/subscribe"
         method="post"
-        // The provider's confirmation page opens beside this one rather than
-        // replacing it. A reader mid-report should not lose their place to
-        // subscribe to the report.
-        target="_blank"
-        rel="noopener"
         className="mt-5 flex flex-wrap items-stretch gap-3"
       >
         <label htmlFor="newsletter-email" className="sr-only">
           Email address
         </label>
-        {/* Buttondown's marker for "this came from an embedded form", which is
-            what makes it answer with a human confirmation page instead of a
-            raw API response. Harmless anywhere else — every provider worth
-            using ignores a field it does not know — so it stays unconditional
-            rather than becoming a second environment variable that has to
-            agree with the first one. */}
-        <input type="hidden" name="embed" value="1" />
+        {/* Which page this was, so "does the report page convert better than
+            the homepage" is answerable. About the site, not the person. */}
+        <input type="hidden" name="source" value={source ?? ""} />
+        {/* The honeypot. Hidden from people and irresistible to naive bots;
+            anything that fills it gets a success response and no row.
+            `tabIndex={-1}` and `autoComplete="off"` keep it away from keyboard
+            users and password managers, and `aria-hidden` from screen readers
+            — a field only a bot should ever see must be invisible to every
+            way a person navigates, not just to sighted mouse users. */}
+        <input
+          type="text"
+          name="website"
+          tabIndex={-1}
+          autoComplete="off"
+          aria-hidden="true"
+          className="hidden"
+        />
         <input
           id="newsletter-email"
           type="email"
@@ -89,9 +107,24 @@ export function EmailCapture({
           Subscribe
         </button>
       </form>
+      {/* This said "your address goes to the list provider, not to
+          AgentCount — we keep no copy of it" while the form posted to a hosted
+          provider. The list moved in-house on 2026-08-01 and that sentence
+          became false, so it changed in the same commit. A privacy claim is
+          the last piece of copy that should be allowed to lag its
+          implementation. */}
       <p className="mt-3 text-xs leading-relaxed text-dead">
-        Your address goes to the list provider, not to {BRAND.name}. We keep no
-        copy of it and it is never used for anything but the report.
+        Your address is stored by {BRAND.name} and used for nothing but the
+        census reports. Nothing is sent yet — there is no sending side built,
+        so there is no confirmation email to expect, and you will be asked to
+        confirm before the first report goes anywhere. Email{" "}
+        <a
+          href={`mailto:${BRAND.contactEmail}`}
+          className="underline decoration-line underline-offset-4 transition-colors hover:text-muted"
+        >
+          {BRAND.contactEmail}
+        </a>{" "}
+        at any point and it is deleted.
       </p>
     </section>
   );
