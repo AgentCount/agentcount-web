@@ -28,4 +28,74 @@ const nextConfig: NextConfig = {
   },
 };
 
+/**
+ * Every URL this site has ever published still resolves.
+ *
+ * Four sections were folded into the pages that already contained their
+ * subject — but a census asks to be cited, and a citation that 404s is worse
+ * than the reorganisation was good. These are permanent (308) rather than
+ * temporary because the moves are: 308 also preserves the method and body,
+ * unlike the 301 a browser may silently downgrade to GET.
+ *
+ * `/stats` was a page-level `permanentRedirect` before this; it moves here so
+ * every legacy URL is declared in one list rather than half in config and half
+ * as route files that look like real pages.
+ *
+ * Query strings survive automatically — Next appends the original query to the
+ * destination — so `/census?chain=bsc` lands on the right chain's rates.
+ */
+nextConfig.redirects = async () => [
+  // The per-rung base rates are a section of the findings page now. `/stats`
+  // was this page's first address, and pointed at `/census`; both land on the
+  // same content, one hop.
+  { source: "/census", destination: "/", permanent: true },
+  { source: "/stats", destination: "/", permanent: true },
+  // "Agents that passed every check" was always a filter rather than a
+  // section. The destination is the directory carrying that filter, spelled
+  // out as facets so the URL says what it means and can be widened from the
+  // controls it arrives with.
+  //
+  // The rungs are LITERAL here, which is the one place in this app that is
+  // true: `next.config.ts` is evaluated at build time with no API to ask, and
+  // the alternative — redirecting to a bare `/directory` — would silently drop
+  // the filter that was the whole point of the old URL. Rung 6 is deliberately
+  // absent, matching what the page computed from the run's own rates. If a
+  // rung is added, this list wants updating; the preset chip in
+  // `DirectoryControls` derives itself and does not.
+  {
+    source: "/working",
+    destination:
+      "/directory?facet=1%3Apass&facet=2%3Apass&facet=3%3Apass&facet=4%3Apass&facet=5%3Apass&facet=7%3Apass",
+    permanent: true,
+  },
+  // The identity-to-payments join is a report: long-form, dated, cited.
+  { source: "/linkage", destination: "/reports/linkage", permanent: true },
+
+  /**
+   * The old cards, kept alive.
+   *
+   * A page's `opengraph-image` is a URL in its own right, and social platforms
+   * cache it independently of the page and re-fetch it later. Moving or
+   * removing a page therefore strands its card URL: the post keeps pointing at
+   * `/linkage/opengraph-image`, the re-fetch 404s, and a link that unfurled
+   * yesterday shows a broken preview today — on someone else's timeline, where
+   * we cannot fix it.
+   *
+   * So each retired card redirects to the card of the page that absorbed its
+   * subject. `/linkage` keeps its own image byte-for-byte; the other two point
+   * at the card for the page their content now lives on.
+   */
+  {
+    source: "/linkage/opengraph-image",
+    destination: "/reports/linkage/opengraph-image",
+    permanent: true,
+  },
+  { source: "/census/opengraph-image", destination: "/opengraph-image", permanent: true },
+  {
+    source: "/working/opengraph-image",
+    destination: "/directory/opengraph-image",
+    permanent: true,
+  },
+];
+
 export default nextConfig;

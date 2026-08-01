@@ -3,7 +3,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { OutboundLink } from "@/components/OutboundLink";
 import { ReportBody } from "@/components/ReportBody";
-import { CORE_REPO, REPORTS, findReport } from "@/lib/reports";
+import { CORE_REPO, findReport, markdownReports } from "@/lib/reports";
 import { readReportMarkdown, stripLeadingH1 } from "@/lib/reports-content";
 
 type Params = { slug: string };
@@ -22,7 +22,9 @@ type Params = { slug: string };
 export const dynamicParams = false;
 
 export function generateStaticParams(): Params[] {
-  return REPORTS.map((r) => ({ slug: r.slug }));
+  // Only the markdown ones: `/reports/linkage` is its own route, and
+  // asking this one to prerender it would look for a file that is not there.
+  return markdownReports().map((r) => ({ slug: r.slug }));
 }
 
 export async function generateMetadata({
@@ -48,7 +50,10 @@ export async function generateMetadata({
 export default async function ReportPage({ params }: { params: Promise<Params> }) {
   const { slug } = await params;
   const report = findReport(slug);
-  if (!report) notFound();
+  // `file === null` means the report is its own route, which Next matches
+  // ahead of this dynamic one — so reaching here with one is a 404, not a
+  // read of a file that does not exist.
+  if (!report || report.file === null) notFound();
 
   const markdown = stripLeadingH1(await readReportMarkdown(report.file));
 

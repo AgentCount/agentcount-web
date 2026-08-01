@@ -32,6 +32,32 @@ import { statusClasses, statusGlyph, statusInkClass, statusLabel } from "@/lib/s
  * endpoint. It tells a reader how big a filter's result will be before they
  * run it; it is not a score, and no count here is ever summed across rungs.
  */
+/**
+ * The rungs a run actually reported, each required to be `pass`.
+ *
+ * Read from the run's own rates rather than written down, which is what
+ * `/working` did before this replaced it: rung 6 is unimplemented and produces
+ * no rows, so requiring it would return nobody forever and imply the question
+ * is being asked. When it ships, the preset tightens with no code change.
+ */
+export function allPassFacets(rates: Rates): RungFacet[] {
+  return rates.rungs.map((r) => ({ rung: r.rung, status: "pass" }));
+}
+
+function allPassQuery(rates: Rates): string {
+  return allPassFacets(rates)
+    .map((f) => `facet=${encodeURIComponent(`${f.rung}:${f.status}`)}`)
+    .join("&");
+}
+
+/** Whether the current filter IS the all-pass preset, for the active chip. */
+function isAllPass(rates: Rates, facets: RungFacet[]): boolean {
+  const want = allPassFacets(rates);
+  if (facets.length !== want.length || want.length === 0) return false;
+  const have = new Set(facets.map((f) => `${f.rung}:${f.status}`));
+  return want.every((f) => have.has(`${f.rung}:${f.status}`));
+}
+
 export function DirectoryControls({
   rates,
   facets,
@@ -83,6 +109,36 @@ export function DirectoryControls({
             Reset
           </Link>
         )}
+      </div>
+
+      {/* The preset that used to be its own page.
+
+          `/working` was the directory with every implemented rung fixed to
+          `pass`, which is a filter rather than a section — so it is a filter
+          here now, one click from the controls that can widen it again. The
+          rung list comes from the run's own rates, exactly as `/working`
+          computed it: rung 6 produces no rows, so it is not among the
+          conditions and nobody is credited for it. When it ships, this preset
+          gets stricter on its own.
+
+          Deliberately still not a score: it asks one yes/no question of each
+          agent and lists the agents whose answer is yes. No count of passed
+          rungs is attached to anyone. */}
+      <div className="flex flex-wrap items-baseline gap-x-4 gap-y-2 border-b border-line px-4 py-2.5">
+        <span className="label">Preset</span>
+        <Link
+          href={`${action}?chain=${encodeURIComponent(chain)}&${allPassQuery(rates)}`}
+          className={`border px-2.5 py-1 font-mono text-[0.6875rem] uppercase tracking-[0.08em] transition-colors ${
+            isAllPass(rates, facets)
+              ? "border-edge bg-raised text-text"
+              : "border-line text-dead hover:border-edge hover:text-muted"
+          }`}
+        >
+          Passing all checks
+        </Link>
+        <span className="text-[0.6875rem] text-dead">
+          every rung this run asked came back pass
+        </span>
       </div>
 
       <fieldset className="px-4 py-3">

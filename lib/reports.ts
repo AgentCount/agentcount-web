@@ -37,8 +37,17 @@ export type Report = {
   chains: string[];
   /** Total agents the report covers, formatted for display. */
   agents: string;
-  /** The file under `content/reports/`, without the extension. */
-  file: string;
+  /**
+   * The file under `content/reports/`, without the extension.
+   *
+   * `null` for a report that is its own route rather than a markdown
+   * document — `/reports/linkage` is a rendered page because its argument is
+   * a set of live joins and tables, not prose. It appears in this index like
+   * any other report and is deliberately excluded from the markdown route's
+   * `generateStaticParams`, which would otherwise try to read a file that
+   * does not exist and fail the build.
+   */
+  file: string | null;
   /** Path of the source file in the core repo, for the provenance line. */
   source: string;
 };
@@ -48,6 +57,17 @@ export type Report = {
  * index, the routes, the sitemap and the card all read from here.
  */
 export const REPORTS: Report[] = [
+  {
+    slug: "linkage",
+    title: "Identity and payments: what the money actually does",
+    date: "2026-07-31",
+    summary:
+      "Where the census identity layer meets the payments layer: 358 agents of 354,858 have ever been paid, 34 have ever settled through x402, and agent-linked value is 0.017% of x402's top-100 volume.",
+    chains: ["base", "bsc", "mainnet", "celo"],
+    agents: "354,858",
+    file: null,
+    source: "analysis/linkage",
+  },
   {
     slug: "2026-07-census",
     title: "ERC-8004 conformance census: four chains",
@@ -63,6 +83,11 @@ export const REPORTS: Report[] = [
 
 export function findReport(slug: string): Report | undefined {
   return REPORTS.find((r) => r.slug === slug);
+}
+
+/** The reports rendered from markdown — everything the `[slug]` route owns. */
+export function markdownReports(): Report[] {
+  return REPORTS.filter((r) => r.file !== null);
 }
 
 /** The core repository, where every report and every document it cites lives. */

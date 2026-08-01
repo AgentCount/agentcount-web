@@ -117,7 +117,7 @@ export async function AgentDirectory({
           </span>
           <span className="text-line">|</span>
           <Link
-            href="/census"
+            href={`/?chain=${encodeURIComponent(run.chain)}`}
             className="underline decoration-line underline-offset-4 transition-colors hover:text-text"
           >
             provenance
@@ -139,17 +139,52 @@ export async function AgentDirectory({
       )}
 
       {agents.items.length === 0 ? (
-        <p className="mt-8 max-w-prose border-l-2 border-edge pl-5 text-sm leading-relaxed text-muted">
-          No agents match this filter in run {run.run_id.slice(0, 8)}.{" "}
-          {facets.length > 0 && (
-            <>
-              Every one of the {facets.length} rung conditions has to hold at
-              once (
-              <span className="font-mono text-text">{serialiseFacets(facets)}</span>
-              ).
-            </>
+        <div className="mt-8 max-w-prose border-l-2 border-edge pl-5 text-sm leading-relaxed text-muted">
+          <p>
+            No agents match this filter in run {run.run_id.slice(0, 8)}.{" "}
+            {facets.length > 0 && (
+              <>
+                Every one of the {facets.length} rung conditions has to hold at
+                once (
+                <span className="font-mono text-text">{serialiseFacets(facets)}</span>
+                ).
+              </>
+            )}
+          </p>
+          {/* The id escape hatch.
+
+              The API's `q` searches name, description and owner prefix — an
+              on-chain agent id matches none of them, so pasting "1234" into
+              any search box on this site returns nothing at all. That is the
+              single most likely way for a first-time visitor to conclude the
+              register does not contain the agent they came to look up.
+
+              Offered only once a search has actually come back empty, and
+              only for a numeric query: at that point the id reading is the
+              only remaining interpretation, and this is the one place that
+              knows no name matched. Every swept chain is listed because an id
+              is not unique across chains — guessing one would send half the
+              askers to the wrong agent. */}
+          {/^\d+$/.test(q) && (
+            <p className="mt-4">
+              <span className="text-text">{q}</span> looks like an agent id.
+              Search covers names, descriptions and owner addresses, not ids —
+              open the permalink directly:{" "}
+              {chainsWithRuns(allRuns).map((chain, i, all) => (
+                <span key={chain}>
+                  <Link
+                    href={`/agent/${encodeURIComponent(chain)}/${encodeURIComponent(q)}`}
+                    className="font-mono text-text underline decoration-line underline-offset-4 transition-colors hover:decoration-edge"
+                  >
+                    {chain}/{q}
+                  </Link>
+                  {i < all.length - 1 ? ", " : ""}
+                </span>
+              ))}
+              .
+            </p>
           )}
-        </p>
+        </div>
       ) : (
         <>
           <div className="mt-8">
