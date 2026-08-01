@@ -43,9 +43,13 @@ describe("schemas accept what the API actually returns", () => {
 
   it("parses a completed run with a null pinned_block (an early dev sweep)", () => {
     const parsed = runsSchema.parse(runs);
-    const dirty = parsed.find((r) => r.checker_commit.endsWith("-dirty"));
-    expect(dirty?.pinned_block).toBeNull();
-    expect(dirty?.finished_at).not.toBeNull();
+    // Selected by the shape under test rather than by a `-dirty` checker
+    // commit, which used to identify this run and no longer does: three of
+    // the four PUBLISHED census runs carry `-dirty` commits too, so that
+    // proxy started matching a real sweep with a real pinned block.
+    const nullBlock = parsed.find((r) => r.pinned_block === null);
+    expect(nullBlock).toBeDefined();
+    expect(nullBlock?.finished_at).not.toBeNull();
   });
 
   it("parses rates — one denominator per (rung, status), never a per-agent field", () => {
