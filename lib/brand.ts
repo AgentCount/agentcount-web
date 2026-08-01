@@ -26,6 +26,38 @@ export const BRAND = {
    */
   tagline:
     "An independent ERC-8004 conformance census: seven rungs per agent, evidence attached, no score.",
+  /**
+   * The greeting: positioning, not method.
+   *
+   * The masthead said "ERC-8004 conformance census", which is an accurate
+   * self-description and a poor greeting — it asks a first-time visitor to
+   * already know what ERC-8004 is before it tells them anything, and it
+   * describes the METHOD when the first second should carry the CLAIM.
+   *
+   * "Counts, not scores" is the whole argument in three words, and it is the
+   * one thing about this project that is unusual enough to be worth the
+   * masthead. The technical self-description does not disappear — see
+   * [`selfDescription`].
+   */
+  greeting: "Counts, not scores.",
+  /**
+   * The technical self-description, kept verbatim and moved rather than
+   * dropped: the footer and the meta description are where a reader who wants
+   * to know exactly what this is will look, and where a search result needs
+   * it to be.
+   */
+  selfDescription: "ERC-8004 conformance census",
+  /**
+   * One sentence for someone who arrived knowing nothing at all.
+   *
+   * Deliberately says "AI agent" before it says ERC-8004, because the reader
+   * who needs this sentence does not know the second phrase. It names the
+   * three things measured in the order the site measures them — what they
+   * declare, what works, what the money does — and ends on the claim that
+   * makes every other number checkable.
+   */
+  newcomer:
+    "AgentCount is an independent, open-source census of every AI agent registered under ERC-8004 — what they declare, what actually works, and what the money does. All code and data are public.",
 } as const;
 
 /** `<title>` for any page but the homepage. One format, one place. */

@@ -218,9 +218,10 @@ export default function RootLayout({
                 />
                 {BRAND.name}
               </Link>
-              <span className="hidden label sm:inline">
-                ERC-8004 conformance census
-              </span>
+              {/* Positioning, not method. The technical self-description
+                  moved to the footer and the meta description — see
+                  `BRAND.greeting`. */}
+              <span className="hidden label sm:inline">{BRAND.greeting}</span>
             </div>
             <nav aria-label="Main" className="flex flex-wrap items-center gap-x-7 gap-y-2">
               {NAV.map((item) => (
@@ -241,7 +242,13 @@ export default function RootLayout({
         <footer className="mt-24 border-t border-edge px-5 py-8 sm:px-7">
           <div className="flex flex-wrap items-start justify-between gap-x-12 gap-y-6">
             <div className="max-w-prose">
-              <p className="text-sm text-muted">
+              {/* The five-second line, for a reader who arrived knowing
+                  nothing. First thing in the footer because the footer is
+                  where someone who did not understand the rest of the page
+                  goes looking — and it is written to be the one sentence
+                  that makes the rest legible, not a summary of it. */}
+              <p className="text-sm text-text">{BRAND.newcomer}</p>
+              <p className="mt-3 text-sm text-muted">
                 <span className="text-text">{BRAND.name}</span> is a conformance
                 census, not a rating agency. Every rung on this site carries the
                 evidence behind it, and nothing here is compressed into a score.
@@ -257,7 +264,13 @@ export default function RootLayout({
                   archived and scraped. A reader holding a copy should be able
                   to tell where the authoritative one lives. Mono, because it is
                   an identifier rather than prose. */}
-              <p className="mt-3 font-mono text-xs text-muted">{BRAND.domain}</p>
+              {/* The technical self-description, displaced from the masthead
+                  by `BRAND.greeting`. It sits with the domain because both
+                  are identifiers rather than prose: what this is, and where
+                  the authoritative copy lives. */}
+              <p className="mt-3 font-mono text-xs text-muted">
+                {BRAND.selfDescription} · {BRAND.domain}
+              </p>
             </div>
             <div className="flex flex-col items-start gap-2">
               <span className="label">About</span>
