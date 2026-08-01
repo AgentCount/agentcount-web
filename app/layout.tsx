@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { IBM_Plex_Mono, IBM_Plex_Sans, IBM_Plex_Sans_Condensed } from "next/font/google";
 import Link from "next/link";
 import { OutboundLink } from "@/components/OutboundLink";
+import { TallyMark } from "@/components/TallyMark";
 import { BRAND } from "@/lib/brand";
 import "./globals.css";
 
@@ -36,11 +37,47 @@ const plexCondensed = IBM_Plex_Sans_Condensed({
 });
 
 export const metadata: Metadata = {
+  /**
+   * The origin every relative URL in this app's metadata resolves against —
+   * `og:image` above all.
+   *
+   * Next does not default this to anything useful. Unset, it guesses: the
+   * build host during a build, `http://localhost:3000` in dev, and it says so
+   * in a warning nobody reads because the pages render perfectly either way.
+   * What it produces is an absolute `og:image` on an origin that is not this
+   * site, over plain `http`. Crawlers do not follow that, so the card silently
+   * does not exist — which is exactly the failure this project shipped with.
+   *
+   * Hardcoded to the canonical domain rather than read from the deploy's own
+   * URL, and that IS the intent: a preview deploy should advertise the
+   * production card. A link shared from a preview is still a link to this
+   * project, and pointing its preview at an ephemeral deploy URL means the
+   * card dies when the deploy is cleaned up.
+   */
+  metadataBase: new URL(`https://${BRAND.domain}`),
   // `template` means every page sets only its own name and gets the product
   // name appended — one more thing the rename in `lib/brand.ts` reaches.
   title: { default: BRAND.name, template: `%s — ${BRAND.name}` },
   description: BRAND.tagline,
   openGraph: { siteName: BRAND.name, type: "website" },
+  /**
+   * The large card, everywhere.
+   *
+   * Next infers `summary_large_image` on any page that resolves an
+   * `opengraph-image`, so this is not what makes the agent cards large. It is
+   * here for the pages that have not got one yet: `summary` renders a small
+   * square thumbnail beside the text, which for a 1200x630 card means a
+   * centre-crop that cuts the wordmark off both sides.
+   */
+  twitter: { card: "summary_large_image" },
+  /**
+   * `public/site.webmanifest` — the 512px maskable icon and the theme colour.
+   * The rest of the icon set (`icon.svg`, `favicon.ico`, `apple-icon.png`)
+   * needs no entry here: those are file conventions in `app/`, and Next emits
+   * their `<link>` tags on every route by itself. All of them are drawn from
+   * one geometry, `lib/tally.ts`, by `scripts/generate-brand.tsx`.
+   */
+  manifest: "/site.webmanifest",
 };
 
 const NAV = [
@@ -49,7 +86,29 @@ const NAV = [
   { href: "/working", label: "Working" },
   { href: "/preflight", label: "Pre-flight" },
   { href: "/census", label: "Census" },
+  // Top level rather than filed under the census, because it is the join
+  // between two layers this project measures separately and the one number a
+  // reader is most likely to arrive already holding an opinion about.
+  { href: "/linkage", label: "Linkage" },
+  // Between the data and the method, because that is what a report is: the
+  // long-form argument the census pages summarise. It earns a top-level slot
+  // rather than a footer link because a citation resolves here, and a reader
+  // arriving from someone else's footnote should not have to hunt for the rest
+  // of the series.
+  { href: "/reports", label: "Reports" },
   { href: "/methodology", label: "Method" },
+];
+
+/**
+ * The pages that say what this project is rather than what it measured.
+ *
+ * Footer rather than nav: nobody arrives looking for them, and both exist to
+ * be found at the moment a reader starts wondering — which is usually after
+ * they have read a finding that names someone.
+ */
+const ABOUT = [
+  { href: "/neutrality", label: "Who pays for this" },
+  { href: "/reports", label: "Reports" },
 ];
 
 /**
@@ -122,6 +181,13 @@ export default function RootLayout({
                 href="/"
                 className="font-display text-2xl font-semibold uppercase tracking-[0.16em] text-text"
               >
+                {/* Inline, on the text baseline, at cap height: the mark is
+                    part of the wordmark's line, not a badge beside it. Green
+                    via the real `text-live` token — the mark is drawn in
+                    `currentColor`, so this is the one saturated colour rule
+                    (`globals.css`) being borrowed, not broken: it is the
+                    status palette's own green, claiming nothing. */}
+                <TallyMark className="mr-2.5 inline-block h-[0.72em] w-[0.72em] text-live" />
                 {BRAND.name}
               </Link>
               <span className="hidden label sm:inline">
@@ -165,6 +231,19 @@ export default function RootLayout({
                   an identifier rather than prose. */}
               <p className="mt-3 font-mono text-xs text-muted">{BRAND.domain}</p>
             </div>
+            <div className="flex flex-col items-start gap-2">
+              <span className="label">About</span>
+              {ABOUT.map((item) => (
+                <Link
+                  key={item.href}
+                  href={item.href}
+                  className="text-sm text-muted underline decoration-line underline-offset-4 transition-colors hover:text-text hover:decoration-edge"
+                >
+                  {item.label}
+                </Link>
+              ))}
+            </div>
+
             {/* Source before Contact: a reader who wants to check something
                 should meet the code before they meet the inbox. */}
             <div className="flex flex-col items-start gap-2">

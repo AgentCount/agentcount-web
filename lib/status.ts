@@ -24,13 +24,19 @@
  * a `title`/`aria-label` spelling the status out in words. Colour is
  * reinforcement, never the carrier.
  *
- * ## Six states, six renderings
+ * ## Seven states, seven renderings
  *
- * `pass`, `fail`, `skipped`, `error`, `unclaimed` and "not checked" are six
- * distinct claims and must never collapse into each other. `unclaimed` has its
- * own cool blue — it used to share the neutral grey of an unrecognised status,
- * which meant the one status the checker invented for "there was nothing here
- * to check" looked like a status this app had never heard of.
+ * `pass`, `fail`, `skipped`, `error`, `unclaimed`, `unprobeable` and "not
+ * checked" are seven distinct claims and must never collapse into each other.
+ * `unclaimed` has its own cool blue — it used to share the neutral grey of an
+ * unrecognised status, which meant the one status the checker invented for
+ * "there was nothing here to check" looked like a status this app had never
+ * heard of.
+ *
+ * `unprobeable` (rung 6, 2026-08-01) shares that blue rather than taking a
+ * seventh hue, because it is the same kind of claim: the rung ran and found
+ * nothing to judge. The two are told apart by their glyphs, which is this
+ * module's own rule — colour is reinforcement, the glyph is the carrier.
  */
 
 type StatusStyle = {
@@ -84,6 +90,18 @@ const STATUS: Record<string, StatusStyle> = {
     fill: "bg-claim",
     glyph: "○",
     label: "unclaimed — the document made no claim to check",
+  },
+  // Rung 6 only, from 2026-08-01. Shares `unclaimed`'s cool blue because it
+  // is the same kind of claim — the rung ran and found nothing it could judge
+  // — and a seventh hue would imply a category that does not exist. The GLYPH
+  // is what separates them, which is the rule this module already follows:
+  // `○` for "said nothing", `⌀` for "said something nothing can dial".
+  unprobeable: {
+    ink: "text-claim",
+    chip: "border-claim/40 text-claim",
+    fill: "bg-claim",
+    glyph: "⌀",
+    label: "unprobeable — no declared endpoint that a probe can reach",
   },
 };
 

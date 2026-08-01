@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { AgentTable } from "@/components/AgentTable";
+import { EmailCapture } from "@/components/EmailCapture";
 import { CountTile, FindingTile } from "@/components/FindingTile";
 import { ChainSwitcher } from "@/components/ChainSwitcher";
 import { RunProvenance } from "@/components/RunProvenance";
@@ -147,6 +148,21 @@ export default async function Home({
           </CountTile>
         </div>
 
+        {/* The four tiles above are one chain at one block. The report is the
+            four-chain argument they are a slice of — and the place where this
+            chain's 49.2% attestation rate is shown to be 12.2% across the
+            population. A reader who takes a number off this page and stops
+            here has the number without the qualification, so the route to the
+            qualification sits directly under the numbers. */}
+        <p className="mt-10">
+          <Link
+            href="/reports/2026-07-census"
+            className="font-mono text-xs uppercase tracking-[0.1em] text-muted underline decoration-line underline-offset-4 transition-colors hover:text-text hover:decoration-edge"
+          >
+            Read the full report: four chains, 354,858 agents →
+          </Link>
+        </p>
+
         <p className="mt-12 max-w-prose border-l-2 border-edge pl-5 text-sm leading-relaxed text-muted">
           On that third number: a separate investigation sampled 300 of the{" "}
           {attested.numerator.toLocaleString("en-US")}
@@ -220,6 +236,10 @@ export default async function Home({
           </Link>
         </p>
       </Section>
+
+      {/* Last thing on the page, after the provenance. The ask comes after
+          the reader has seen what they would be subscribing to, not before. */}
+      <EmailCapture />
     </>
   );
 }
