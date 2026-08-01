@@ -65,7 +65,7 @@ export default function ReportsIndex() {
       {/* Under the list rather than above it: someone who has just read what
           the reports are is in a position to decide whether they want the next
           one. Above, it would be asking before answering. */}
-      <EmailCapture />
+      <EmailCapture source="reports" />
     </>
   );
 }

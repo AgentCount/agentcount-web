@@ -239,7 +239,7 @@ export default async function Home({
 
       {/* Last thing on the page, after the provenance. The ask comes after
           the reader has seen what they would be subscribing to, not before. */}
-      <EmailCapture />
+      <EmailCapture source="homepage" />
     </>
   );
 }

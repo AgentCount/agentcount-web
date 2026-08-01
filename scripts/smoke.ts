@@ -117,6 +117,11 @@ const ROUTES: { path: string; expect: number; card: boolean }[] = [
   { path: "/reports/2026-07-census", expect: 200, card: true },
   { path: "/neutrality", expect: 200, card: true },
   { path: "/linkage", expect: 200, card: true },
+  // The subscribe form's landing page, in both its shapes. `card: false`
+  // because it is `noindex` — a page nobody should ever arrive at from a
+  // search result has no business having a share image.
+  { path: "/subscribed", expect: 200, card: false },
+  { path: "/subscribed?state=invalid", expect: 200, card: false },
   { path: "/agent/base/1", expect: 200, card: true },
   // The `?run=` form is what took the route down: reading it is dynamic usage,
   // and a page declared static may not do it.
