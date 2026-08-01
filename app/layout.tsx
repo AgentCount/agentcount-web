@@ -134,17 +134,12 @@ const ACTION = { href: "/preflight", label: "Check your agent" };
  */
 const ABOUT = [
   { href: "/neutrality", label: "Who pays for this" },
-  // The three pages that left the top-level nav. They are still whole pages
-  // and still linked from the sections that supersede them; these entries
-  // exist so that cutting the nav to five never makes a live page reachable
-  // only by typing its URL.
-  //
-  // PR 3 folds each into its new home — Census into Findings, Working into a
-  // Directory preset, Linkage into a report — at which point these become
-  // redirects and this list loses them again.
-  { href: "/census", label: "Base rates per rung" },
-  { href: "/working", label: "Agents passing every check" },
-  { href: "/linkage", label: "Identity and payments" },
+  // Linkage is a report now, not a section — it is the long-form join between
+  // the identity layer and the payments layer, which is what the reports index
+  // is for. Census and Working needed no footer entry once they became a
+  // homepage section and a directory preset respectively: both are reachable
+  // from the pages that absorbed them.
+  { href: "/reports/linkage", label: "Identity and payments" },
 ];
 
 /**

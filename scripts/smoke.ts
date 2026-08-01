@@ -111,16 +111,14 @@ const ROUTES: { path: string; expect: number; card: boolean }[] = [
   // default aggregates one findings document per chain, `?chain=` reads a
   // single run. The fixtures carry three chains so the first genuinely sums.
   { path: "/?chain=base", expect: 200, card: true },
-  { path: "/census", expect: 200, card: true },
   { path: "/directory", expect: 200, card: true },
   { path: "/directory?q=trading&facet=1:pass", expect: 200, card: true },
-  { path: "/working", expect: 200, card: true },
   { path: "/preflight", expect: 200, card: true },
   { path: "/methodology", expect: 200, card: true },
   { path: "/reports", expect: 200, card: true },
   { path: "/reports/2026-07-census", expect: 200, card: true },
+  { path: "/reports/linkage", expect: 200, card: true },
   { path: "/neutrality", expect: 200, card: true },
-  { path: "/linkage", expect: 200, card: true },
   { path: "/data", expect: 200, card: true },
   // The subscribe form's landing page, in both its shapes. `card: false`
   // because it is `noindex` — a page nobody should ever arrive at from a
@@ -143,6 +141,76 @@ function check(ok: boolean, message: string) {
     console.log(`  FAIL ${message}`);
     failures.push(message);
   }
+}
+
+/**
+ * Every URL this site has published still resolves, and lands somewhere real.
+ *
+ * A census asks to be cited. A citation that 404s is worse than the
+ * reorganisation was good, so each folded section is asserted twice: the old
+ * path answers 308 with the expected `location`, and that destination is
+ * itself a 200. Checking only the redirect would let a permanent redirect
+ * point confidently at a dead page.
+ */
+const REDIRECTS: { from: string; to: string }[] = [
+  { from: "/census", to: "/" },
+  { from: "/stats", to: "/" },
+  { from: "/linkage", to: "/reports/linkage" },
+  {
+    from: "/working",
+    // Unencoded colons: Next normalises `%3A` in a redirect destination back
+    // to `:` before emitting the Location header, and a colon is legal in a
+    // query value. Asserting the encoded form fails against a redirect that
+    // is working correctly.
+    to: "/directory?facet=1:pass&facet=2:pass&facet=3:pass&facet=4:pass&facet=5:pass&facet=7:pass",
+  },
+];
+
+async function checkLegacyRedirects() {
+  for (const { from, to } of REDIRECTS) {
+    const res = await fetch(`${BASE}${from}`, {
+      redirect: "manual",
+      signal: AbortSignal.timeout(30_000),
+    });
+    const location = res.headers.get("location") ?? "";
+    check(
+      res.status === 308 && location === to,
+      `${from} -> ${res.status} ${location || "(no location)"} (want 308 ${to})`,
+    );
+
+    const landed = await fetch(`${BASE}${to}`, { signal: AbortSignal.timeout(30_000) });
+    check(landed.status === 200, `  ...and ${to} -> ${landed.status} (want 200)`);
+  }
+
+  // A retired page's CARD url outlives the page: platforms cache it and
+  // re-fetch it later, so a stranded one breaks a preview on somebody else's
+  // timeline, where it cannot be fixed.
+  for (const from of [
+    "/linkage/opengraph-image",
+    "/census/opengraph-image",
+    "/working/opengraph-image",
+  ]) {
+    const res = await fetch(`${BASE}${from}`, {
+      redirect: "follow",
+      signal: AbortSignal.timeout(30_000),
+    });
+    const type = res.headers.get("content-type") ?? "";
+    check(
+      res.status === 200 && type.startsWith("image/"),
+      `retired card ${from} still resolves to an image (${res.status} ${type})`,
+    );
+  }
+
+  // The query string must survive, or `/census?chain=bsc` silently loses the
+  // chain it was asking about.
+  const withQuery = await fetch(`${BASE}/census?chain=bsc`, {
+    redirect: "manual",
+    signal: AbortSignal.timeout(30_000),
+  });
+  check(
+    (withQuery.headers.get("location") ?? "").includes("chain=bsc"),
+    `/census?chain=bsc keeps its query (${withQuery.headers.get("location")})`,
+  );
 }
 
 /**
@@ -232,6 +300,7 @@ async function run(): Promise<void> {
       );
     }
     await checkHeaderShape();
+    await checkLegacyRedirects();
   } finally {
     web.kill("SIGTERM");
     api.close();

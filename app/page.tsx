@@ -3,6 +3,8 @@ import { AgentTable } from "@/components/AgentTable";
 import { AllRunsProvenance } from "@/components/AllRunsProvenance";
 import { EmailCapture } from "@/components/EmailCapture";
 import { CountTile, FindingTile } from "@/components/FindingTile";
+import { allPassFacets } from "@/components/DirectoryControls";
+import { RateBar } from "@/components/RateBar";
 import { ChainSwitcher } from "@/components/ChainSwitcher";
 import { RunProvenance } from "@/components/RunProvenance";
 import { Section } from "@/components/Section";
@@ -134,6 +136,15 @@ export default async function Home({
     baseIndex >= 0 ? pick(perRunFindings[baseIndex].findings, "attested") : null;
 
   const report = REPORTS[0];
+
+  // Where /working went: the directory with every rung this run reported fixed
+  // to `pass`. Built from the run's own rates, so rung 6 — which produces no
+  // rows — is not among the conditions and nobody is credited for it.
+  const workingHref = `/directory?chain=${encodeURIComponent(run.chain)}&${allPassFacets(
+    rates,
+  )
+    .map((f) => `facet=${encodeURIComponent(`${f.rung}:${f.status}`)}`)
+    .join("&")}`;
 
   /**
    * How the headline states its own scope — and it must state it.
@@ -314,6 +325,42 @@ export default async function Home({
         )}
       </section>
 
+      {/* What /census used to be.
+
+          It was never a separate subject — it is the same seven questions as
+          the tiles above, answered for the whole population instead of
+          summarised into four headlines. As its own nav item it asked a reader
+          to already know that "Census" meant "per-rung base rates"; as a
+          section directly under the findings it is simply the next level of
+          detail, which is what it always was.
+
+          Scoped to `run` — one chain, one block — because a stacked bar over
+          summed chains would hide the 44x spread between them that the report
+          exists to show. The chain switcher above changes it. */}
+      <Section
+        title="Every rung, every status"
+        aside={`base rates on ${run.chain}`}
+        className="mt-20 max-w-5xl"
+        intro={
+          <>
+            Population counts, not a score for any one agent. A rung&rsquo;s
+            segments do not sum to the whole population when an earlier failure
+            stopped the pipeline — that gap is drawn as its own &ldquo;not
+            checked&rdquo; segment rather than folded into whichever status
+            happens to render widest.
+          </>
+        }
+      >
+        <div className="space-y-8">
+          {rates.rungs.map((r) => (
+            <RateBar key={r.rung} rung={r} total={rates.agent_count} />
+          ))}
+        </div>
+        <div className="mt-10">
+          <StatusLegend statuses={statusVocabulary(rates)} />
+        </div>
+      </Section>
+
       <Section
         title="One agent, seven rungs"
         aside={`first three on ${run.chain}`}
@@ -338,7 +385,7 @@ export default async function Home({
             Search all {population.toLocaleString("en-US")} agents →
           </Link>
           <Link
-            href="/working"
+            href={workingHref}
             className="text-muted underline decoration-line underline-offset-4 transition-colors hover:text-text hover:decoration-edge"
           >
             Agents that passed every check →
@@ -360,12 +407,6 @@ export default async function Home({
       >
         <RunProvenance run={run} />
         <p className="mt-6 flex flex-wrap gap-x-8 gap-y-2 font-mono text-xs uppercase tracking-[0.1em]">
-          <Link
-            href="/census"
-            className="text-muted underline decoration-line underline-offset-4 transition-colors hover:text-text hover:decoration-edge"
-          >
-            Base rates per rung →
-          </Link>
           <Link
             href="/methodology"
             className="text-muted underline decoration-line underline-offset-4 transition-colors hover:text-text hover:decoration-edge"

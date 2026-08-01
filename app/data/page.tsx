@@ -30,6 +30,25 @@ export default function DataPage() {
     <>
       <header className="border-b border-edge pb-6">
         <h1 className="numeral text-[clamp(1.75rem,3.2vw,2.5rem)] text-text">Data</h1>
+        {/* The canonicality rule, stated publicly because the site's own
+            headline now depends on it. It cannot live only in a code comment:
+            a reader checking our numbers needs to know which runs we are
+            willing to quote, and why some sweeps are not among them. */}
+        <p className="mt-4 max-w-prose text-sm leading-relaxed text-muted">
+          <span className="text-text">
+            A run is canonical if, and only if, its archive and sha256 are
+            committed to{" "}
+            <code className="font-mono text-xs">published-runs.json</code>.
+          </span>{" "}
+          That commit is the definition, not a description of one: the census
+          also runs proof sweeps of a few hundred agents, and the API records
+          them the same way it records a full sweep, with no field telling the
+          two apart. Publication is the act that distinguishes them. Every
+          figure on this site&rsquo;s front page is summed from the runs listed
+          below and from no others — so a sweep that has finished but is not
+          yet published is deliberately not quoted anywhere, and the front page
+          is a little behind rather than briefly wrong.
+        </p>
         <p className="mt-4 max-w-prose text-sm leading-relaxed text-muted">
           Every canonical run, downloadable in full. No account, no key, no rate
           limit, no email gate. One URL per run, and the bytes at that URL never
