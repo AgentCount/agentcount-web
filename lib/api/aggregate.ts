@@ -71,6 +71,26 @@ export function totalAgents(runs: Run[]): number {
  * `app/page.tsx` takes for a missing headline number, because rendering "—"
  * where the page's argument should be is worse than failing loudly.
  */
+/**
+ * Re-scope a per-run denominator label to the population.
+ *
+ * The API labels one finding's denominator "agents in this run", which is
+ * exactly right for the page it was written for and false under a figure
+ * summed over several. This app's standing rule is to print the API's words
+ * untouched — but printing a qualifier that misdescribes the number it
+ * qualifies is the worse failure, and this is a census whose whole promise is
+ * that the qualifier is true.
+ *
+ * So the substitution is deliberately narrow: only the exact phrase "this
+ * run", only when more than one run went into the figure. Every other label
+ * ("documents that parsed and reached rung 4") is scope-neutral and passes
+ * through untouched.
+ */
+function rescope(label: string, runCount: number): string {
+  if (runCount < 2) return label;
+  return label.replace(/\bthis run\b/, `these ${runCount} runs`);
+}
+
 export function aggregateFinding(perRun: Findings[], key: string): Finding {
   const rows = perRun
     .map((f) => f.findings.find((x) => x.key === key))
@@ -90,8 +110,8 @@ export function aggregateFinding(perRun: Findings[], key: string): Finding {
     // matching the API's own contract: a rate over nobody is undefined, not
     // 0%, and `FindingTile` already renders that case as an em dash.
     percent: denominator === 0 ? null : (numerator / denominator) * 100,
-    // Every run labels this denominator the same way; taking the first is
-    // taking the API's word rather than inventing a phrase for the union.
-    denominator_label: rows[0].denominator_label,
+    // Every run labels this denominator the same way, so the first is the
+    // API's word for it — re-scoped only where that word says "this run".
+    denominator_label: rescope(rows[0].denominator_label, rows.length),
   };
 }

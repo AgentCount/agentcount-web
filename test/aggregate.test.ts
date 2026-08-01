@@ -77,10 +77,34 @@ describe("aggregateFinding", () => {
     expect(got.percent).toBeCloseTo(90, 10);
   });
 
-  it("carries the denominator label through", () => {
+  it("carries a scope-neutral denominator label through untouched", () => {
     expect(aggregateFinding([findings("a", 1, 2)], "k").denominator_label).toBe(
       "valid documents",
     );
+  });
+
+  it("re-scopes a per-run label once more than one run is summed", () => {
+    const perRun = (runId: string): Findings => ({
+      run_id: runId,
+      findings: [
+        {
+          key: "k",
+          numerator: 1,
+          denominator: 2,
+          percent: 50,
+          denominator_label: "agents in this run",
+        },
+      ],
+    });
+    // One run: the API's own words, because they are still true.
+    expect(aggregateFinding([perRun("a")], "k").denominator_label).toBe(
+      "agents in this run",
+    );
+    // Three: "this run" would misdescribe the number it qualifies.
+    expect(
+      aggregateFinding([perRun("a"), perRun("b"), perRun("c")], "k")
+        .denominator_label,
+    ).toBe("agents in these 3 runs");
   });
 
   it("returns a null percent over an empty population", () => {

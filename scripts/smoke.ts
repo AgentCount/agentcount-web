@@ -107,6 +107,10 @@ async function waitForServer(url: string, timeoutMs = 60_000): Promise<void> {
  */
 const ROUTES: { path: string; expect: number; card: boolean }[] = [
   { path: "/", expect: 200, card: true },
+  // The homepage has two modes and they take different code paths: the
+  // default aggregates one findings document per chain, `?chain=` reads a
+  // single run. The fixtures carry three chains so the first genuinely sums.
+  { path: "/?chain=base", expect: 200, card: true },
   { path: "/census", expect: 200, card: true },
   { path: "/directory", expect: 200, card: true },
   { path: "/directory?q=trading&facet=1:pass", expect: 200, card: true },
