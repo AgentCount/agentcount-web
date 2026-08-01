@@ -7,7 +7,7 @@ on:
 
 jobs:
   check:
-    name: lint · typecheck · test · build
+    name: lint · typecheck · test · build · smoke
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
@@ -33,12 +33,22 @@ jobs:
       - run: pnpm exec tsc --noEmit
       - run: pnpm test
 
-      # The build must succeed with NO API reachable. `generateStaticParams`
-      # returns empty and every page renders on demand, so a build that needed
-      # a live API would fail deploys exactly when the API is down — which is
-      # when you most want to ship a fix. The address below is a closed port on
-      # purpose: if the build ever starts depending on the API, this job goes
-      # red instead of quietly passing against a real one.
+      # The build must succeed with NO API reachable. Every page that reads the
+      # census declares `dynamic = "force-dynamic"` and renders on demand, so a
+      # build that needed a live API would fail deploys exactly when the API is
+      # down — which is when you most want to ship a fix. The address below is
+      # a closed port on purpose: if the build ever starts depending on the
+      # API, this job goes red instead of quietly passing against a real one.
       - run: pnpm run build
         env:
           AGENTCOUNT_API_URL: http://127.0.0.1:9
+
+      # Then actually ASK THE BUILT APP FOR EVERY PAGE.
+      #
+      # Everything above this line passed on 2026-08-01 while every agent
+      # permalink in production returned a 500 and no page had a link-preview
+      # image. Neither fault is visible to a type-checker, a linter, a unit
+      # test, or a build — the first only exists at request time, and the
+      # second only in the served `<head>`. `scripts/smoke.ts` boots this build
+      # against a stub API serving `test/fixtures` and checks both.
+      - run: pnpm run smoke

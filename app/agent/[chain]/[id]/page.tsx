@@ -38,21 +38,36 @@ function isValidAgentId(id: string): boolean {
 type Params = { chain: string; id: string };
 
 /**
- * ISR, not static generation and not `force-dynamic`.
+ * Rendered on demand, with the CACHING DONE AT THE FETCH LAYER rather than at
+ * the page layer.
  *
- * 60,097 agents cannot be built at deploy time — that is a 60,097-request
- * stampede against the API for pages nobody may ever open. An empty
- * `generateStaticParams` with `dynamicParams` left on means nothing is
- * prebuilt, every page renders on first request, and the result is cached and
- * revalidated. A build then needs no API at all, which is the same property
- * every other page here protects.
+ * This page previously declared `revalidate = 300` alongside an empty
+ * `generateStaticParams`, reasoning that 60,097 agents cannot be built at
+ * deploy time and that nothing prebuilt plus a revalidating cache gets the
+ * same result for free. The reasoning about build time is right. The mechanism
+ * was not, and it took the whole route down in production:
+ *
+ * declaring `generateStaticParams` opts a route into STATIC generation, and a
+ * statically generated page may not read request-time input. This one reads
+ * `searchParams` for `?run=`. Next therefore throws `DYNAMIC_SERVER_USAGE` on
+ * every render, which is a 500 on every agent permalink — the one page worth
+ * sharing a link to.
+ *
+ * It has to be found in production, which is the trap: `next dev` renders
+ * every route dynamically, so the page is perfect locally. `next build`
+ * SUCCEEDS too, because nothing is prerendered for it to fail on — the error
+ * only exists at request time. A green CI and a working dev server were both
+ * telling the truth about the things they check.
+ *
+ * So the page is dynamic, and `next: { revalidate }` in `lib/api/client.ts`
+ * keeps the API load bounded instead: concurrent readers of the same agent
+ * share one upstream response, which is the property that was actually being
+ * protected. A build still needs no API at all.
+ *
+ * If page-level caching is ever wanted back, `?run=` has to stop being a query
+ * parameter first — the two cannot coexist.
  */
-export const revalidate = 300;
-export const dynamicParams = true;
-
-export async function generateStaticParams(): Promise<Params[]> {
-  return [];
-}
+export const dynamic = "force-dynamic";
 
 export async function generateMetadata({
   params,
