@@ -145,6 +145,49 @@ function check(ok: boolean, message: string) {
   }
 }
 
+/**
+ * The masthead's SHAPE — deliberately not its pixels.
+ *
+ * The header fits a 360px phone because of four structural facts: at most
+ * five sections, a search form, one action, and a `<details>` disclosure that
+ * collapses the sections on a small screen without JavaScript. Those were
+ * verified as pixels during development, at exact widths, by rendering the
+ * page inside a fixed-width same-origin iframe — Chrome's `--window-size`
+ * silently floors at ~500px, so the obvious method (screenshot at 390) renders
+ * a 500px page and crops it, which looks exactly like a clipped layout and is
+ * not one. That measurement needs a browser and does not belong in CI.
+ *
+ * What DOES belong here is the invariant that survives without one: the
+ * realistic regression is someone appending a sixth nav item, or dropping the
+ * disclosure, not someone subtly breaking flex-wrap. This asserts the shape
+ * and says plainly that it is not a layout measurement.
+ */
+async function checkHeaderShape() {
+  const html = await fetch(`${BASE}/`, { signal: AbortSignal.timeout(30_000) }).then((r) =>
+    r.text(),
+  );
+
+  const nav = html.match(/<nav[^>]*aria-label="Main"[^>]*>([\s\S]*?)<\/nav>/)?.[1] ?? "";
+  const items = nav.match(/<a\b/g)?.length ?? 0;
+  check(
+    items > 0 && items <= 5,
+    `masthead lists ${items} sections (<= 5, or it stops fitting a phone)`,
+  );
+
+  check(
+    /<form[^>]*action="\/directory"[^>]*>/.test(html) && /name="q"/.test(html),
+    "masthead carries the search form, posting to /directory",
+  );
+  check(
+    /href="\/preflight"[^>]*>Check your agent/.test(html),
+    "masthead carries the one action, labelled for the errand",
+  );
+  check(
+    /<summary[^>]*>/.test(html),
+    "sections collapse behind a <details> disclosure on small screens",
+  );
+}
+
 async function run(): Promise<void> {
   const api = await startStubApi();
   const web: ChildProcess = spawn("pnpm", ["exec", "next", "start", "--port", String(WEB_PORT)], {
@@ -188,6 +231,7 @@ async function run(): Promise<void> {
         `${imgPath} -> ${img.status} ${type}`,
       );
     }
+    await checkHeaderShape();
   } finally {
     web.kill("SIGTERM");
     api.close();
