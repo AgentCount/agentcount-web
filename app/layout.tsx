@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { IBM_Plex_Mono, IBM_Plex_Sans, IBM_Plex_Sans_Condensed } from "next/font/google";
 import Link from "next/link";
 import { OutboundLink } from "@/components/OutboundLink";
+import { TallyMark } from "@/components/TallyMark";
 import { BRAND } from "@/lib/brand";
 import "./globals.css";
 
@@ -69,6 +70,14 @@ export const metadata: Metadata = {
    * centre-crop that cuts the wordmark off both sides.
    */
   twitter: { card: "summary_large_image" },
+  /**
+   * `public/site.webmanifest` — the 512px maskable icon and the theme colour.
+   * The rest of the icon set (`icon.svg`, `favicon.ico`, `apple-icon.png`)
+   * needs no entry here: those are file conventions in `app/`, and Next emits
+   * their `<link>` tags on every route by itself. All of them are drawn from
+   * one geometry, `lib/tally.ts`, by `scripts/generate-brand.tsx`.
+   */
+  manifest: "/site.webmanifest",
 };
 
 const NAV = [
@@ -172,6 +181,13 @@ export default function RootLayout({
                 href="/"
                 className="font-display text-2xl font-semibold uppercase tracking-[0.16em] text-text"
               >
+                {/* Inline, on the text baseline, at cap height: the mark is
+                    part of the wordmark's line, not a badge beside it. Green
+                    via the real `text-live` token — the mark is drawn in
+                    `currentColor`, so this is the one saturated colour rule
+                    (`globals.css`) being borrowed, not broken: it is the
+                    status palette's own green, claiming nothing. */}
+                <TallyMark className="mr-2.5 inline-block h-[0.72em] w-[0.72em] text-live" />
                 {BRAND.name}
               </Link>
               <span className="hidden label sm:inline">

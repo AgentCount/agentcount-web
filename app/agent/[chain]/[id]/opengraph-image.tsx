@@ -1,6 +1,6 @@
 import { ImageResponse } from "next/og";
 import { getAgent, resolveRun } from "@/lib/api/endpoints";
-import { COLOR, Masthead, OG_CONTENT_TYPE, OG_SIZE } from "@/lib/og";
+import { brandFonts, COLOR, Masthead, OG_CONTENT_TYPE, OG_SIZE } from "@/lib/og";
 
 /**
  * The link preview for one agent: the rung strip, the name, and the run date,
@@ -108,10 +108,9 @@ export default async function Image({
           background: COLOR.bg,
           color: COLOR.text,
           padding: 64,
-          // No `fontFamily`: Satori resolves family names against fonts it has
-          // actually been given, and it ships only its default. Asking for
-          // "monospace" resolves to nothing and fails the render — the site's
-          // monospace treatment does not carry over here.
+          // No `fontFamily` here: only the masthead wordmark asks for the
+          // Plex Mono that `brandFonts()` loads (see `lib/og.tsx`); the rest
+          // of the card stays in Satori's default sans.
         }}
       >
         <Masthead />
@@ -183,6 +182,9 @@ export default async function Image({
         </div>
       </div>
     ),
-    size,
+    // The fonts are what let the masthead's wordmark render in the site's
+    // mono — the tally + wordmark corner that makes a shared card
+    // attributable even when cropped to its top edge.
+    { ...size, fonts: await brandFonts() },
   );
 }

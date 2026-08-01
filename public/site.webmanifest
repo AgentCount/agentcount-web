@@ -1,0 +1,12 @@
+{
+  "name": "AgentCount",
+  "short_name": "AgentCount",
+  "description": "An independent ERC-8004 conformance census: seven rungs per agent, evidence attached, no score.",
+  "icons": [
+    { "src": "/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ],
+  "theme_color": "#08090b",
+  "background_color": "#08090b",
+  "display": "browser"
+}

@@ -9,6 +9,7 @@
     "lint": "eslint",
     "test": "vitest run",
     "smoke": "tsx scripts/smoke.ts",
+    "brand": "tsx scripts/generate-brand.tsx",
     "check:api": "tsx --env-file=.env.local scripts/check-api.ts"
   },
   "dependencies": {

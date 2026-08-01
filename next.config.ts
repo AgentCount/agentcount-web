@@ -16,6 +16,15 @@ const nextConfig: NextConfig = {
    */
   outputFileTracingIncludes: {
     "/reports/[slug]": ["./content/reports/**"],
+    /**
+     * Same disease, different organ: `lib/og.tsx` reads the two IBM Plex Mono
+     * TTFs with a `process.cwd()`-relative path at request time, so the trace
+     * cannot see them either. Every `opengraph-image` route renders through
+     * that module; without the fonts in the bundle each card route 500s in
+     * production only.
+     */
+    "/**/opengraph-image": ["./lib/fonts/*.ttf"],
+    "/opengraph-image": ["./lib/fonts/*.ttf"],
   },
 };
 
