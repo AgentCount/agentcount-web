@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { EmailCapture } from "@/components/EmailCapture";
 import { REPORTS } from "@/lib/reports";
 
 export const metadata = {
@@ -60,6 +61,11 @@ export default function ReportsIndex() {
           </li>
         ))}
       </ul>
+
+      {/* Under the list rather than above it: someone who has just read what
+          the reports are is in a position to decide whether they want the next
+          one. Above, it would be asking before answering. */}
+      <EmailCapture />
     </>
   );
 }
