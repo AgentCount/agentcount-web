@@ -223,7 +223,18 @@ export default async function Home({
                 here. */}
             <h1 className="numeral max-w-[22ch] text-[clamp(2rem,4.2vw,3.25rem)] text-text">
               We checked all {population.toLocaleString("en-US")} AI agents
-              registered on {scope}.
+              registered on{" "}
+              {/* The chain list links to the page that says what those chains
+                  are and are not: every known deployment, counted, with the
+                  swept share computed rather than claimed. The scope claim
+                  and its evidence should be one click apart. */}
+              <Link
+                href="/coverage"
+                className="underline decoration-line underline-offset-8 transition-colors hover:decoration-edge"
+              >
+                {scope}
+              </Link>
+              .
             </h1>
             <p className="mt-5 max-w-prose text-lg leading-relaxed text-muted">
               Seven yes/no questions per agent, every answer recomputable. No
