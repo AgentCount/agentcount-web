@@ -1,0 +1,235 @@
+import Link from "next/link";
+import { OutboundLink } from "@/components/OutboundLink";
+import { Section } from "@/components/Section";
+import { CORE_REPO } from "@/lib/reports";
+import {
+  PUBLISHED_RUNS,
+  archiveSize,
+  archiveUrl,
+  checksumUrl,
+} from "@/lib/published-runs";
+
+export const metadata = {
+  title: "Data",
+  description:
+    "Every canonical run of the census, downloadable in full. Free, no account, no key, no rate limit. CC BY 4.0, with a sha256 committed to git for each archive.",
+};
+
+const num = (n: number | null) => (n === null ? "—" : n.toLocaleString("en-US"));
+
+/**
+ * The downloads page.
+ *
+ * Static, and reading a committed file rather than the API — deliberately.
+ * A downloads page that fails when the API is down fails exactly when someone
+ * most wants the raw data, and the archive hashes are a git artifact that no
+ * API can honestly serve anyway (see `lib/published-runs.ts`).
+ */
+export default function DataPage() {
+  return (
+    <>
+      <header className="border-b border-edge pb-6">
+        <h1 className="numeral text-[clamp(1.75rem,3.2vw,2.5rem)] text-text">Data</h1>
+        <p className="mt-4 max-w-prose text-sm leading-relaxed text-muted">
+          Every canonical run, downloadable in full. No account, no key, no rate
+          limit, no email gate. One URL per run, and the bytes at that URL never
+          change — a run is a dated measurement, and an archive that quietly
+          became something else would destroy the only thing publishing it is
+          for.
+        </p>
+        <p className="mt-4 max-w-prose text-sm leading-relaxed text-muted">
+          This project&rsquo;s claim is that every number it publishes can be
+          recomputed by someone else. That claim is only true if the inputs are
+          actually downloadable — a census you have to ask for is a census you
+          have to take on trust.
+        </p>
+      </header>
+
+      <Section
+        title="Published runs"
+        aside={`${PUBLISHED_RUNS.length} archives`}
+        className="mt-12"
+        intro={
+          <>
+            <code className="font-mono text-xs text-text">schema</code> is the
+            evidence contract the run was written under — it is not decoration,
+            and a tool reading across versions has to branch on it. Rung 6 did
+            not exist before version 7.
+          </>
+        }
+      >
+        <div className="overflow-x-auto">
+          <table className="w-full border-collapse text-left text-[0.8125rem]">
+            <thead>
+              <tr>
+                {["chain", "run", "pinned block", "agents", "schema", "checker", "size", ""].map(
+                  (h, i) => (
+                    <th
+                      key={h || i}
+                      scope="col"
+                      className={`label whitespace-nowrap border-b border-edge px-3 py-2 font-normal ${
+                        ["pinned block", "agents", "size"].includes(h) ? "text-right" : ""
+                      }`}
+                    >
+                      {h}
+                    </th>
+                  ),
+                )}
+              </tr>
+            </thead>
+            <tbody>
+              {PUBLISHED_RUNS.map((r) => (
+                <tr key={r.run_id}>
+                  <td className="border-b border-line px-3 py-2 font-mono text-muted">
+                    {r.chain}
+                  </td>
+                  <td className="border-b border-line px-3 py-2 font-mono text-dead">
+                    {r.run_id.slice(0, 8)}
+                  </td>
+                  <td className="border-b border-line px-3 py-2 text-right font-mono text-muted">
+                    {num(r.pinned_block)}
+                  </td>
+                  <td className="border-b border-line px-3 py-2 text-right font-mono text-text">
+                    {num(r.swept)}
+                  </td>
+                  <td className="border-b border-line px-3 py-2 font-mono text-muted">
+                    {r.schema_version}
+                  </td>
+                  <td className="border-b border-line px-3 py-2 font-mono text-muted">
+                    {r.checker_version}
+                  </td>
+                  <td className="border-b border-line px-3 py-2 text-right font-mono text-muted">
+                    {archiveSize(r.archive_bytes)}
+                  </td>
+                  <td className="whitespace-nowrap border-b border-line px-3 py-2">
+                    <OutboundLink href={archiveUrl(r)} className="font-mono text-xs">
+                      .tar.zst
+                    </OutboundLink>
+                    <span className="px-2 text-line">·</span>
+                    <OutboundLink href={checksumUrl(r)} className="font-mono text-xs text-dead">
+                      sha256
+                    </OutboundLink>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </Section>
+
+      <Section
+        title="Provenance, per run"
+        aside="citable"
+        className="mt-16"
+        intro={
+          <>
+            Everything needed to cite a figure or reproduce a run. The hash is
+            also committed to{" "}
+            <OutboundLink href={`${CORE_REPO}/blob/main/published-runs.json`}>
+              <code className="font-mono text-xs">published-runs.json</code>
+            </OutboundLink>{" "}
+            in the core repository, so the git history attests the archives and
+            not only the numbers taken from them.
+          </>
+        }
+      >
+        <div className="space-y-8">
+          {PUBLISHED_RUNS.map((r) => (
+            <div key={r.run_id} className="border-l-2 border-edge pl-5">
+              <div className="flex flex-wrap items-baseline gap-x-5 gap-y-1 font-mono text-xs text-dead">
+                <span className="text-muted">{r.chain}</span>
+                <span className="text-line">|</span>
+                <span className="break-all">{r.run_id}</span>
+                {r.finished_at && (
+                  <>
+                    <span className="text-line">|</span>
+                    <time dateTime={r.finished_at}>{r.finished_at.slice(0, 10)}</time>
+                  </>
+                )}
+              </div>
+              <dl className="mt-3 grid grid-cols-1 sm:grid-cols-[9rem_1fr]">
+                {(
+                  [
+                    ["pinned block", num(r.pinned_block)],
+                    ["agents swept", num(r.swept)],
+                    ["unreadable", r.unreadable === null ? "unknown (rebuilt export)" : num(r.unreadable)],
+                    ["unwritable", r.unwritable === null ? "unknown (rebuilt export)" : num(r.unwritable)],
+                    ["schema version", String(r.schema_version)],
+                    ["checker", `${r.checker_version} @ ${r.checker_commit.slice(0, 12)}`],
+                    ["spec commit", r.spec_commit.slice(0, 12)],
+                    ["sha256", r.archive_sha256],
+                    ["rerun", r.rerun_command],
+                  ] as [string, string][]
+                ).map(([k, v]) => (
+                  <div key={k} className="contents">
+                    <dt className="label border-t border-line py-2 sm:pr-4">{k}</dt>
+                    <dd className="break-all border-line pb-2 font-mono text-xs text-muted sm:border-t sm:py-2">
+                      {v}
+                    </dd>
+                  </div>
+                ))}
+              </dl>
+            </div>
+          ))}
+        </div>
+        {/* `unreadable`/`unwritable` reading "unknown" is not a gap in the page
+            — it is the manifest being honest. Those counts live in the
+            sweeping process and are never stored, so a run rebuilt from the
+            database cannot recover them, and writing zero would assert that
+            nothing was lost. */}
+        <p className="mt-8 max-w-prose text-sm leading-relaxed text-muted">
+          <span className="text-text">On &ldquo;unknown&rdquo;:</span> these four
+          archives were rebuilt from the database, because they were swept
+          before anything published exports. The counts of agents that could not
+          be read or could not be written are held in the sweeping process and
+          never stored, so a rebuild genuinely does not know them — and{" "}
+          <span className="text-text">zero would be a claim that nothing was
+          lost</span>. Runs published from now on carry the real figures.
+        </p>
+      </Section>
+
+      <Section title="Using it" aside="CC BY 4.0" className="mt-16 max-w-3xl">
+        <pre className="overflow-x-auto border-l-2 border-edge bg-panel px-5 py-4 font-mono text-xs leading-relaxed text-muted">
+{`run=${PUBLISHED_RUNS[0]?.run_id ?? "<run_id>"}
+curl -LO https://storage.googleapis.com/agentcount-data/runs/$run.tar.zst
+curl -LO https://storage.googleapis.com/agentcount-data/runs/$run.tar.zst.sha256
+shasum -a 256 -c $run.tar.zst.sha256
+tar --zstd -xf $run.tar.zst`}
+        </pre>
+        <p className="mt-6 text-sm leading-relaxed text-muted">
+          Released under{" "}
+          <OutboundLink href="https://creativecommons.org/licenses/by/4.0/">
+            CC BY 4.0
+          </OutboundLink>{" "}
+          — use it for anything, including commercially. The one condition is
+          attribution: cite AgentCount and the{" "}
+          <code className="font-mono text-xs text-text">run_id</code> you used,
+          because a figure without a run id cannot be re-derived by whoever
+          reads your work next.
+        </p>
+        <p className="mt-4 text-sm leading-relaxed text-muted">
+          <OutboundLink href={`${CORE_REPO}/blob/main/DATA.md`}>
+            <code className="font-mono text-xs">DATA.md</code>
+          </OutboundLink>{" "}
+          documents what is in an archive, every schema version, the two
+          categories of personal data an archive contains, and a worked example
+          re-deriving a published headline from a download.
+        </p>
+        <p className="mt-6 flex flex-wrap gap-x-8 gap-y-2 font-mono text-xs uppercase tracking-[0.1em]">
+          <Link
+            href="/reports"
+            className="text-muted underline decoration-line underline-offset-4 transition-colors hover:text-text hover:decoration-edge"
+          >
+            The reports →
+          </Link>
+          <Link
+            href="/methodology"
+            className="text-muted underline decoration-line underline-offset-4 transition-colors hover:text-text hover:decoration-edge"
+          >
+            What each rung measures →
+          </Link>
+        </p>
+      </Section>
+    </>
+  );
+}

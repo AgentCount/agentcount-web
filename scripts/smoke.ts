@@ -117,6 +117,7 @@ const ROUTES: { path: string; expect: number; card: boolean }[] = [
   { path: "/reports/2026-07-census", expect: 200, card: true },
   { path: "/neutrality", expect: 200, card: true },
   { path: "/linkage", expect: 200, card: true },
+  { path: "/data", expect: 200, card: true },
   // The subscribe form's landing page, in both its shapes. `card: false`
   // because it is `noindex` — a page nobody should ever arrive at from a
   // search result has no business having a share image.
