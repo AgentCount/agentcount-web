@@ -245,7 +245,7 @@ tar --zstd -xf $run.tar.zst`}
             href="/methodology"
             className="text-muted underline decoration-line underline-offset-4 transition-colors hover:text-text hover:decoration-edge"
           >
-            What each rung measures →
+            What each check measures →
           </Link>
         </p>
       </Section>

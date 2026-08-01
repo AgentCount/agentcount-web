@@ -144,7 +144,7 @@ export async function AgentDirectory({
             No agents match this filter in run {run.run_id.slice(0, 8)}.{" "}
             {facets.length > 0 && (
               <>
-                Every one of the {facets.length} rung conditions has to hold at
+                Every one of the {facets.length} check conditions has to hold at
                 once (
                 <span className="font-mono text-text">{serialiseFacets(facets)}</span>
                 ).

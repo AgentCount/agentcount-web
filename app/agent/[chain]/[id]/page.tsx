@@ -13,6 +13,7 @@ import {
   resolveRun,
   statusVocabulary,
 } from "@/lib/api/endpoints";
+import type { RungDetail } from "@/lib/api/schemas";
 import { pageTitle } from "@/lib/brand";
 import { addressUrl, blockUrl, explorerFor, resourceLink, tokenUrl } from "@/lib/links";
 
@@ -85,12 +86,51 @@ export async function generateMetadata({
   const name = agent?.name ?? `Agent #${id}`;
   const description = agent?.description
     ? agent.description.slice(0, 200)
-    : `ERC-8004 conformance record for agent ${id} on ${chain}: seven rungs, evidence attached, no score.`;
+    : `ERC-8004 conformance record for agent ${id} on ${chain}: seven checks, evidence attached, no score.`;
 
   return {
     title: `${name} · ${chain}`,
     description,
     openGraph: { title: `${name} · ${chain}`, description },
+  };
+}
+
+/**
+ * One line of evidence per check, for the badge popovers.
+ *
+ * Deliberately a SUMMARY, not the evidence table: the popover has room for one
+ * fact, and the full record is already on the same page under each check. The
+ * key is chosen per check because what matters differs — a fetch is about the
+ * URL and its status, a parse about what broke, a conformance check about
+ * which field was missing.
+ *
+ * Values are printed as the API sent them, truncated only for width. Nothing
+ * here is computed or reworded.
+ */
+function makeKeyEvidence(rungs: RungDetail[]) {
+  const byRung = new Map(rungs.map((r) => [r.rung, r]));
+  // Ordered by how much each key tells a reader who is hovering.
+  const PREFERRED = [
+    "reason",
+    "http_status",
+    "fields_missing",
+    "final_url",
+    "request_url",
+    "registry",
+    "feedback_count",
+  ];
+  return (n: number): string | null => {
+    const evidence = byRung.get(n)?.evidence;
+    if (!evidence) return null;
+    for (const key of PREFERRED) {
+      const value = evidence[key];
+      if (value === undefined || value === null) continue;
+      const text = Array.isArray(value) ? value.join(", ") : String(value);
+      if (text.length === 0 || text === "[]") continue;
+      const short = text.length > 90 ? `${text.slice(0, 90)}...` : text;
+      return `${key}: ${short}`;
+    }
+    return null;
   };
 }
 
@@ -122,6 +162,7 @@ export default async function AgentDetail({
   const blockHref = blockUrl(agent.chain, snapshot.block_number);
   // The registry is on rung 1's evidence, which is where the chain records it.
   const registry = agent.rungs.find((r) => r.rung === 1)?.evidence?.registry;
+  const keyEvidence = makeKeyEvidence(agent.rungs);
   const tokenHref =
     typeof registry === "string"
       ? tokenUrl(agent.chain, registry, snapshot.token_id)
@@ -165,9 +206,16 @@ export default async function AgentDetail({
           {/* The strip is the headline here — the one thing someone following
               a shared link came to read. */}
           <div>
-            <span className="label">Rungs 1–7</span>
+            <span className="label">Checks 1–7</span>
             <div className="mt-2">
-              <RungStrip rungs={agent.rungs} size="md" />
+              <RungStrip
+                rungs={agent.rungs}
+                size="md"
+                // The agent page is the one place a badge can show WHY, so its
+                // popover carries the check's most telling evidence line —
+                // the fetched URL, the HTTP status, the missing field.
+                evidenceFor={keyEvidence}
+              />
             </div>
           </div>
         </div>
@@ -185,7 +233,7 @@ export default async function AgentDetail({
 
       <div className="mt-10 grid grid-cols-1 gap-x-14 gap-y-16 xl:grid-cols-[minmax(0,1.9fr)_minmax(0,1fr)]">
         <Section
-          title="The seven rungs, with their evidence"
+          title="The seven checks, with their evidence"
           aside={`${agent.rungs.length} recorded`}
           intro={
             <>
@@ -333,7 +381,7 @@ export default async function AgentDetail({
                 href="/methodology"
                 className="font-mono text-xs uppercase tracking-[0.1em] text-muted underline decoration-line underline-offset-4 transition-colors hover:text-text hover:decoration-edge"
               >
-                What each rung measures →
+                What each check measures →
               </Link>
             </p>
           </Section>

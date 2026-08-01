@@ -1,5 +1,6 @@
 import { ImageResponse } from "next/og";
 import { getAgent, resolveRun } from "@/lib/api/endpoints";
+import { questionFor } from "@/lib/checks";
 import { brandFonts, COLOR, Masthead, OG_CONTENT_TYPE, OG_SIZE } from "@/lib/og";
 
 /**
@@ -37,7 +38,7 @@ import { brandFonts, COLOR, Masthead, OG_CONTENT_TYPE, OG_SIZE } from "@/lib/og"
 export const runtime = "nodejs";
 export const size = OG_SIZE;
 export const contentType = OG_CONTENT_TYPE;
-export const alt = "Conformance record: seven rungs, with the status of each";
+export const alt = "Conformance record: seven checks, with the status of each";
 
 function statusColor(status: string | undefined): string {
   switch (status) {
@@ -150,19 +151,34 @@ export default async function Image({
                     justifyContent: "center",
                     gap: 4,
                     width: 132,
-                    height: 108,
+                    height: 132,
+                    padding: "0 6px",
                     borderRadius: 2,
                     border: `3px ${r ? "solid" : "dashed"} ${color}`,
                     background: COLOR.panel,
                     color,
                   }}
                 >
-                  <span style={{ fontSize: 40, fontWeight: 700 }}>{n}</span>
+                  <span style={{ fontSize: 34, fontWeight: 700 }}>{n}</span>
+                  {/* The plain question, from `lib/checks.ts` — the same
+                      wording every other surface uses. A card is read with no
+                      legend beside it, so a bare number and a status word said
+                      nothing about what was asked. */}
+                  <span
+                    style={{
+                      fontSize: 13,
+                      lineHeight: 1.2,
+                      textAlign: "center",
+                      color: COLOR.text,
+                    }}
+                  >
+                    {questionFor(n)}
+                  </span>
                   {/* The word, not a glyph — see the module doc. A preview is
                       read without the site's legend next to it. 17px because
                       the longest word, "not checked", must clear the 132px
                       cell in mono, which runs wider than the old default. */}
-                  <span style={{ fontSize: 17 }}>{r ? r.status : "not checked"}</span>
+                  <span style={{ fontSize: 15 }}>{r ? r.status : "not checked"}</span>
                 </div>
               );
             })}
@@ -178,7 +194,7 @@ export default async function Image({
               color: COLOR.muted,
             }}
           >
-            <span>rungs 1-7 / no score</span>
+            <span>checks 1-7 / no score</span>
             <span>{runDate ? runDate.slice(0, 10) : "no completed run"}</span>
           </div>
         </div>

@@ -1,4 +1,5 @@
 import type { RungRate } from "@/lib/api/schemas";
+import { checkLabel, questionFor } from "@/lib/checks";
 import {
   NOT_CHECKED_LABEL,
   statusBarPattern,
@@ -43,7 +44,8 @@ export function RateBar({ rung, total }: { rung: RungRate; total: number }) {
         <div className="flex items-baseline gap-2">
           <span className="numeral text-2xl text-dead">{rung.rung}</span>
           <h3 className="font-mono text-sm uppercase tracking-[0.1em] text-text">
-            {rung.name}
+            {questionFor(rung.rung, rung.name)}{" "}
+            <span className="text-dead">{rung.name}</span>
           </h3>
         </div>
         <span className="label">of {total.toLocaleString("en-US")}</span>
@@ -53,7 +55,7 @@ export function RateBar({ rung, total }: { rung: RungRate; total: number }) {
         <div
           className="flex h-2.5 w-full overflow-hidden bg-panel"
           role="img"
-          aria-label={`Rung ${rung.rung}, ${rung.name}: ${rung.counts
+          aria-label={`${checkLabel(rung.rung, rung.name)}: ${rung.counts
             .map((c) => `${c.status} ${c.count.toLocaleString("en-US")}`)
             .join(", ")}${
             notChecked > 0 ? `, not checked ${notChecked.toLocaleString("en-US")}` : ""

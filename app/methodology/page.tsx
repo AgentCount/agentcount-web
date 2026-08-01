@@ -1,6 +1,26 @@
 import { RoleGlossary } from "@/components/RoleGlossary";
-import { getMethodology } from "@/lib/api/endpoints";
+import { getMethodology, getRates, listRuns, statusVocabulary } from "@/lib/api/endpoints";
 import { BRAND } from "@/lib/brand";
+import { CHECKS } from "@/lib/checks";
+import {
+  NOT_CHECKED_GLYPH,
+  NOT_CHECKED_LABEL,
+  statusGlyph,
+  statusInkClass,
+  statusLabel,
+} from "@/lib/status";
+
+/** The closed set this app has styling for — used only when no run is
+ * reachable, so the definitions list is never empty and no `StatusWord` link
+ * lands on a missing anchor. */
+const KNOWN_STATUSES = [
+  "pass",
+  "fail",
+  "error",
+  "skipped",
+  "unclaimed",
+  "unprobeable",
+];
 
 export const metadata = { title: "Methodology" };
 // A build must not depend on the API being reachable: this page fetches live
@@ -10,6 +30,20 @@ export const dynamic = "force-dynamic";
 
 export default async function MethodologyPage() {
   const m = await getMethodology();
+
+  /**
+   * The status words to define, taken from a real run rather than typed here.
+   *
+   * If no run can be reached the definitions fall back to the words this app
+   * has styling for — the page is prose about the method and must render
+   * without the API, but a definitions list that silently omitted a status
+   * would break every `StatusWord` link pointing at it.
+   */
+  const vocabulary = await listRuns()
+    .then((runs) => runs.find((r) => r.finished_at !== null))
+    .then((run) => (run ? getRates(run.run_id) : null))
+    .then((rates) => (rates ? statusVocabulary(rates) : KNOWN_STATUSES))
+    .catch(() => KNOWN_STATUSES);
 
   return (
     <>
@@ -28,7 +62,9 @@ export default async function MethodologyPage() {
         <ul className="mt-3 list-disc space-y-2 pl-5 text-sm leading-relaxed">
           <li>
             Every agent registered under ERC-8004 gets the{" "}
-            <strong>same seven questions</strong>, called rungs, and every
+            <strong>same seven questions</strong>, called rungs here and{" "}
+            <strong>checks 1&ndash;7</strong> everywhere else on the site, and
+            every
             answer carries the evidence collected to reach it.
           </li>
           <li>
@@ -84,6 +120,62 @@ export default async function MethodologyPage() {
 
       <section className="mt-14 max-w-4xl">
         <h2 className="font-mono text-sm uppercase tracking-[0.12em] text-text">The seven rungs</h2>
+        {/* The two vocabularies, side by side.
+
+            This page keeps `rung` and the checker's own names, because they
+            are what the schema, the API, the evidence keys and the archives
+            are written in — a reader checking a claim against a downloaded
+            run meets those words, not ours. Everywhere else on the site the
+            same seven appear as plain questions, and the mapping has to be
+            stated rather than left for a reader to infer from position. */}
+        <p className="mt-3 text-muted">
+          On the rest of the site these appear as{" "}
+          <strong>checks 1&ndash;7</strong>, each written as the plain question
+          it answers. The ladder vocabulary below is the technical one: it is
+          what the API sends, what the evidence is keyed by, and what a
+          downloaded archive contains.
+        </p>
+        <div className="mt-5 overflow-x-auto">
+          <table className="w-full min-w-[34rem] border-collapse text-left">
+            <caption className="sr-only">
+              How each rung is named on this page and elsewhere on the site
+            </caption>
+            <thead>
+              <tr>
+                <th scope="col" className="label border-b border-line pb-2 pr-4">
+                  rung
+                </th>
+                <th scope="col" className="label border-b border-line pb-2 pr-4">
+                  checker name
+                </th>
+                <th scope="col" className="label border-b border-line pb-2 pr-4">
+                  shown as
+                </th>
+                <th scope="col" className="label border-b border-line pb-2">
+                  what a pass establishes
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              {CHECKS.map((c) => (
+                <tr key={c.number}>
+                  <td className="border-b border-line py-2 pr-4 font-mono text-xs text-muted">
+                    {c.number}
+                  </td>
+                  <td className="border-b border-line py-2 pr-4 font-mono text-xs text-text">
+                    {c.internal}
+                  </td>
+                  <td className="border-b border-line py-2 pr-4 text-sm text-text">
+                    {c.question}
+                  </td>
+                  <td className="border-b border-line py-2 text-sm text-muted">
+                    {c.meaning}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
         <dl className="mt-4">
           <div className="grid grid-cols-1 gap-x-8 border-t border-line py-4 sm:grid-cols-[10rem_1fr]">
             <dt className="font-mono text-xs uppercase tracking-[0.1em] text-muted">1 · registered</dt>
@@ -274,6 +366,37 @@ export default async function MethodologyPage() {
           styling and the verbatim text the API sent, never guessed at as one
           of the words above.
         </p>
+
+        {/* The link targets.
+
+            Every status word printed in prose anywhere on this site links
+            here (see `components/StatusWord.tsx`). The list is built from the
+            run's own vocabulary rather than a literal, so a status the
+            checker starts producing tomorrow gets a definition and a working
+            anchor the day it first appears — both ends of the link come from
+            the API. */}
+        <dl className="mt-6 border-t border-line">
+          {vocabulary.map((s) => (
+            <div key={s} id={`status-${s}`} className="border-b border-line py-3 scroll-mt-24">
+              <dt className="flex items-baseline gap-2">
+                <span aria-hidden="true" className={`font-mono text-xs ${statusInkClass(s)}`}>
+                  {statusGlyph(s)}
+                </span>
+                <span className="font-mono text-sm text-text">{s}</span>
+              </dt>
+              <dd className="mt-1 text-sm text-muted">{statusLabel(s)}</dd>
+            </div>
+          ))}
+          <div id="status-not-checked" className="border-b border-line py-3 scroll-mt-24">
+            <dt className="flex items-baseline gap-2">
+              <span aria-hidden="true" className="font-mono text-xs text-dead">
+                {NOT_CHECKED_GLYPH}
+              </span>
+              <span className="font-mono text-sm text-text">not checked</span>
+            </dt>
+            <dd className="mt-1 text-sm text-muted">{NOT_CHECKED_LABEL}</dd>
+          </div>
+        </dl>
       </section>
 
       <section className="mt-14 max-w-4xl">

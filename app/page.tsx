@@ -4,6 +4,7 @@ import { AllRunsProvenance } from "@/components/AllRunsProvenance";
 import { EmailCapture } from "@/components/EmailCapture";
 import { CountTile, FindingTile } from "@/components/FindingTile";
 import { allPassFacets } from "@/components/DirectoryControls";
+import { StatusWord } from "@/components/StatusWord";
 import { RateBar } from "@/components/RateBar";
 import { ChainSwitcher } from "@/components/ChainSwitcher";
 import { RunProvenance } from "@/components/RunProvenance";
@@ -208,7 +209,7 @@ export default async function Home({
                   publishes a population-weighted rate, and a line claiming
                   otherwise directly under one would be the site contradicting
                   itself. The promise that actually holds — and the one that
-                  matters — is that an agent's seven rungs are never summed
+                  matters — is that an agent's seven checks are never summed
                   into a score. See `components/RungStrip.tsx`. */}
               <span>no score, no ranking, no per-agent aggregate</span>
             </div>
@@ -263,8 +264,8 @@ export default async function Home({
           <FindingTile index={2} finding={unclaimed}>
             of conforming documents never say which agent they belong to. The
             registration entry that would bind a document to its on-chain id is
-            only recommended, so most omit it and rung 5 records{" "}
-            <em className="not-italic text-claim">unclaimed</em> — neither a
+            only recommended, so most omit it and check 5 (Claims its
+            identity?) records <StatusWord status="unclaimed" /> — neither a
             pass nor a fail.
           </FindingTile>
 
@@ -338,12 +339,12 @@ export default async function Home({
           summed chains would hide the 44x spread between them that the report
           exists to show. The chain switcher above changes it. */}
       <Section
-        title="Every rung, every status"
+        title="Every check, every status"
         aside={`base rates on ${run.chain}`}
         className="mt-20 max-w-5xl"
         intro={
           <>
-            Population counts, not a score for any one agent. A rung&rsquo;s
+            Population counts, not a score for any one agent. A check&rsquo;s
             segments do not sum to the whole population when an earlier failure
             stopped the pipeline — that gap is drawn as its own &ldquo;not
             checked&rdquo; segment rather than folded into whichever status
@@ -362,14 +363,15 @@ export default async function Home({
       </Section>
 
       <Section
-        title="One agent, seven rungs"
+        title="One agent, seven checks"
         aside={`first three on ${run.chain}`}
         className="mt-20 max-w-5xl"
         intro={
           <>
-            Exactly as the directory renders them. A rung with no row was never
-            reached this run — rung 6 is not yet implemented, so it reads as
-            not checked for everyone, never as a failure.
+            Exactly as the directory renders them. Hover or tap any badge for
+            the question it answers. A check with no row was never reached this
+            run — check 6 (Answers?) is not yet implemented, so it reads as not
+            checked for everyone, never as a failure.
           </>
         }
       >
@@ -411,7 +413,7 @@ export default async function Home({
             href="/methodology"
             className="text-muted underline decoration-line underline-offset-4 transition-colors hover:text-text hover:decoration-edge"
           >
-            How each rung is measured →
+            How each check is measured →
           </Link>
         </p>
       </Section>

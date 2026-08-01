@@ -57,7 +57,7 @@ export function AgentTable({ agents }: { agents: AgentSummary[] }) {
               scope="col"
               className="label whitespace-nowrap border-b border-edge px-3 py-2 font-normal"
             >
-              Rungs 1–7
+              Checks 1–7
             </th>
           </tr>
         </thead>
