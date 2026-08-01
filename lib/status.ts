@@ -82,7 +82,7 @@ const STATUS: Record<string, StatusStyle> = {
     chip: "border-dim/40 text-dim",
     fill: "bg-dim",
     glyph: "–",
-    label: "skipped — a rung this one depends on did not pass",
+    label: "skipped — a check this one depends on did not pass",
   },
   unclaimed: {
     ink: "text-claim",
@@ -149,6 +149,18 @@ export function statusBgClasses(status: string): string {
   return styleFor(status).fill;
 }
 
+/**
+ * Where a status word's definition lives, as a fragment on `/methodology`.
+ *
+ * Derived rather than listed so a status the checker starts producing
+ * tomorrow gets a working link the day it appears — the definitions list on
+ * the methodology page is built from the same run vocabulary, so both ends of
+ * the link come from the API rather than from a literal kept in step by hand.
+ */
+export function statusAnchor(status: string): string {
+  return `#status-${encodeURIComponent(status)}`;
+}
+
 /** A rung with no row at all was never reached this run — visibly different
  * from `skipped`, which is a status the API actively assigned. Dashed, so it
  * differs from every solid-bordered status by outline as well as by glyph. */
@@ -158,7 +170,7 @@ export const NOT_CHECKED_GLYPH = "·";
 // reached it"; the pre-flight checker means "a draft cannot answer it". Both
 // are "never asked", and the specific reason is carried per rung by
 // `RungLadder`'s `notApplicable`.
-export const NOT_CHECKED_LABEL = "not checked — this rung was never asked";
+export const NOT_CHECKED_LABEL = "not checked — this check was never asked";
 
 /**
  * A repeating-stripe overlay for the rate bars, so a stacked bar is readable

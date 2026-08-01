@@ -61,7 +61,7 @@ export default async function PreflightPage() {
         <h2 className="label">Why this exists</h2>
         <p className="mt-3 text-sm leading-relaxed text-muted">
           In the reference run, 48 agents belonging to 48 unrelated owners all
-          failed rung 4 identically — one hosting service&rsquo;s template
+          failed check 4 (Follows the spec?) identically — one hosting service&rsquo;s template
           omitted <code className="font-mono text-text">agentRegistry</code>,
           and nobody found out until after minting. Separately, 10,101
           documents from 6,460 owners share one exact set of missing
@@ -75,7 +75,7 @@ export default async function PreflightPage() {
             href="/methodology"
             className="underline decoration-line underline-offset-4 transition-colors hover:text-text"
           >
-            What each rung measures →
+            What each check measures →
           </Link>
         </p>
       </section>

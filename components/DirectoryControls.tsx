@@ -1,5 +1,6 @@
 import Link from "next/link";
 import type { RungFacet } from "@/lib/api/endpoints";
+import { checkLabel, questionFor } from "@/lib/checks";
 import type { Rates } from "@/lib/api/schemas";
 import { statusClasses, statusGlyph, statusInkClass, statusLabel } from "@/lib/status";
 
@@ -137,14 +138,14 @@ export function DirectoryControls({
           Passing all checks
         </Link>
         <span className="text-[0.6875rem] text-dead">
-          every rung this run asked came back pass
+          every check this run asked came back pass
         </span>
       </div>
 
       <fieldset className="px-4 py-3">
-        <legend className="sr-only">Rung filters</legend>
+        <legend className="sr-only">Check filters</legend>
         <div className="mb-2 flex items-baseline gap-3">
-          <span className="label">Rungs</span>
+          <span className="label">Checks</span>
           <span className="text-[0.6875rem] text-dead">
             every ticked box must hold — tick nothing to see all agents
           </span>
@@ -156,7 +157,13 @@ export function DirectoryControls({
               className="flex flex-wrap items-center gap-x-2 gap-y-1 border-t border-line/60 py-1.5"
             >
               <span className="w-36 shrink-0 font-mono text-[0.6875rem] uppercase tracking-[0.08em] text-muted">
-                <span className="text-dead">{r.rung}</span> {r.name}
+                {/* The plain question is what a reader filters by; the
+                    checker's own name stays visible in dead grey because the
+                    facet it builds (`4:pass`) is written in that vocabulary
+                    and appears in the URL. */}
+                <span className="text-dead">{r.rung}</span>{" "}
+                <span className="text-text">{questionFor(r.rung, r.name)}</span>{" "}
+                <span className="text-dead">{r.name}</span>
               </span>
               {r.counts.map((c) => {
                 const value = `${r.rung}:${c.status}`;
@@ -164,7 +171,7 @@ export function DirectoryControls({
                 return (
                   <label
                     key={c.status}
-                    title={`rung ${r.rung}, ${r.name}: ${statusLabel(c.status)}`}
+                    title={`${checkLabel(r.rung, r.name)}: ${statusLabel(c.status)}`}
                     // The input itself is `sr-only` — the chip IS the control,
                     // and a native checkbox beside it would be a second thing
                     // to look at. `has-[:focus-visible]` puts the focus ring

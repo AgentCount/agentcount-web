@@ -118,9 +118,9 @@ export default function NeutralityPage() {
           <h2 className="label text-text">What we are not</h2>
           <p className="mt-3">
             {BRAND.name} is a conformance census, not a rating agency. We do not
-            score, rank, or aggregate agents into a judgment. Seven rungs, each
+            score, rank, or aggregate agents into a judgment. Seven checks, each
             a separate question, each carrying the evidence that answered it. A
-            reader who disagrees with a rung can see exactly what it was given
+            reader who disagrees with a check can see exactly what it was given
             and reach their own conclusion, which is the only kind of
             independence that survives being checked.
           </p>
@@ -132,7 +132,7 @@ export default function NeutralityPage() {
           href="/methodology"
           className="text-muted underline decoration-line underline-offset-4 transition-colors hover:text-text hover:decoration-edge"
         >
-          What each rung measures →
+          What each check measures →
         </Link>
         <Link
           href="/reports"

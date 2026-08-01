@@ -322,7 +322,7 @@ export default function RootLayout({
               <p className="text-sm text-text">{BRAND.newcomer}</p>
               <p className="mt-3 text-sm text-muted">
                 <span className="text-text">{BRAND.name}</span> is a conformance
-                census, not a rating agency. Every rung on this site carries the
+                census, not a rating agency. Every check on this site carries the
                 evidence behind it, and nothing here is compressed into a score.
               </p>
               {/* The canonical domain, set as text rather than as a link: a

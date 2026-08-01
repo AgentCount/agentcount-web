@@ -2,6 +2,7 @@
 
 import { useActionState } from "react";
 import { RungLadder } from "@/components/RungLadder";
+import { questionFor } from "@/lib/checks";
 import { RungStrip } from "@/components/RungStrip";
 import { Section } from "@/components/Section";
 import { StatusLegend } from "@/components/StatusLegend";
@@ -55,7 +56,8 @@ export function PreflightForm({ statuses }: { statuses: string[] }) {
             <div className="flex items-baseline gap-3">
               <span className="label">Intended identity</span>
               <span className="text-[0.6875rem] text-dead">
-                optional — all three, or rung 5 stays unchecked
+                optional — all three, or check 5 (Claims its identity?) stays
+                unchecked
               </span>
             </div>
             <div className="mt-3 grid grid-cols-1 gap-3 sm:grid-cols-[7rem_7rem_1fr]">
@@ -114,8 +116,8 @@ export function PreflightForm({ statuses }: { statuses: string[] }) {
                 <span className="font-mono text-text">
                   {state.result.spec_commit.slice(0, 12)}
                 </span>
-                . A rung shown as <em>not checked</em> is one a draft cannot
-                answer — not a rung you failed.
+                . A check shown as <em>not checked</em> is one a draft cannot
+                answer — not a check you failed.
               </>
             }
           >
@@ -159,7 +161,7 @@ export function PreflightForm({ statuses }: { statuses: string[] }) {
                 {state.result.not_applicable.map((n) => (
                   <li key={n.rung} className="flex gap-3 text-xs">
                     <span className="w-24 shrink-0 font-mono uppercase tracking-[0.08em] text-dead">
-                      {n.rung} · {n.name}
+                      {n.rung} · {questionFor(n.rung, n.name)}
                     </span>
                     <span className="text-muted">{n.reason}</span>
                   </li>
@@ -170,9 +172,9 @@ export function PreflightForm({ statuses }: { statuses: string[] }) {
         ) : (
           <Section title="What the checker says" aside="awaiting a document">
             <p className="max-w-prose text-sm leading-relaxed text-muted">
-              Results appear here. The checker answers rungs 3, 4 and 5 — the
+              Results appear here. The checker answers checks 3, 4 and 5 — the
               three a document can be judged on before it exists on-chain.
-              Rungs 1, 2 and 7 need a minted agent, a published URI and
+              Checks 1, 2 and 7 need a minted agent, a published URI and
               feedback respectively, so a draft leaves them unchecked.
             </p>
           </Section>

@@ -1,4 +1,5 @@
 import type { Finding } from "@/lib/api/schemas";
+import { humaniseRungs } from "@/lib/checks";
 
 /**
  * One headline number, set large, with one line of plain-English context.
@@ -54,7 +55,7 @@ export function FindingTile({
       </p>
       <p className="mt-4 border-t border-line pt-2 font-mono text-[0.6875rem] leading-relaxed text-dead">
         {finding.numerator.toLocaleString("en-US")} / {finding.denominator.toLocaleString("en-US")}{" "}
-        {finding.denominator_label}
+        {humaniseRungs(finding.denominator_label)}
       </p>
     </div>
   );

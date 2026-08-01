@@ -1,3 +1,4 @@
+import { checkFor, questionFor } from "@/lib/checks";
 import type { RungDetail } from "@/lib/api/schemas";
 import {
   NOT_CHECKED_GLYPH,
@@ -68,8 +69,17 @@ export function RungLadder({
 
             <div className="min-w-0">
               <div className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-2">
-                <h3 className="font-mono text-sm uppercase tracking-[0.1em] text-text">
-                  {r?.name ?? na?.name ?? "—"}
+                {/* The plain question leads; the checker's own name sits
+                    beside it in mono, because that is the word the evidence
+                    below and a downloaded archive are keyed by. Both, so a
+                    reader can follow either vocabulary without a lookup. */}
+                <h3 className="flex flex-wrap items-baseline gap-x-3 gap-y-1">
+                  <span className="font-sans text-base font-semibold text-text">
+                    {questionFor(n, r?.name ?? na?.name)}
+                  </span>
+                  <span className="font-mono text-xs uppercase tracking-[0.1em] text-dead">
+                    rung {n} · {r?.name ?? na?.name ?? "—"}
+                  </span>
                 </h3>
                 <span
                   title={label}
@@ -83,7 +93,8 @@ export function RungLadder({
                   {r ? r.status : "not checked"}
                 </span>
               </div>
-              <p className="mt-1.5 text-xs text-dead">{label}</p>
+              <p className="mt-1.5 text-xs text-muted">{checkFor(n)?.meaning}</p>
+              <p className="mt-1 text-xs text-dead">{label}</p>
 
               {r ? (
                 <>
@@ -94,7 +105,7 @@ export function RungLadder({
                 </>
               ) : (
                 <p className="mt-3 text-sm text-muted">
-                  {na?.reason ?? "This run never reached this rung for this agent."}
+                  {na?.reason ?? "This run never reached this check for this agent."}
                 </p>
               )}
             </div>
