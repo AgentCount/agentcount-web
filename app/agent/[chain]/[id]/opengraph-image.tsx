@@ -108,9 +108,9 @@ export default async function Image({
           background: COLOR.bg,
           color: COLOR.text,
           padding: 64,
-          // No `fontFamily` here: only the masthead wordmark asks for the
-          // Plex Mono that `brandFonts()` loads (see `lib/og.tsx`); the rest
-          // of the card stays in Satori's default sans.
+          // No `fontFamily` needed: `brandFonts()` replaces Satori's default,
+          // so the whole card renders in the site's Plex Mono (see the fonts
+          // note in `lib/og.tsx`).
         }}
       >
         <Masthead />
@@ -159,8 +159,10 @@ export default async function Image({
                 >
                   <span style={{ fontSize: 40, fontWeight: 700 }}>{n}</span>
                   {/* The word, not a glyph — see the module doc. A preview is
-                      read without the site's legend next to it. */}
-                  <span style={{ fontSize: 19 }}>{r ? r.status : "not checked"}</span>
+                      read without the site's legend next to it. 17px because
+                      the longest word, "not checked", must clear the 132px
+                      cell in mono, which runs wider than the old default. */}
+                  <span style={{ fontSize: 17 }}>{r ? r.status : "not checked"}</span>
                 </div>
               );
             })}

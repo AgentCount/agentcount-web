@@ -30,10 +30,13 @@
  * card must pass `fonts: await brandFonts()` in its `ImageResponse` options —
  * that is what makes `fontFamily: "IBM Plex Mono"` real. The two TTFs live in
  * `lib/fonts/` (OFL, notice alongside) and are read from disk once per
- * process; `next.config.ts` traces them into the deployed functions. Text
- * that sets no `fontFamily` still renders in Satori's default sans — the
- * site's condensed/sans split does not carry over, only the mono does, and
- * only where a card asks for it.
+ * process; `next.config.ts` traces them into the deployed functions.
+ *
+ * Passing fonts also REPLACES Satori's bundled default, so every card now
+ * renders entirely in Plex Mono — including text that sets no `fontFamily`.
+ * Verified by render, and kept: mono is the site's dominant voice, and one
+ * true face beats one right face plus a wrong fallback. Mind the width when
+ * writing card copy; mono runs ~20% wider than the old default sans.
  */
 import { readFile } from "node:fs/promises";
 import { join } from "node:path";
@@ -147,6 +150,8 @@ export type CardOptions = {
 export function Masthead() {
   return (
     <div style={{ display: "flex", alignItems: "center", gap: 20 }}>
+      {/* Satori draws this, not a browser — next/image has no meaning here. */}
+      {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
         src={tallyDataUri({ color: COLOR.live })}
         width={44}
@@ -210,7 +215,9 @@ function mixedColor(status: string | null): string {
   }
 }
 
-export function MixedStrip({ cell = 44 }: { cell?: number }) {
+/** Default cell sized so masthead + strip share the card's 1072px of usable
+ * width with air between them — mono runs wide, and at 44px they collided. */
+export function MixedStrip({ cell = 36 }: { cell?: number }) {
   return (
     <div style={{ display: "flex", gap: Math.round(cell / 5) }}>
       {MIXED_STRIP.map((status, i) => {
