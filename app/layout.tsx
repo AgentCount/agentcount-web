@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { IBM_Plex_Mono, IBM_Plex_Sans, IBM_Plex_Sans_Condensed } from "next/font/google";
 import Link from "next/link";
+import { NavSearch } from "@/components/NavSearch";
 import { OutboundLink } from "@/components/OutboundLink";
 import { TallyMark } from "@/components/TallyMark";
 import { BRAND } from "@/lib/brand";
@@ -80,28 +81,49 @@ export const metadata: Metadata = {
   manifest: "/site.webmanifest",
 };
 
+/**
+ * Five sections, in the order a first-time visitor needs them.
+ *
+ * Nine items was a table of contents for people who already knew the site.
+ * Every one of them was a real page, which is exactly why the list stopped
+ * working: nine equal-weight labels rank nothing, so the reader has to read
+ * all nine to find the one door they wanted, and the two jobs that actually
+ * bring people here — "is this agent real?" and "check my agent" — were
+ * neither of them a nav item.
+ *
+ * Directory leads because looking an agent up is the most common errand and
+ * the search box beside it is the same job. Findings is the census's argument,
+ * Reports the long-form version, Method how a rung is decided, Data the
+ * archives that make the recomputability claim checkable rather than merely
+ * stated.
+ *
+ * The four that left are not gone: Working is a preset filter inside
+ * Directory, Census a section of Findings, Linkage a report, Pre-flight the
+ * action button to the right of this list. Each keeps its old URL.
+ */
 const NAV = [
-  { href: "/", label: "Findings" },
   { href: "/directory", label: "Directory" },
-  { href: "/working", label: "Working" },
-  { href: "/preflight", label: "Pre-flight" },
-  { href: "/census", label: "Census" },
-  // Top level rather than filed under the census, because it is the join
-  // between two layers this project measures separately and the one number a
-  // reader is most likely to arrive already holding an opinion about.
-  { href: "/linkage", label: "Linkage" },
-  // Between the data and the method, because that is what a report is: the
-  // long-form argument the census pages summarise. It earns a top-level slot
-  // rather than a footer link because a citation resolves here, and a reader
-  // arriving from someone else's footnote should not have to hunt for the rest
-  // of the series.
+  { href: "/", label: "Findings" },
   { href: "/reports", label: "Reports" },
   { href: "/methodology", label: "Method" },
-  // Last, and top-level rather than a footer link. It is the page that makes
-  // the recomputability claim checkable rather than merely stated, so burying
-  // it would undercut the thing it exists to prove.
   { href: "/data", label: "Data" },
 ];
+
+/**
+ * The one thing a visitor can DO here, so it is the one thing shaped like a
+ * control rather than a link.
+ *
+ * Bordered and bone — never filled, never coloured. `globals.css` reserves
+ * saturation for rung statuses, and a green or blue button would both break
+ * that rule and quietly demote the six status colours from "the only meaning
+ * on the page" to "one of several things that are coloured". A box with a
+ * hairline is enough to read as a control in a page that has no other boxes.
+ *
+ * Labelled for the errand, not the page title: "Pre-flight" names a feature
+ * someone must already understand, "Check your agent" names a thing they came
+ * to do.
+ */
+const ACTION = { href: "/preflight", label: "Check your agent" };
 
 /**
  * The pages that say what this project is rather than what it measured.
@@ -112,7 +134,17 @@ const NAV = [
  */
 const ABOUT = [
   { href: "/neutrality", label: "Who pays for this" },
-  { href: "/reports", label: "Reports" },
+  // The three pages that left the top-level nav. They are still whole pages
+  // and still linked from the sections that supersede them; these entries
+  // exist so that cutting the nav to five never makes a live page reachable
+  // only by typing its URL.
+  //
+  // PR 3 folds each into its new home — Census into Findings, Working into a
+  // Directory preset, Linkage into a report — at which point these become
+  // redirects and this list loses them again.
+  { href: "/census", label: "Base rates per rung" },
+  { href: "/working", label: "Agents passing every check" },
+  { href: "/linkage", label: "Identity and payments" },
 ];
 
 /**
@@ -176,10 +208,16 @@ export default function RootLayout({
     >
       <body className="min-h-screen">
         {/* The masthead is a register header, not a nav bar: the wordmark and
-            what it measures sit on one hairline, and the sections are set as
-            micro-labels rather than buttons. */}
+            the greeting sit on one hairline, and the sections are set as
+            micro-labels rather than buttons — with two exceptions that earn
+            their weight, the search box and the one action.
+
+            At `sm` and up everything sits on one row. Below it the row breaks
+            into three: identity, then search full-width, then the sections
+            behind a `<details>` disclosure. That disclosure is why the header
+            fits a 360px phone without a hamburger's worth of JavaScript. */}
         <header className="border-b border-edge">
-          <div className="flex flex-wrap items-end justify-between gap-x-10 gap-y-4 px-5 py-4 sm:px-7">
+          <div className="flex flex-wrap items-center justify-between gap-x-8 gap-y-3 px-5 py-4 sm:px-7">
             <div className="flex items-baseline gap-4">
               <Link
                 href="/"
@@ -223,17 +261,56 @@ export default function RootLayout({
                   `BRAND.greeting`. */}
               <span className="hidden label sm:inline">{BRAND.greeting}</span>
             </div>
-            <nav aria-label="Main" className="flex flex-wrap items-center gap-x-7 gap-y-2">
-              {NAV.map((item) => (
-                <Link
-                  key={item.href}
-                  href={item.href}
-                  className="label transition-colors hover:text-text"
-                >
-                  {item.label}
-                </Link>
-              ))}
-            </nav>
+            {/* Search before the sections, and full-width on its own row on a
+                phone: "is this agent real?" is the errand most people arrive
+                with, so it gets the most reachable slot rather than the
+                left-over one. */}
+            <div className="order-3 w-full sm:order-none sm:ml-auto sm:w-auto">
+              <NavSearch />
+            </div>
+
+            {/* `<details>` is the whole mobile menu: open/closed is a browser
+                behaviour, so five sections collapse on a phone with no state,
+                no hydration and no bundle. From `sm` up the marker is hidden
+                and the list is laid out inline, so the disclosure exists only
+                where it is needed.
+
+                `open` is set unconditionally because at `sm` and up the CSS
+                shows the list regardless — a closed `<details>` that CSS keeps
+                visible would be a lie to a screen reader. On a phone the
+                reader closes it; it reopens on navigation, which is the
+                correct default for a five-item register. */}
+            <details
+              open
+              className="order-4 w-full [&_summary]:sm:hidden sm:order-none sm:w-auto"
+            >
+              <summary className="label cursor-pointer list-none py-1 marker:content-none">
+                Sections
+              </summary>
+              <nav
+                aria-label="Main"
+                className="mt-2 flex flex-wrap items-center gap-x-7 gap-y-2 sm:mt-0"
+              >
+                {NAV.map((item) => (
+                  <Link
+                    key={item.href}
+                    href={item.href}
+                    className="label transition-colors hover:text-text"
+                  >
+                    {item.label}
+                  </Link>
+                ))}
+              </nav>
+            </details>
+
+            {/* The one control on the site. Bordered bone, never filled: see
+                `ACTION`. */}
+            <Link
+              href={ACTION.href}
+              className="order-2 border border-edge px-3 py-1.5 font-mono text-[0.6875rem] uppercase tracking-[0.08em] text-text transition-colors hover:bg-raised sm:order-none"
+            >
+              {ACTION.label}
+            </Link>
           </div>
         </header>
 
