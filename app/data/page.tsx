@@ -3,7 +3,7 @@ import { OutboundLink } from "@/components/OutboundLink";
 import { Section } from "@/components/Section";
 import { CORE_REPO } from "@/lib/reports";
 import {
-  PUBLISHED_RUNS,
+  getPublishedRuns,
   archiveSize,
   archiveUrl,
   checksumUrl,
@@ -25,7 +25,11 @@ const num = (n: number | null) => (n === null ? "—" : n.toLocaleString("en-US"
  * most wants the raw data, and the archive hashes are a git artifact that no
  * API can honestly serve anyway (see `lib/published-runs.ts`).
  */
-export default function DataPage() {
+export default async function DataPage() {
+  // Read from the core repo, falling back to the committed copy — so a run
+  // published this morning is downloadable from this page this morning, not
+  // after someone remembers to copy a file across repositories.
+  const runs = await getPublishedRuns();
   return (
     <>
       <header className="border-b border-edge pb-6">
@@ -66,7 +70,7 @@ export default function DataPage() {
 
       <Section
         title="Published runs"
-        aside={`${PUBLISHED_RUNS.length} archives`}
+        aside={`${runs.length} archives`}
         className="mt-12"
         intro={
           <>
@@ -97,7 +101,7 @@ export default function DataPage() {
               </tr>
             </thead>
             <tbody>
-              {PUBLISHED_RUNS.map((r) => (
+              {runs.map((r) => (
                 <tr key={r.run_id}>
                   <td className="border-b border-line px-3 py-2 font-mono text-muted">
                     {r.chain}
@@ -153,7 +157,7 @@ export default function DataPage() {
         }
       >
         <div className="space-y-8">
-          {PUBLISHED_RUNS.map((r) => (
+          {runs.map((r) => (
             <div key={r.run_id} className="border-l-2 border-edge pl-5">
               <div className="flex flex-wrap items-baseline gap-x-5 gap-y-1 font-mono text-xs text-dead">
                 <span className="text-muted">{r.chain}</span>
@@ -209,7 +213,7 @@ export default function DataPage() {
 
       <Section title="Using it" aside="CC BY 4.0" className="mt-16 max-w-3xl">
         <pre className="overflow-x-auto border-l-2 border-edge bg-panel px-5 py-4 font-mono text-xs leading-relaxed text-muted">
-{`run=${PUBLISHED_RUNS[0]?.run_id ?? "<run_id>"}
+{`run=${runs[0]?.run_id ?? "<run_id>"}
 curl -LO https://storage.googleapis.com/agentcount-data/runs/$run.tar.zst
 curl -LO https://storage.googleapis.com/agentcount-data/runs/$run.tar.zst.sha256
 shasum -a 256 -c $run.tar.zst.sha256

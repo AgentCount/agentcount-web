@@ -22,7 +22,7 @@ import {
   statusVocabulary,
 } from "@/lib/api/endpoints";
 import type { Finding, Findings } from "@/lib/api/schemas";
-import { PUBLISHED_RUNS } from "@/lib/published-runs";
+import { getPublishedRuns } from "@/lib/published-runs";
 import { REPORTS } from "@/lib/reports";
 
 // A build must not depend on the API being reachable: this page fetches live
@@ -74,7 +74,9 @@ export default async function Home({
   searchParams: Promise<{ run?: string; chain?: string }>;
 }) {
   const sp = await searchParams;
-  const allRuns = await listRuns();
+  // Both read before anything is chosen: the run list says what exists, the
+  // published list says which of those this site is willing to quote.
+  const [allRuns, published] = await Promise.all([listRuns(), getPublishedRuns()]);
   const perChain = sp.chain !== undefined || sp.run !== undefined;
 
   // One sweep per chain, largest population first — restricted to runs whose
@@ -83,7 +85,7 @@ export default async function Home({
   // `canonicalRuns`.
   const censusRuns = canonicalRuns(
     allRuns,
-    new Set(PUBLISHED_RUNS.map((r) => r.run_id)),
+    new Set(published.map((r) => r.run_id)),
   );
 
   // The run that the sample table, the rates and the status legend describe.
