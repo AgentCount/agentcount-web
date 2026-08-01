@@ -1,6 +1,6 @@
 import { ImageResponse } from "next/og";
 import { getAgent, resolveRun } from "@/lib/api/endpoints";
-import { BRAND } from "@/lib/brand";
+import { COLOR, Masthead, OG_CONTENT_TYPE, OG_SIZE } from "@/lib/og";
 
 /**
  * The link preview for one agent: the rung strip, the name, and the run date,
@@ -28,28 +28,16 @@ import { BRAND } from "@/lib/brand";
  * ## Why the colours are literals
  *
  * Satori resolves no CSS variables and no Tailwind classes, so `lib/status.ts`'s
- * class names cannot be reused. The hex values below are copied from
- * `app/globals.css`'s `@theme` block and must be kept in step with it by hand.
+ * class names cannot be reused. `lib/og.tsx` holds a hand-copy of
+ * `app/globals.css`'s `@theme` block, which must be kept in step with it by
+ * hand, and which this card shares with the fixed pages' cards — along with
+ * the masthead, so the two kinds of card cannot drift into looking like two
+ * different products.
  */
 export const runtime = "nodejs";
-export const size = { width: 1200, height: 630 };
-export const contentType = "image/png";
+export const size = OG_SIZE;
+export const contentType = OG_CONTENT_TYPE;
 export const alt = "Conformance record: seven rungs, with the status of each";
-
-const COLOR = {
-  bg: "#08090b",
-  panel: "#101317",
-  line: "#1c2128",
-  edge: "#2b323b",
-  text: "#e8e4dc",
-  muted: "#99a0a9",
-  dead: "#5f666f",
-  live: "#3ddc84",
-  fail: "#ff5f56",
-  warn: "#f2b035",
-  dim: "#646c78",
-  claim: "#8b9ac4",
-};
 
 function statusColor(status: string | undefined): string {
   switch (status) {
@@ -126,13 +114,13 @@ export default async function Image({
           // monospace treatment does not carry over here.
         }}
       >
+        <Masthead />
+
         <div style={{ display: "flex", flexDirection: "column" }}>
-          <div style={{ fontSize: 26, color: COLOR.muted }}>{BRAND.name}</div>
           <div
             style={{
               fontSize: 64,
               fontWeight: 700,
-              marginTop: 16,
               // Satori has no `text-overflow`; a hard slice keeps a 200-character
               // name from pushing the strip off the canvas.
               lineHeight: 1.1,
