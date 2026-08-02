@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { AgentTable } from "@/components/AgentTable";
 import { ChainSwitcher } from "@/components/ChainSwitcher";
+import { chainDisplayName } from "@/lib/chains";
 import { DirectoryControls } from "@/components/DirectoryControls";
 import { Pagination } from "@/components/Pagination";
 import { StatusLegend } from "@/components/StatusLegend";
@@ -140,8 +141,14 @@ export async function AgentDirectory({
 
       {agents.items.length === 0 ? (
         <div className="mt-8 max-w-prose border-l-2 border-edge pl-5 text-sm leading-relaxed text-muted">
+          {/* The empty state names the chain in English, never a run hash: a
+              first-time visitor does not know that a run is one chain, and
+              "no agents match in run cfbfcc01" reads as "this agent does not
+              exist" when the truth is "we searched base only". */}
           <p>
-            No agents match this filter in run {run.run_id.slice(0, 8)}.{" "}
+            Nothing matched among the{" "}
+            {rates.agent_count.toLocaleString("en-US")} agents on{" "}
+            <span className="text-text">{chainDisplayName(run.chain)}</span>.{" "}
             {facets.length > 0 && (
               <>
                 Every one of the {facets.length} check conditions has to hold at
@@ -151,6 +158,41 @@ export async function AgentDirectory({
               </>
             )}
           </p>
+          {/* Search is scoped to one chain's run, so the most likely reason
+              for an empty result is simply "wrong chain". Offer the same
+              query everywhere else it could be, rather than making the
+              visitor discover the chain switcher. */}
+          {q && !/^\d+$/.test(q) && chainsWithRuns(allRuns).filter((c) => c !== run.chain).length > 0 && (
+            <p className="mt-4">
+              Search covers one chain at a time. Try the same search on{" "}
+              {chainsWithRuns(allRuns)
+                .filter((c) => c !== run.chain)
+                .map((chain, i, all) => (
+                  <span key={chain}>
+                    <Link
+                      href={`/directory?chain=${encodeURIComponent(chain)}&q=${encodeURIComponent(q)}`}
+                      className="text-text underline decoration-line underline-offset-4 transition-colors hover:decoration-edge"
+                    >
+                      {chainDisplayName(chain)}
+                    </Link>
+                    {i < all.length - 1 ? ", " : ""}
+                  </span>
+                ))}
+              .
+            </p>
+          )}
+          {/* An 0x paste is the other common dead end: `q` matches the OWNER
+              address (prefix), not the agentWallet, and nothing on the page
+              said so. */}
+          {/^0x/i.test(q) && (
+            <p className="mt-4">
+              Address search matches the agent&rsquo;s{" "}
+              <span className="text-text">owner</span> — the address holding
+              its ERC-721 token. A payment wallet (
+              <code className="font-mono text-xs">agentWallet</code>) is not
+              searchable yet.
+            </p>
+          )}
           {/* The id escape hatch.
 
               The API's `q` searches name, description and owner prefix — an

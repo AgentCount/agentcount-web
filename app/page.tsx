@@ -390,11 +390,16 @@ export default async function Home({
           <StatusLegend statuses={statusVocabulary(rates)} />
         </div>
         <p className="mt-6 flex flex-wrap gap-x-8 gap-y-2 font-mono text-xs uppercase tracking-[0.1em]">
+          {/* "Search all N agents" was false: search is scoped to one
+              chain's run, and this link landed on the default chain — 17% of
+              the population. The label now says what the directory actually
+              is, until cross-chain search ships in the API. */}
           <Link
             href="/directory"
             className="text-muted underline decoration-line underline-offset-4 transition-colors hover:text-text hover:decoration-edge"
           >
-            Search all {population.toLocaleString("en-US")} agents →
+            Browse the directory: {population.toLocaleString("en-US")} agents,
+            chain by chain →
           </Link>
           <Link
             href={workingHref}
