@@ -4,9 +4,7 @@ import Link from "next/link";
 import { NavSearch } from "@/components/NavSearch";
 import { OutboundLink } from "@/components/OutboundLink";
 import { TallyMark } from "@/components/TallyMark";
-import { BRAND, newcomerSentence } from "@/lib/brand";
-import { formatChainList } from "@/lib/chains";
-import { getPublishedRuns, sweptChains } from "@/lib/published-runs";
+import { BRAND, NEWCOMER_SENTENCE } from "@/lib/brand";
 import "./globals.css";
 
 /**
@@ -84,60 +82,36 @@ export const metadata: Metadata = {
 };
 
 /**
- * Three sections. The header names places a reader goes to READ; everything
- * that is a tool, an archive or a piece of self-description lives in the
- * footer.
+ * Two places, because there are two things a reader comes here to do: look an
+ * agent up, or read what the census found.
  *
- * "Findings" left because it pointed at `/`, which is exactly where the
- * wordmark already goes — a nav item that duplicates the logo spends a slot
- * and teaches nothing. "Data" left the header because a downloads page is
- * not a section of the argument; it is reference, and it is one line down in
- * the footer under a name that says what it is.
+ * "Agents" is the list of agents. It was called "Directory", which names the
+ * shape of the page rather than what is in it — a reader scanning a nav bar
+ * should not have to translate. The URL stays `/directory`: labels are for
+ * readers, URLs are identifiers other people have linked to.
  *
- * Directory leads: looking an agent up is the most common errand, and the
- * search box on the row above is the same job. Reports is the long-form
- * argument, Method how a check is decided.
+ * Method moved to the footer with the other reference material. It is what
+ * you read when you are checking a number, not what you come for.
  */
 const NAV = [
-  { href: "/directory", label: "Directory" },
+  { href: "/directory", label: "Agents" },
   { href: "/reports", label: "Reports" },
-  { href: "/methodology", label: "Method" },
 ];
 
 /**
- * The tools and archives, in the footer.
+ * Reference and tools, in the footer.
  *
- * The pre-flight checker used to be a bordered button at the far right of the
- * masthead, which asked a reader to guess what it was from three words and
- * gave the site's one control the most valuable slot on the page. It reads
- * better as a named thing in a list of named things — and "Check a file" says
- * what you hand it, which "Check before you mint" never did.
+ * The pre-flight checker used to be a bordered button in the masthead, which
+ * asked a reader to guess what it was from three words. "Check a file" says
+ * what you hand it.
  */
 const TOOLS = [
+  { href: "/methodology", label: "Method" },
   { href: "/preflight", label: "Check a file" },
   { href: "/data", label: "Archives" },
   { href: "/coverage", label: "Coverage" },
 ];
 
-/**
- * The pages that say what this project is rather than what it measured.
- *
- * Footer rather than nav: nobody arrives looking for them, and both exist to
- * be found at the moment a reader starts wondering — which is usually after
- * they have read a finding that names someone.
- */
-const ABOUT = [
-  { href: "/neutrality", label: "Funding" },
-  // What the census does and does not cover, with the probe that keeps the
-  // answer honest. In the footer for the same reason the others are: it is
-  // the page a reader wants at the moment they start asking about scope.
-  // Linkage is a report now, not a section — it is the long-form join between
-  // the identity layer and the payments layer, which is what the reports index
-  // is for. Census and Working needed no footer entry once they became a
-  // homepage section and a directory preset respectively: both are reachable
-  // from the pages that absorbed them.
-  { href: "/reports/linkage", label: "Identity and payments" },
-];
 
 /**
  * The two public repositories, linked from the footer.
@@ -188,15 +162,11 @@ const LICENSE = {
  * space either side. Data gets the whole width; prose opts back into a
  * readable measure with `max-w-prose` where it appears.
  */
-export default async function RootLayout({
+export default function RootLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  // The footer names the swept chains, so it reads the same canonical list
-  // the headline does — the live one from the core repo, not the committed
-  // fallback. See `getPublishedRuns`.
-  const chains = formatChainList(sweptChains(await getPublishedRuns()));
   return (
     <html
       lang="en"
@@ -259,10 +229,6 @@ export default async function RootLayout({
                 />
                 {BRAND.name}
               </Link>
-              {/* Positioning, not method. The technical self-description
-                  moved to the footer and the meta description — see
-                  `BRAND.greeting`. */}
-              <span className="hidden label sm:inline">{BRAND.greeting}</span>
             </div>
             {/* Search closes row one, full-width on its own line on a phone:
                 "is this agent real?" is the errand most people arrive with,
@@ -325,12 +291,10 @@ export default async function RootLayout({
                   where someone who did not understand the rest of the page
                   goes looking — and it is written to be the one sentence
                   that makes the rest legible, not a summary of it. */}
-              <p className="text-sm text-text">
-                {newcomerSentence(chains)}
-              </p>
+              <p className="text-sm text-text">{NEWCOMER_SENTENCE}</p>
               {/* The "not a rating agency" paragraph that sat here was the
                   footer saying the newcomer sentence a second time in
-                  different words; it lives in full on /neutrality, where a
+                  different words; the independence commitments live on the method
                   reader wondering about it actually goes. */}
               {/* The canonical domain, set as text rather than as a link: a
                   reader on the canonical domain gains nothing from a link to
@@ -355,19 +319,6 @@ export default async function RootLayout({
             <div className="flex flex-col items-start gap-2">
               <span className="label">Tools</span>
               {TOOLS.map((item) => (
-                <Link
-                  key={item.href}
-                  href={item.href}
-                  className="text-sm text-muted underline decoration-line underline-offset-4 transition-colors hover:text-text hover:decoration-edge"
-                >
-                  {item.label}
-                </Link>
-              ))}
-            </div>
-
-            <div className="flex flex-col items-start gap-2">
-              <span className="label">About</span>
-              {ABOUT.map((item) => (
                 <Link
                   key={item.href}
                   href={item.href}

@@ -107,7 +107,7 @@ export default async function ReportPage({ params }: { params: Promise<Params> }
             How each rung is measured →
           </Link>
           <Link
-            href="/neutrality"
+            href="/methodology#independence"
             className="text-muted underline decoration-line underline-offset-4 transition-colors hover:text-text hover:decoration-edge"
           >
             Who pays for this →

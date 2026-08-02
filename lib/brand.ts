@@ -26,23 +26,8 @@ export const BRAND = {
    */
   tagline:
     "An independent ERC-8004 conformance census: seven rungs per agent, evidence attached, no score.",
-  /**
-   * The greeting: what makes this register unusual, in two words.
-   *
-   * The masthead first said "ERC-8004 conformance census", which asks a
-   * first-time visitor to know what ERC-8004 is before it tells them
-   * anything. It then said "Counts, not scores." for a while, which was
-   * better positioning and two other problems: it is the same negation
-   * construction this project's prose leans on everywhere (see the 2026-08
-   * review), and it defines the product by what a competitor does, which
-   * gives the competitor the frame.
-   *
-   * "Evidence attached" is the promise that is actually unusual and actually
-   * kept: every check on this site carries the evidence that produced it, and
-   * every published number can be recomputed from an archive anyone can
-   * download. It says what a reader gets rather than what someone else does.
-   */
-  greeting: "Evidence attached.",
+  // No slogan. The wordmark and the headline say what this is; a tagline
+  // beside them was a third voice saying it again.
   /**
    * The technical self-description, kept verbatim and moved rather than
    * dropped: the footer and the meta description are where a reader who wants
@@ -55,22 +40,18 @@ export const BRAND = {
 /**
  * One sentence for someone who arrived knowing nothing at all.
  *
- * Deliberately says "AI agent" before it says ERC-8004, because the reader
- * who needs this sentence does not know the second phrase. It names the
- * three things measured in the order the site measures them — what they
- * declare, what works, what the money does — and ends on the claim that
- * makes every other number checkable.
+ * Says "AI agent" before it says ERC-8004, because the reader who needs this
+ * sentence does not know the second phrase. It names the three things
+ * measured in the order the site measures them.
  *
- * A function, not a string, because the sentence carries scope. The registry
- * is deployed on far more chains than this census sweeps, so "every AI agent
- * registered under ERC-8004" unqualified was an overclaim — the same class
- * the census exists to catch. The caller supplies the swept-chain list,
- * derived from the published runs, so the sentence widens on its own the day
- * a new chain's archive is published.
+ * "on the chains it sweeps" is the scope, and it stays: the registry is
+ * deployed on far more chains than this census reads, so the sentence
+ * without it claims a completeness nobody has. The chains are no longer
+ * listed here — /coverage names every one of them and says what share they
+ * are, which is a better answer than a parenthetical that grows with every
+ * sweep.
  */
-export function newcomerSentence(chainList: string): string {
-  return `${BRAND.name} is an independent, open-source census of every AI agent registered under ERC-8004 on the chains it sweeps (${chainList}) — what they declare, what actually works, and what the money does. All code and data are public.`;
-}
+export const NEWCOMER_SENTENCE = `${BRAND.name} is an independent, open-source census of every AI agent registered under ERC-8004 on the chains it sweeps — what they declare, what actually works, and what the money does. All code and data are public.`;
 
 /** `<title>` for any page but the homepage. One format, one place. */
 export function pageTitle(page: string): string {
