@@ -84,50 +84,40 @@ export const metadata: Metadata = {
 };
 
 /**
- * Five sections, in the order a first-time visitor needs them.
+ * Three sections. The header names places a reader goes to READ; everything
+ * that is a tool, an archive or a piece of self-description lives in the
+ * footer.
  *
- * Nine items was a table of contents for people who already knew the site.
- * Every one of them was a real page, which is exactly why the list stopped
- * working: nine equal-weight labels rank nothing, so the reader has to read
- * all nine to find the one door they wanted, and the two jobs that actually
- * bring people here — "is this agent real?" and "check my agent" — were
- * neither of them a nav item.
+ * "Findings" left because it pointed at `/`, which is exactly where the
+ * wordmark already goes — a nav item that duplicates the logo spends a slot
+ * and teaches nothing. "Data" left the header because a downloads page is
+ * not a section of the argument; it is reference, and it is one line down in
+ * the footer under a name that says what it is.
  *
- * Directory leads because looking an agent up is the most common errand and
- * the search box beside it is the same job. Findings is the census's argument,
- * Reports the long-form version, Method how a rung is decided, Data the
- * archives that make the recomputability claim checkable rather than merely
- * stated.
- *
- * The four that left are not gone: Working is a preset filter inside
- * Directory, Census a section of Findings, Linkage a report, Pre-flight the
- * action button to the right of this list. Each keeps its old URL.
+ * Directory leads: looking an agent up is the most common errand, and the
+ * search box on the row above is the same job. Reports is the long-form
+ * argument, Method how a check is decided.
  */
 const NAV = [
   { href: "/directory", label: "Directory" },
-  { href: "/", label: "Findings" },
   { href: "/reports", label: "Reports" },
   { href: "/methodology", label: "Method" },
-  { href: "/data", label: "Data" },
 ];
 
 /**
- * The one thing a visitor can DO here, so it is the one thing shaped like a
- * control rather than a link.
+ * The tools and archives, in the footer.
  *
- * Bordered and bone — never filled, never coloured. `globals.css` reserves
- * saturation for rung statuses, and a green or blue button would both break
- * that rule and quietly demote the six status colours from "the only meaning
- * on the page" to "one of several things that are coloured". A box with a
- * hairline is enough to read as a control in a page that has no other boxes.
- *
- * Labelled for the errand, not the page title: "Pre-flight" names a feature
- * someone must already understand. "Check your agent" was tried and read as
- * "look up my minted agent" — the directory's job — when what the page checks
- * is a document before minting. The label now says when and what, in the
- * page's own words.
+ * The pre-flight checker used to be a bordered button at the far right of the
+ * masthead, which asked a reader to guess what it was from three words and
+ * gave the site's one control the most valuable slot on the page. It reads
+ * better as a named thing in a list of named things — and "Check a file" says
+ * what you hand it, which "Check before you mint" never did.
  */
-const ACTION = { href: "/preflight", label: "Check before you mint" };
+const TOOLS = [
+  { href: "/preflight", label: "Check a file" },
+  { href: "/data", label: "Archives" },
+  { href: "/coverage", label: "Coverage" },
+];
 
 /**
  * The pages that say what this project is rather than what it measured.
@@ -137,11 +127,10 @@ const ACTION = { href: "/preflight", label: "Check before you mint" };
  * they have read a finding that names someone.
  */
 const ABOUT = [
-  { href: "/neutrality", label: "Who pays for this" },
+  { href: "/neutrality", label: "Funding" },
   // What the census does and does not cover, with the probe that keeps the
   // answer honest. In the footer for the same reason the others are: it is
   // the page a reader wants at the moment they start asking about scope.
-  { href: "/coverage", label: "What this covers" },
   // Linkage is a report now, not a section — it is the long-form join between
   // the identity layer and the payments layer, which is what the reports index
   // is for. Census and Working needed no footer entry once they became a
@@ -320,14 +309,9 @@ export default async function RootLayout({
               </nav>
             </details>
 
-            {/* The one control on the site. Bordered bone, never filled: see
-                `ACTION`. */}
-            <Link
-              href={ACTION.href}
-              className="border border-edge px-3 py-1.5 font-mono text-[0.6875rem] uppercase tracking-[0.08em] text-text transition-colors hover:bg-raised"
-            >
-              {ACTION.label}
-            </Link>
+            {/* Row two carries places only. The one control the site had
+                here — the pre-flight checker — moved to the footer's Tools
+                list: see `TOOLS`. */}
           </div>
         </header>
 
@@ -363,10 +347,24 @@ export default async function RootLayout({
                   by `BRAND.greeting`. It sits with the domain because both
                   are identifiers rather than prose: what this is, and where
                   the authoritative copy lives. */}
-              <p className="mt-3 font-mono text-xs text-muted">
-                {BRAND.selfDescription} · {BRAND.domain}
-              </p>
+              {/* The domain alone. "ERC-8004 conformance census · " used to
+                  precede it and restated, in fewer words, the sentence
+                  directly above — the footer describing itself twice. */}
+              <p className="mt-3 font-mono text-xs text-muted">{BRAND.domain}</p>
             </div>
+            <div className="flex flex-col items-start gap-2">
+              <span className="label">Tools</span>
+              {TOOLS.map((item) => (
+                <Link
+                  key={item.href}
+                  href={item.href}
+                  className="text-sm text-muted underline decoration-line underline-offset-4 transition-colors hover:text-text hover:decoration-edge"
+                >
+                  {item.label}
+                </Link>
+              ))}
+            </div>
+
             <div className="flex flex-col items-start gap-2">
               <span className="label">About</span>
               {ABOUT.map((item) => (
