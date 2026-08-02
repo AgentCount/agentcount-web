@@ -246,7 +246,20 @@ export default async function MethodologyPage() {
               </em>{" "}
               That is a contract-level invariant — such feedback cannot be
               submitted in the first place — so there is nothing here for this
-              rung to detect. Note the scope of what we read: the census reads{" "}
+              rung to detect. Verified against the deployed contract on
+              2026-08-01, not assumed from the spec: the Reputation
+              Registry&rsquo;s verified source (
+              <code className="font-mono text-xs">giveFeedback</code> at{" "}
+              <code className="font-mono text-xs">0x8004baa1…9b63</code>,
+              Blockscout-verified on Base) reverts for the owner, any
+              approved-for-all operator, and the per-token approved address,
+              and an <code className="font-mono text-xs">eth_call</code>{" "}
+              simulation from the owner of a live agent reverts with
+              &ldquo;Self-feedback not allowed&rdquo;. One honest limit: the
+              registry is an upgradeable proxy, so the invariant is as
+              permanent as its current implementation — and it binds
+              addresses, not people; an owner submitting from a second wallet
+              is not detectable by anyone. Note the scope of what we read: the census reads{" "}
               <code className="font-mono text-text">ownerOf</code> only, and
               never ERC-721 approvals, so it could not identify an approved
               operator even if the ban did not exist. It answers only
@@ -274,6 +287,10 @@ export default async function MethodologyPage() {
           commit{" "}
           <code className="break-all font-mono text-xs text-text">{m.spec_commit}</code>
           , checker version {m.checker_version} (schema {m.schema_version}).
+          ERC-8004 is a <span className="text-text">Draft</span>: the standard
+          can still change, which is why every result pins the exact spec text
+          it was judged against and the pin is re-checked for drift rather
+          than assumed current.
         </p>
 
         <h3 className="mt-7 font-mono text-xs uppercase tracking-[0.12em] text-muted">

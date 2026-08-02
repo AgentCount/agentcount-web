@@ -20,7 +20,7 @@
  * `externalValue` is **external post-mint inflow to agent-declared addresses**.
  * It is not revenue and not earnings: airdrops, refunds, mistakes and an
  * operator's own capital returning from DeFi all look identical to it, and on
- * Base the largest recipient's inflows are provably Morpho vault yield. Every
+ * Base the largest recipient's inflows are Morpho vault yield. Every
  * figure is also a lower bound — two stablecoins per chain, nothing else.
  *
  * The page says all of this. It is repeated here because the next person to
@@ -53,6 +53,13 @@ export const LINKAGE: {
     queriedOn: string;
     /** Distinct EVM addresses in x402scan's top 100 by volume and by count. */
     sellersExamined: number;
+    /** The forward direction: our 34 x402-settled agents resolve to this many
+     * receiving addresses on a chain x402scan indexes. */
+    baseAddresses: number;
+    /** …of which this many x402scan corroborates (exact or within 15%). */
+    corroborated: number;
+    /** …of which this many match to the exact settlement count. */
+    exactMatches: number;
     /** …that are a declared `agentWallet` on any of the four chains. */
     declaredAgentWallet: number;
     /** …that own an agent, the spec's default value for `agentWallet`. */
@@ -91,6 +98,9 @@ export const LINKAGE: {
     sourceUrl: "https://www.x402scan.com",
     queriedOn: "2026-07-30",
     sellersExamined: 138,
+    baseAddresses: 20,
+    corroborated: 18,
+    exactMatches: 9,
     declaredAgentWallet: 0,
     agentOwner: 3,
     topSellerSettlements: 139_636_446,
