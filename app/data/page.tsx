@@ -178,7 +178,22 @@ export default async function DataPage() {
                     ["unreadable", r.unreadable === null ? "unknown (rebuilt export)" : num(r.unreadable)],
                     ["unwritable", r.unwritable === null ? "unknown (rebuilt export)" : num(r.unwritable)],
                     ["schema version", String(r.schema_version)],
-                    ["checker", `${r.checker_version} @ ${r.checker_commit.slice(0, 12)}`],
+                    // The commit is shortened; the `-dirty` marker is not.
+                    // Truncating it off once made this page silently claim a
+                    // clean build the homepage was honestly reporting as
+                    // dirty — the same run, two stories, on one site.
+                    [
+                      "checker",
+                      `${r.checker_version} @ ${r.checker_commit.slice(0, 12)}${
+                        r.checker_commit.endsWith("-dirty") ? "-dirty" : ""
+                      }`,
+                    ],
+                    ...(r.rebuilt_at
+                      ? ([["archive rebuilt", r.rebuilt_at.slice(0, 10)]] as [
+                          string,
+                          string,
+                        ][])
+                      : []),
                     ["spec commit", r.spec_commit.slice(0, 12)],
                     ["sha256", r.archive_sha256],
                     ["rerun", r.rerun_command],
@@ -208,6 +223,20 @@ export default async function DataPage() {
           never stored, so a rebuild genuinely does not know them — and{" "}
           <span className="text-text">zero would be a claim that nothing was
           lost</span>. Runs published from now on carry the real figures.
+        </p>
+        <p className="mt-4 max-w-prose text-sm leading-relaxed text-muted">
+          <span className="text-text">On the checker line:</span> a commit
+          ending in <code className="font-mono text-xs">-dirty</code> means the
+          sweep was built from a tree with uncommitted changes. The stamp is
+          honest and stays displayed; the standing policy since 2026-08-02 is
+          that canonical runs are swept from clean commits only. Separately,
+          the four rebuilt archives&rsquo; internal manifests overstate their
+          schema and checker versions — they carry the 2026-08-01 rebuild
+          era&rsquo;s values, not the sweep&rsquo;s. The figures on this page
+          and the API are the sweep-time record; where an archive manifest
+          disagrees with them, the database is authoritative. The full
+          correction is logged in the core repository&rsquo;s methodology
+          changelog.
         </p>
       </Section>
 

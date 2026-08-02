@@ -52,6 +52,15 @@ export type PublishedRun = {
   archive: string;
   archive_bytes: number;
   archive_sha256: string;
+  /** Set when the archive was rebuilt from the database rather than written
+   * by the sweep itself. See the note on /data: a rebuilt archive's internal
+   * manifest may disagree with the sweep-time record, and the sweep-time
+   * record wins. */
+  rebuilt_at?: string;
+  /** The binary that wrote the export, as distinct from the checker that
+   * judged the run. Absent from entries published before 2026-08-02. */
+  exporter_version?: string | null;
+  exporter_commit?: string | null;
 };
 
 /**
