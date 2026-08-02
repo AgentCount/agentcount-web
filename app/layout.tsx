@@ -344,11 +344,10 @@ export default async function RootLayout({
               <p className="text-sm text-text">
                 {newcomerSentence(chains)}
               </p>
-              <p className="mt-3 text-sm text-muted">
-                <span className="text-text">{BRAND.name}</span> is a conformance
-                census, not a rating agency. Every check on this site carries the
-                evidence behind it, and nothing here is compressed into a score.
-              </p>
+              {/* The "not a rating agency" paragraph that sat here was the
+                  footer saying the newcomer sentence a second time in
+                  different words; it lives in full on /neutrality, where a
+                  reader wondering about it actually goes. */}
               {/* The canonical domain, set as text rather than as a link: a
                   reader on the canonical domain gains nothing from a link to
                   where they already are.

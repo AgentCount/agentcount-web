@@ -8,6 +8,7 @@ import {
   agentDetailSchema,
   agentPageSchema,
   findingsSchema,
+  searchResponseSchema,
   methodologySchema,
   ratesSchema,
   runsSchema,
@@ -15,6 +16,7 @@ import {
   type AgentDetail,
   type AgentPage,
   type Findings,
+  type SearchGroup,
   type Methodology,
   type Rates,
   type Run,
@@ -175,6 +177,28 @@ export async function getAgent(
     agentDetailSchema,
     { allow404: true },
   );
+}
+
+/**
+ * Cross-run search — one query over an explicit set of runs, grouped per run
+ * in the order given. The caller passes its canonical run ids because
+ * "published" is decided by a git commit this API has no view of (see
+ * `lib/api/aggregate.ts`).
+ *
+ * Returns `null` when the API predates the endpoint (404), so the search
+ * page can fall back to per-chain links instead of erroring — the site must
+ * keep working against an older API during a deploy window.
+ */
+export async function searchAgents(
+  q: string,
+  runIds: string[],
+): Promise<SearchGroup[] | null> {
+  const params = new URLSearchParams();
+  params.set("q", q);
+  params.set("runs", runIds.join(","));
+  return get(`/api/search?${params.toString()}`, searchResponseSchema, {
+    allow404: true,
+  }) as Promise<SearchGroup[] | null>;
 }
 
 export async function getRates(runId: string): Promise<Rates> {

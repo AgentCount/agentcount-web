@@ -68,6 +68,10 @@ function startStubApi(): Promise<Server> {
     if (/^\/api\/runs\/[^/]+\/rates$/.test(path)) return send(fixture("rates"));
     if (/^\/api\/runs\/[^/]+\/findings$/.test(path)) return send(fixture("findings"));
     if (path === "/api/agents") return send(fixture("agents"));
+    // Cross-run search. The fixture carries three groups — one with more
+    // matches than it returns rows for, and one with none — so the page's
+    // "all N on this chain" link and its per-chain empty group both render.
+    if (path === "/api/search") return send(fixture("search"));
     // Only agent 1 exists. Every other id 404s, which is what lets the test
     // below assert that a missing agent renders the app's own not-found page
     // rather than an error.
@@ -113,6 +117,9 @@ const ROUTES: { path: string; expect: number; card: boolean }[] = [
   { path: "/?chain=base", expect: 200, card: true },
   { path: "/directory", expect: 200, card: true },
   { path: "/directory?q=trading&facet=1:pass", expect: 200, card: true },
+  // Both shapes: the empty form, and a query that reaches the API stub.
+  { path: "/search", expect: 200, card: false },
+  { path: "/search?q=trading", expect: 200, card: false },
   { path: "/preflight", expect: 200, card: true },
   { path: "/methodology", expect: 200, card: true },
   { path: "/reports", expect: 200, card: true },
@@ -243,8 +250,8 @@ async function checkHeaderShape() {
   );
 
   check(
-    /<form[^>]*action="\/directory"[^>]*>/.test(html) && /name="q"/.test(html),
-    "masthead carries the search form, posting to /directory",
+    /<form[^>]*action="\/search"[^>]*>/.test(html) && /name="q"/.test(html),
+    "masthead carries the search form, posting to /search",
   );
   // The label is asserted as a RULE, not as a string: the action must not be
   // named after the page ("Pre-flight"), because that name asks a reader to
