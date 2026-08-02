@@ -4,7 +4,9 @@ import Link from "next/link";
 import { NavSearch } from "@/components/NavSearch";
 import { OutboundLink } from "@/components/OutboundLink";
 import { TallyMark } from "@/components/TallyMark";
-import { BRAND } from "@/lib/brand";
+import { BRAND, newcomerSentence } from "@/lib/brand";
+import { formatChainList } from "@/lib/chains";
+import { getPublishedRuns, sweptChains } from "@/lib/published-runs";
 import "./globals.css";
 
 /**
@@ -191,11 +193,15 @@ const LICENSE = {
  * space either side. Data gets the whole width; prose opts back into a
  * readable measure with `max-w-prose` where it appears.
  */
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
+  // The footer names the swept chains, so it reads the same canonical list
+  // the headline does — the live one from the core repo, not the committed
+  // fallback. See `getPublishedRuns`.
+  const chains = formatChainList(sweptChains(await getPublishedRuns()));
   return (
     <html
       lang="en"
@@ -319,7 +325,9 @@ export default function RootLayout({
                   where someone who did not understand the rest of the page
                   goes looking — and it is written to be the one sentence
                   that makes the rest legible, not a summary of it. */}
-              <p className="text-sm text-text">{BRAND.newcomer}</p>
+              <p className="text-sm text-text">
+                {newcomerSentence(chains)}
+              </p>
               <p className="mt-3 text-sm text-muted">
                 <span className="text-text">{BRAND.name}</span> is a conformance
                 census, not a rating agency. Every check on this site carries the

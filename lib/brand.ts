@@ -47,18 +47,27 @@ export const BRAND = {
    * it to be.
    */
   selfDescription: "ERC-8004 conformance census",
-  /**
-   * One sentence for someone who arrived knowing nothing at all.
-   *
-   * Deliberately says "AI agent" before it says ERC-8004, because the reader
-   * who needs this sentence does not know the second phrase. It names the
-   * three things measured in the order the site measures them — what they
-   * declare, what works, what the money does — and ends on the claim that
-   * makes every other number checkable.
-   */
-  newcomer:
-    "AgentCount is an independent, open-source census of every AI agent registered under ERC-8004 — what they declare, what actually works, and what the money does. All code and data are public.",
 } as const;
+
+/**
+ * One sentence for someone who arrived knowing nothing at all.
+ *
+ * Deliberately says "AI agent" before it says ERC-8004, because the reader
+ * who needs this sentence does not know the second phrase. It names the
+ * three things measured in the order the site measures them — what they
+ * declare, what works, what the money does — and ends on the claim that
+ * makes every other number checkable.
+ *
+ * A function, not a string, because the sentence carries scope. The registry
+ * is deployed on far more chains than this census sweeps, so "every AI agent
+ * registered under ERC-8004" unqualified was an overclaim — the same class
+ * the census exists to catch. The caller supplies the swept-chain list,
+ * derived from the published runs, so the sentence widens on its own the day
+ * a new chain's archive is published.
+ */
+export function newcomerSentence(chainList: string): string {
+  return `${BRAND.name} is an independent, open-source census of every AI agent registered under ERC-8004 on the chains it sweeps (${chainList}) — what they declare, what actually works, and what the money does. All code and data are public.`;
+}
 
 /** `<title>` for any page but the homepage. One format, one place. */
 export function pageTitle(page: string): string {

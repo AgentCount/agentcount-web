@@ -145,6 +145,28 @@ export async function getPublishedRuns(): Promise<PublishedRun[]> {
   }
 }
 
+/**
+ * The swept chains, unique, largest population first — the order every
+ * chain-list sentence on the site reads in. Derived, never typed: a new
+ * chain's published run changes every sentence built from this with no copy
+ * edit anywhere.
+ *
+ * Takes the run list rather than defaulting to the committed copy: since the
+ * canonical list is fetched from the core repo, a default here would quietly
+ * make every chain-list sentence read from the fallback while the rest of the
+ * page read the live one.
+ */
+export function sweptChains(runs: PublishedRun[]): string[] {
+  const newest = new Map<string, PublishedRun>();
+  for (const r of runs) {
+    const held = newest.get(r.chain);
+    if (!held || r.started_at > held.started_at) newest.set(r.chain, r);
+  }
+  return [...newest.values()]
+    .sort((a, b) => (b.agent_count ?? 0) - (a.agent_count ?? 0))
+    .map((r) => r.chain);
+}
+
 /** Where the archives live. One URL per run, immutable once written. */
 export const DATA_HOST = "https://storage.googleapis.com/agentcount-data";
 
