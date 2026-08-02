@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { AgentTable } from "@/components/AgentTable";
 import { AllRunsProvenance } from "@/components/AllRunsProvenance";
-import { EmailCapture } from "@/components/EmailCapture";
+
 import { CountTile, FindingTile } from "@/components/FindingTile";
 import { allPassFacets } from "@/components/DirectoryControls";
 import { StatusWord } from "@/components/StatusWord";
@@ -248,15 +248,43 @@ export default async function Home({
               </Link>
               .
             </h1>
+            {/* Why this census exists, in the one place a first-time visitor
+                actually is. Every figure in it is derived — the population
+                from the runs, the rate from the findings, the paid count from
+                the published linkage — so the paragraph moves with the data.
+                The old sub ("no scores, no rankings — counts") restated the
+                masthead greeting two inches above it; the runs table moved to
+                the Provenance section, where provenance lives, reachable by
+                the one-line summary below. */}
             <p className="mt-5 max-w-prose text-lg leading-relaxed text-muted">
-              Seven yes/no questions per agent, every answer recomputable. No
-              scores, no rankings — <span className="text-text">counts</span>.
+              Registration counts like the one above get cited as evidence
+              that an autonomous agent economy exists, and nobody was checking
+              what stands behind them. This census reads every registered
+              agent at a pinned block and asks seven checkable questions —
+              does the registration point at a document, does the document
+              work, does anyone attest to the agent, does money actually reach
+              it — and publishes every answer with the evidence to recompute
+              it, and no score. So far:{" "}
+              <span className="text-text">
+                {pct(unreachable)} of registration documents declare no way to
+                reach an agent
+              </span>
+              , most feedback is written by a few automated clients, and{" "}
+              <span className="text-text">
+                {LINKAGE.total.paid.toLocaleString("en-US")} of{" "}
+                {LINKAGE.total.agents.toLocaleString("en-US")} agents have ever
+                been paid
+              </span>
+              .
             </p>
-            <div className="mt-6">
-              <AllRunsProvenance runs={censusRuns} />
-            </div>
-            <p className="mt-4 font-mono text-xs text-dead">
-              no score, no ranking, no per-agent aggregate
+            <p className="mt-5 font-mono text-xs text-dead">
+              {censusRuns.length} sweeps · {censusRuns.length} chains ·{" "}
+              <a
+                href="#provenance"
+                className="underline decoration-line underline-offset-4 transition-colors hover:text-muted"
+              >
+                provenance ↓
+              </a>
             </p>
           </>
         )}
@@ -292,6 +320,11 @@ export default async function Home({
             <StatusWord status="unclaimed" />: neither a pass nor a fail.
           </FindingTile>
 
+          {/* The Base caveat rides the tile it qualifies, as one clause. The
+              full paragraph — 300-agent sample, 42–53% interval, why it is
+              not printed as a count — lives in the report the sentence links
+              to; the tile only has to stop a reader taking the feedback
+              number at face value. */}
           <FindingTile index={3} finding={attested}>
             have at least one on-chain feedback entry.{" "}
             <span className="text-text">
@@ -299,6 +332,13 @@ export default async function Home({
               resolves than agents with none
             </span>{" "}
             — {pct(attestedResolvable)} against {pct(unattestedResolvable)}.
+            {baseAttested && (
+              <>
+                {" "}
+                A sampled read traces most of Base&rsquo;s feedback to a
+                handful of client addresses.
+              </>
+            )}
           </FindingTile>
 
           {/* The fourth tile answers the economy question the other three
@@ -362,19 +402,6 @@ export default async function Home({
           </Link>
         </p>
 
-        {baseAttested && (
-          <p className="mt-12 max-w-prose border-l-2 border-edge pl-5 text-sm leading-relaxed text-muted">
-            On that third number: a separate investigation sampled 300 of the{" "}
-            {baseAttested.numerator.toLocaleString("en-US")}
-            {" agents carrying feedback on Base "}
-            and read the Reputation Registry directly at that run&rsquo;s pinned
-            block. It estimates that one client address accounts for 42–53% of
-            them, and six addresses for the large majority. That is a{" "}
-            <span className="text-text">sample with a confidence interval</span>,
-            not a count like the four numbers above — which is exactly why it is
-            not printed as one.
-          </p>
-        )}
       </section>
 
       {/* What /census used to be.
@@ -452,6 +479,7 @@ export default async function Home({
       </Section>
 
       <Section
+        id="provenance"
         title="Provenance"
         aside="reproducible"
         className="mt-20 max-w-3xl"
@@ -463,6 +491,15 @@ export default async function Home({
           </>
         }
       >
+        {/* The runs table lived in the hero, where it was administrative
+            furniture between the claim and the findings. It is provenance, so
+            it lives with the provenance — the hero's one-line summary links
+            here. */}
+        {!perChain && (
+          <div className="mb-8">
+            <AllRunsProvenance runs={censusRuns} />
+          </div>
+        )}
         <RunProvenance run={run} />
         <p className="mt-6 flex flex-wrap gap-x-8 gap-y-2 font-mono text-xs uppercase tracking-[0.1em]">
           <Link
@@ -474,9 +511,9 @@ export default async function Home({
         </p>
       </Section>
 
-      {/* Last thing on the page, after the provenance. The ask comes after
-          the reader has seen what they would be subscribing to, not before. */}
-      <EmailCapture source="homepage" />
+      {/* The homepage EmailCapture left with the review's delete list: the
+          reports page keeps it, and that is where a reader who wants reports
+          by email is standing. */}
     </>
   );
 }

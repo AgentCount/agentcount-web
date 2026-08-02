@@ -18,15 +18,18 @@ export function Section({
   intro,
   children,
   className = "",
+  id,
 }: {
   title: string;
   aside?: React.ReactNode;
   intro?: React.ReactNode;
   children: React.ReactNode;
   className?: string;
+  /** Anchor target, for in-page links like the hero's "provenance ↓". */
+  id?: string;
 }) {
   return (
-    <section aria-label={title} className={className}>
+    <section aria-label={title} className={className} id={id}>
       <div className="ruled">
         <h2 className="label text-muted">{title}</h2>
         <span className="ruled-line" />
