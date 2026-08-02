@@ -75,10 +75,12 @@ export default function LinkagePage() {
               {oneIn(total.x402, total.agents)}
             </div>
             <p className="mt-3 text-sm leading-relaxed text-muted">
-              has ever received a settlement through x402 — {num(total.x402)}{" "}
-              agents, and {chains.find((c) => c.chain === "base")?.x402} of them
-              are on one chain. x402 is the ecosystem&rsquo;s own payment
-              protocol.
+              has ever received a settlement through{" "}
+              <OutboundLink href="https://www.x402.org">x402</OutboundLink> —{" "}
+              {num(total.x402)} agents, and{" "}
+              {chains.find((c) => c.chain === "base")?.x402} of them are on one
+              chain. x402 is the payment protocol the ERC-8004 spec itself
+              name-checks.
             </p>
           </div>
           <div className="border-l-2 border-edge pl-5">
@@ -92,6 +94,34 @@ export default function LinkagePage() {
             </p>
           </div>
         </div>
+
+        {/* Why x402 is the protocol-level signal, and how the sources were
+            verified — stated where payments data first appears on the site,
+            because this project demands exactly this passage of everyone it
+            measures. */}
+        <p className="mt-10 max-w-prose border-l-2 border-edge pl-5 text-sm leading-relaxed text-muted">
+          <span className="text-text">Why x402, and how these figures were
+          checked.</span>{" "}
+          &ldquo;Paid&rdquo; counts plain stablecoin transfers — that is the
+          primary measure. On top of it, a payment is flagged{" "}
+          <span className="text-text">x402-style</span> when its transaction
+          also carries an EIP-3009 authorization from the same token, which is
+          how <OutboundLink href="https://www.x402.org">x402</OutboundLink>{" "}
+          settles on EVM chains. x402 is measured at the protocol level
+          because it is the one payment protocol the ERC-8004 spec
+          name-checks (a registration document may declare{" "}
+          <code className="font-mono text-xs">x402Support</code>) and the one
+          with an independent index to verify against; other rails — AP2,
+          Solana&rsquo;s — exist and are out of scope. The authorization
+          signal is broader than x402 itself, so the {num(total.x402)} was
+          checked against{" "}
+          <OutboundLink href={crossCheck.sourceUrl} untrusted>
+            {crossCheck.source}
+          </OutboundLink>{" "}
+          below: of the {crossCheck.baseAddresses} receiving addresses it can
+          see, {crossCheck.corroborated} corroborate,{" "}
+          {crossCheck.exactMatches} to the exact settlement count.
+        </p>
       </section>
 
       <Section
@@ -222,6 +252,18 @@ export default function LinkagePage() {
           ))}
         </dl>
         <p className="mt-6 text-sm leading-relaxed text-muted">
+          <span className="text-text">The forward direction first:</span> our{" "}
+          {num(total.x402)} x402-settled agents resolve to{" "}
+          {num(crossCheck.baseAddresses)} receiving addresses on chains{" "}
+          {crossCheck.source} indexes. {num(crossCheck.corroborated)} of the{" "}
+          {num(crossCheck.baseAddresses)} corroborate —{" "}
+          {num(crossCheck.exactMatches)} to the exact settlement count. Both
+          divergences trace to their index being facilitator-scoped. The
+          hypothesis that would have overturned our number — double counting
+          on our side — was tested first: every flagged transfer sits in its
+          own transaction. No correction was forced.
+        </p>
+        <p className="mt-4 text-sm leading-relaxed text-muted">
           Zero of the 138 is a declared{" "}
           <code className="font-mono text-xs text-text">agentWallet</code>. The
           three that own an agent all sell on Base while owning an agent on a{" "}
@@ -238,8 +280,9 @@ export default function LinkagePage() {
           the payment activity is.
         </p>
         <p className="mt-4 text-sm leading-relaxed text-muted">
-          {crossCheck.source} publishes no statement of limits of its own, so
-          this caveat is ours and is not attributed to them. Its index is{" "}
+          {crossCheck.source} published no statement of limits of its own as
+          of {crossCheck.queriedOn}, so this caveat is ours and is not
+          attributed to them. Its index is{" "}
           <span className="text-text">facilitator-scoped</span> where ours reads
           the chain directly, and it covers base, solana, polygon and optimism —{" "}
           <span className="text-text">not</span> Celo, BNB Chain or Ethereum

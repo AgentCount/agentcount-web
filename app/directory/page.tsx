@@ -19,9 +19,8 @@ export default async function DirectoryPage({
           Every agent registered under ERC-8004, with all seven conformance
           checks shown side by side. There is no score here, on purpose — a
           check&rsquo;s status is exactly the word the checker recorded for it,
-          never a tally. Tick several check filters to ask a question no other
-          tool in the ecosystem can answer, and share the URL: the filter is in
-          it.
+          never a tally. Tick several check filters to combine conditions, and
+          share the URL: the filter is in it.
         </>
       }
     />
