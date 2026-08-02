@@ -25,7 +25,7 @@ export function NavSearch() {
   return (
     <form
       method="get"
-      action="/directory"
+      action="/search"
       role="search"
       className="flex w-full items-stretch sm:w-auto"
     >

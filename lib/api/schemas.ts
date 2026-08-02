@@ -93,6 +93,18 @@ export const agentPageSchema = z.object({
   }),
 });
 
+/** One run's slice of a cross-run search: the caller's run, its chain, how
+ * many matched in total, and the first few matches in the directory's own
+ * row shape. */
+export const searchGroupSchema = z.object({
+  run_id: z.string(),
+  chain: z.string(),
+  total: z.number(),
+  items: z.array(agentSummarySchema),
+});
+
+export const searchResponseSchema = z.array(searchGroupSchema);
+
 export const rungDetailSchema = z.object({
   rung: z.number(),
   name: z.string(),
@@ -202,6 +214,7 @@ export type Rates = z.infer<typeof ratesSchema>;
 export type RungSummary = z.infer<typeof rungSummarySchema>;
 export type AgentSummary = z.infer<typeof agentSummarySchema>;
 export type AgentPage = z.infer<typeof agentPageSchema>;
+export type SearchGroup = z.infer<typeof searchGroupSchema>;
 export type RungDetail = z.infer<typeof rungDetailSchema>;
 export type Snapshot = z.infer<typeof snapshotSchema>;
 export type Archive = z.infer<typeof archiveSchema>;
