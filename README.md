@@ -4,8 +4,9 @@ The AgentCount frontend: a Next.js App Router site that renders an ERC-8004
 conformance census. Every agent gets seven rungs — `registered`,
 `resolvable`, `parseable`, `conformant`, `bound`, `live`, `attested`
 (renamed from `independent` 2026-07-29) — each `pass` / `fail` / `skipped` /
-`error`, and — `bound` only, added 2026-07-29 — `unclaimed`, with structured
-evidence. **There is no score, grade, tier, or ranking anywhere in this
+`error`, plus two rung-specific statuses: `unclaimed` (`bound` only, added
+2026-07-29) and `unprobeable` (`live` only, added 2026-08-01), with
+structured evidence. **There is no score, grade, tier, or ranking anywhere in this
 product.** That is the
 whole differentiation from every competitor that compresses an agent to a
 single 0–100 number, and this UI must never smuggle one back in — no "N of 7
@@ -41,50 +42,45 @@ pnpm dev                # http://localhost:3000
 | `lib/api/` | Zod schemas, the fetch client, and one function per endpoint. |
 | `lib/paging.ts` | Page-number ↔ offset maths. |
 | `lib/status.ts` | Status → colour, glyph, and spelled-out label. The status *word* is never chosen here — only how it is drawn. |
-| `app/` | Routes. Every page is a Server Component (the one exception, `app/error.tsx`, is required by Next for error boundaries). |
+| `app/` | Routes. Every page is a Server Component. The two client files, `app/error.tsx` (required by Next for error boundaries) and `app/preflight/PreflightForm.tsx`, are not pages. `loading.tsx` sits on segments that only ever answer 200 — a loading file makes its segment stream, and a streamed response cannot still become a 404. |
 | `components/` | Presentational pieces only. |
 | `scripts/check-api.ts` | Validates every endpoint against a live API. |
 
 ## The pages
 
-- **`/`** — the homepage: what this run found, as four numbers, each with the
-  population behind it. Every figure comes from
-  `GET /api/runs/{id}/findings` or `/api/methodology` — none is typed here,
-  and none is derived here either (the API returns the percentage already
-  computed, so this app formats rather than divides).
-- **`/directory`** — every agent, searchable by name, description or owner
-  prefix, and filterable on any combination of rung statuses. Identity is the
-  document's own `name`, falling back to `Agent #{id}` only when there is
-  none — never the URI, which is frequently a multi-kilobyte base64 blob or an
-  empty string. Filters live in the URL, so a filtered view is linkable.
-- **`/working`** — the agents for which every rung this run actually ran came
-  back `pass`. The same component as the directory with its facets fixed.
-  Which rungs count is read from the run's own rates, so rung 6 is not
-  required of anyone and joins automatically when it ships.
-- **`/agent/[chain]/[id]`** — the permalink. The ladder vertically, one rung
-  per section, each with its status and its evidence rendered in full (not
-  summarised), plus the archive summary, the on-chain snapshot, and the run's
-  full provenance. Rendered on demand with ISR — 60k pages cannot be built at
-  deploy time — with a per-agent OG image so a shared link previews as a data
-  card.
-- **`/census`** — population base rates per rung, then the run's provenance
-  (pinned block, `checker_commit`, `spec_commit`). Was `/stats`; that path
-  now 308s here.
-- **`/methodology`** — a five-bullet summary, then the long-form detail, plus
-  the live `spec_commit` and rung-4 MUST/SHOULD/MAY lists, all read from the
-  API rather than duplicated here.
+| Route | What |
+|------|------|
+| `/` | The homepage: this run's findings, the per-check base rates, and the run's provenance. Every figure comes from the API already computed. |
+| `/search` | One query across every published chain, grouped by chain. Falls back to per-chain links when the API predates `/api/search`. |
+| `/directory` | Every agent on one chain, filterable on any combination of check statuses. Filters live in the URL, so a filtered view is linkable. |
+| `/agent/[chain]/[id]` | The permalink: every check with its status and its evidence in full, plus the on-chain snapshot and the run's provenance. Rendered on demand with ISR, with a per-agent OG image. |
+| `/methodology` | What each check asks, plus the live `spec_commit` and the rung-4 MUST/SHOULD/MAY lists, read from the API rather than duplicated here. |
+| `/reports` | The report index. Static — the list is a hand-maintained registry. |
+| `/reports/[slug]` | One dated report, prerendered from markdown in `content/reports/`. |
+| `/reports/linkage` | The identity-to-payments join, as its own route. |
+| `/data` | Every canonical run as a downloadable archive with its sha256. Static, so it works when the API is down. |
+| `/coverage` | Every chain the registry is deployed on, counted the same way the census counts, and which of them are swept. The swept share is computed from the committed probe output, never typed. |
+| `/preflight` | Paste a registration file and see what the checker says before it is minted. Nothing is stored. |
+| `/neutrality` | Who pays for this, and what payment cannot buy. |
+| `/subscribed` | Where the subscribe form lands. Not indexed. |
+| `/healthz` | Health JSON that distinguishes "this site is broken" from "its backend is broken". |
+| `/api/subscribe` | The subscribe form's POST target. It forwards to the census API server-side, so the API's address never reaches the browser. |
+
+Retired paths — `/census`, `/stats`, `/working`, `/linkage` — redirect
+permanently; the full list lives in `next.config.ts`.
 
 ## Accessibility
 
 Rung badges encode status in **three** channels: the rung number, a glyph
-(`✓ ✗ ! – ○ ·`), and colour. Colour alone excluded red-green colourblind
+(`✓ ✗ ! – ○ ⌀ ·`), and colour. Colour alone excluded red-green colourblind
 readers — roughly 8% of men — from the densest information on the site, and
 `pass`/`fail` were the two statuses rendered most similarly. Every badge also
 carries a `title` and `aria-label` spelling the status out in words, and a
 status legend appears on every page that shows a badge or a bar.
 
 A rung with **no row** for a given agent was never reached this run (a
-short-circuited pipeline, or — currently — rung 6, not yet implemented). The
+short-circuited pipeline, or a run swept before rung 6 shipped on
+2026-08-01). The
 UI renders that as "not checked", visibly distinct from `skipped`: "not
 checked" and "we couldn't ask" are different claims, and neither is invented
 here — the API's own absence of a row is the fact being rendered.

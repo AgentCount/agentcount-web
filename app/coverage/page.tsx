@@ -136,9 +136,9 @@ export default async function CoveragePage() {
                     ? c.name
                     : chainDisplayName(c.slug)}
                 </td>
-                <td className="py-1.5 pr-4 text-right text-dead">
-                  {c.chain_id.toLocaleString("en-US")}
-                </td>
+                {/* A chain id is an identifier, not a quantity: 8453, never
+                    "8,453". The global tabular-nums still aligns the column. */}
+                <td className="py-1.5 pr-4 text-right text-dead">{c.chain_id}</td>
                 <td className="py-1.5 pr-4 text-right text-muted">
                   {c.status === "ok" ? num(c.agents) : "—"}
                 </td>

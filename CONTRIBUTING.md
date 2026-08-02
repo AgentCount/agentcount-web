@@ -58,11 +58,11 @@ information on the site. Do not remove the glyph.
 ## Before you push
 
 ```sh
-npm run lint
-npx tsc --noEmit
-npm test
-npm run build          # must succeed with no API reachable
-npm run check:api      # against a live API, after any crates/api change
+pnpm lint
+pnpm exec tsc --noEmit
+pnpm test
+pnpm build             # must succeed with no API reachable
+pnpm check:api         # against a live API, after any crates/api change
 ```
 
 `check:api` is the only thing that catches drift between this repo and the API.
