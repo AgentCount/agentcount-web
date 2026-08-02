@@ -214,17 +214,24 @@ export default async function RootLayout({
       className={`${plexSans.variable} ${plexMono.variable} ${plexCondensed.variable}`}
     >
       <body className="min-h-screen">
-        {/* The masthead is a register header, not a nav bar: the wordmark and
-            the greeting sit on one hairline, and the sections are set as
-            micro-labels rather than buttons — with two exceptions that earn
-            their weight, the search box and the one action.
+        {/* The masthead is a register header, not a nav bar — and it is two
+            deliberate rows, not one negotiated one. The old single row held
+            seven items of five kinds, and between ~640px and ~1100px the
+            flex-wrap chose what broke; the header had a different shape at
+            every width, which is what "items appended over time" looks like
+            at runtime.
 
-            At `sm` and up everything sits on one row. Below it the row breaks
-            into three: identity, then search full-width, then the sections
-            behind a `<details>` disclosure. That disclosure is why the header
-            fits a 360px phone without a hamburger's worth of JavaScript. */}
+            Row one is identity and the one input: wordmark, greeting, search.
+            Row two is places and the one action: the five sections, the CTA.
+            The hairline between them does the composing, and the header has
+            the same shape at every width from `sm` up.
+
+            Below `sm` each row still stacks: identity, then search
+            full-width, then the sections behind a `<details>` disclosure,
+            then the CTA. That disclosure is why the header fits a 360px
+            phone without a hamburger's worth of JavaScript. */}
         <header className="border-b border-edge">
-          <div className="flex flex-wrap items-center justify-between gap-x-8 gap-y-3 px-5 py-4 sm:px-7">
+          <div className="flex flex-wrap items-center justify-between gap-x-8 gap-y-3 px-5 py-3.5 sm:px-7">
             <div className="flex items-baseline gap-4">
               <Link
                 href="/"
@@ -268,14 +275,17 @@ export default async function RootLayout({
                   `BRAND.greeting`. */}
               <span className="hidden label sm:inline">{BRAND.greeting}</span>
             </div>
-            {/* Search before the sections, and full-width on its own row on a
-                phone: "is this agent real?" is the errand most people arrive
-                with, so it gets the most reachable slot rather than the
-                left-over one. */}
-            <div className="order-3 w-full sm:order-none sm:ml-auto sm:w-auto">
+            {/* Search closes row one, full-width on its own line on a phone:
+                "is this agent real?" is the errand most people arrive with,
+                so it shares the identity row rather than competing with the
+                nav. */}
+            <div className="w-full sm:ml-auto sm:w-auto">
               <NavSearch />
             </div>
+          </div>
 
+          {/* Row two: places, then the one action. */}
+          <div className="flex flex-wrap items-center justify-between gap-x-8 gap-y-3 border-t border-line px-5 py-2.5 sm:px-7">
             {/* `<details>` is the whole mobile menu: open/closed is a browser
                 behaviour, so five sections collapse on a phone with no state,
                 no hydration and no bundle. From `sm` up the marker is hidden
@@ -289,7 +299,7 @@ export default async function RootLayout({
                 correct default for a five-item register. */}
             <details
               open
-              className="order-4 w-full [&_summary]:sm:hidden sm:order-none sm:w-auto"
+              className="w-full [&_summary]:sm:hidden sm:w-auto"
             >
               <summary className="label cursor-pointer list-none py-1 marker:content-none">
                 Sections
@@ -314,7 +324,7 @@ export default async function RootLayout({
                 `ACTION`. */}
             <Link
               href={ACTION.href}
-              className="order-2 border border-edge px-3 py-1.5 font-mono text-[0.6875rem] uppercase tracking-[0.08em] text-text transition-colors hover:bg-raised sm:order-none"
+              className="border border-edge px-3 py-1.5 font-mono text-[0.6875rem] uppercase tracking-[0.08em] text-text transition-colors hover:bg-raised"
             >
               {ACTION.label}
             </Link>
