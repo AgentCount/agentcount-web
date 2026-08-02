@@ -57,6 +57,21 @@ export function EvidenceTable({
                 <OutboundLink href={link.href} untrusted={link.untrusted}>
                   {text}
                 </OutboundLink>
+              ) : text.length > 200 ? (
+                // Truncation-with-expansion is not summarising: the full
+                // value is right there, one tap away, verbatim. What it
+                // prevents is a 3KB base64 data: URI turning the evidence
+                // register into a wall — the exact page where a reader is
+                // trying to scan seven checks.
+                <details>
+                  <summary className="cursor-pointer list-none">
+                    {text.slice(0, 120)}
+                    <span className="text-dead">
+                      … ({text.length.toLocaleString("en-US")} chars — expand)
+                    </span>
+                  </summary>
+                  {text}
+                </details>
               ) : (
                 text
               )}

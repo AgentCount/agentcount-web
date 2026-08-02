@@ -5,12 +5,13 @@ import { AllRunsProvenance } from "@/components/AllRunsProvenance";
 import { CountTile, FindingTile } from "@/components/FindingTile";
 import { allPassFacets } from "@/components/DirectoryControls";
 import { StatusWord } from "@/components/StatusWord";
-import { RateBar } from "@/components/RateBar";
+import { MissingRateBar, RateBar } from "@/components/RateBar";
 import { ChainSwitcher } from "@/components/ChainSwitcher";
 import { RunProvenance } from "@/components/RunProvenance";
 import { Section } from "@/components/Section";
 import { StatusLegend } from "@/components/StatusLegend";
 import { aggregateFinding, canonicalRuns, totalAgents } from "@/lib/api/aggregate";
+import { CHECKS } from "@/lib/checks";
 import {
   chainsWithRuns,
   getFindings,
@@ -431,9 +432,19 @@ export default async function Home({
         }
       >
         <div className="space-y-8">
-          {rates.rungs.map((r) => (
-            <RateBar key={r.rung} rung={r} total={rates.agent_count} />
-          ))}
+          {/* The full ladder, 1 through 7, never the subset with data: a list
+              that runs 1, 2, 3, 4, 5, 7 reads as a bug. A position the run
+              carries no rates for renders hatched, and takes real data the
+              moment a run reports it — `MissingRateBar` renders only when the
+              lookup fails. */}
+          {CHECKS.map((c) => {
+            const r = rates.rungs.find((x) => x.rung === c.number);
+            return r ? (
+              <RateBar key={c.number} rung={r} total={rates.agent_count} />
+            ) : (
+              <MissingRateBar key={c.number} rungNumber={c.number} />
+            );
+          })}
         </div>
         <div className="mt-10">
           <StatusLegend statuses={statusVocabulary(rates)} />

@@ -1,5 +1,5 @@
 import type { RungRate } from "@/lib/api/schemas";
-import { checkLabel, questionFor } from "@/lib/checks";
+import { checkFor, checkLabel, questionFor } from "@/lib/checks";
 import {
   NOT_CHECKED_LABEL,
   statusBarPattern,
@@ -100,6 +100,41 @@ export function RateBar({ rung, total }: { rung: RungRate; total: number }) {
             </li>
           )}
         </ul>
+      </div>
+    </div>
+  );
+}
+
+/**
+ * The row for a rung the run carries no data for — today, rung 6.
+ *
+ * Rendered by the rates section for any ladder position missing from
+ * `rates.rungs`, so the numbering never skips from 5 to 7 and a reader is
+ * not left inferring whether the gap is a bug. Built to disappear on its
+ * own: the moment a run reports the rung, `rates.rungs` contains it, the
+ * caller's lookup succeeds, and the real `RateBar` renders in this row with
+ * no code change here.
+ */
+export function MissingRateBar({ rungNumber }: { rungNumber: number }) {
+  return (
+    <div className="grid grid-cols-1 gap-x-8 gap-y-3 lg:grid-cols-[13rem_1fr]">
+      <div className="flex items-baseline gap-3 lg:flex-col lg:items-start lg:gap-1">
+        <div className="flex items-baseline gap-2">
+          <span className="numeral text-2xl text-dead">{rungNumber}</span>
+          <h3 className="font-mono text-sm uppercase tracking-[0.1em] text-dead">
+            {questionFor(rungNumber)}{" "}
+            <span className="text-dead/70">{checkFor(rungNumber)?.internal}</span>
+          </h3>
+        </div>
+      </div>
+      <div>
+        <div
+          aria-hidden="true"
+          className="h-[10px] w-full bg-[repeating-linear-gradient(135deg,transparent,transparent_3px,rgba(232,228,220,.06)_3px,rgba(232,228,220,.06)_6px)]"
+        />
+        <p className="mt-2 font-mono text-xs text-dead">
+          · {NOT_CHECKED_LABEL} — this check is not asked of anyone yet
+        </p>
       </div>
     </div>
   );
