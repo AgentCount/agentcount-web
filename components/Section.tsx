@@ -30,7 +30,16 @@ export function Section({
       <div className="ruled">
         <h2 className="label text-muted">{title}</h2>
         <span className="ruled-line" />
-        {aside && <span className="label">{aside}</span>}
+        {/* Muted rather than dead: the aside is load-bearing — it often names
+            the SCOPE of the section ("base rates on bsc"), and a scope printed
+            at the floor of legibility is how a reader misses that the page
+            changed subject. Spelled out rather than using the `label` utility
+            so the colour cannot lose a specificity race. */}
+        {aside && (
+          <span className="font-mono text-[0.6875rem] uppercase leading-none tracking-[0.14em] text-muted">
+            {aside}
+          </span>
+        )}
       </div>
       {intro && (
         <div className="mt-4 max-w-prose text-sm leading-relaxed text-muted">{intro}</div>

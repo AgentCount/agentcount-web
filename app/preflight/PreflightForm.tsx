@@ -108,7 +108,10 @@ export function PreflightForm({ statuses }: { statuses: string[] }) {
         {state.kind === "checked" ? (
           <Section
             title="What the checker says"
-            aside={`${state.result.rungs.length} of 7 answerable`}
+            // Not "N of 7": even about answerability, a numerator-over-seven
+            // reads as the tally this product refuses, and screenshots do not
+            // carry the distinction.
+            aside="answers checks 3–5"
             intro={
               <>
                 The same checker that judged every agent in the census, at spec

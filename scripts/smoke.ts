@@ -246,9 +246,15 @@ async function checkHeaderShape() {
     /<form[^>]*action="\/directory"[^>]*>/.test(html) && /name="q"/.test(html),
     "masthead carries the search form, posting to /directory",
   );
+  // The label is asserted as a RULE, not as a string: the action must not be
+  // named after the page ("Pre-flight"), because that name asks a reader to
+  // already know what the feature is. Pinning the exact wording here would
+  // mean every copy edit lands as a red build, which trains people to edit
+  // the test rather than think about the label.
+  const action = html.match(/href="\/preflight"[^>]*>([^<]+)</)?.[1]?.trim() ?? "";
   check(
-    /href="\/preflight"[^>]*>Check your agent/.test(html),
-    "masthead carries the one action, labelled for the errand",
+    action.length > 0 && !/^pre-?flight$/i.test(action),
+    `masthead carries the one action, labelled for the errand ("${action}")`,
   );
   check(
     /<summary[^>]*>/.test(html),

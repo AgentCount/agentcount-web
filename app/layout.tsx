@@ -122,10 +122,12 @@ const NAV = [
  * hairline is enough to read as a control in a page that has no other boxes.
  *
  * Labelled for the errand, not the page title: "Pre-flight" names a feature
- * someone must already understand, "Check your agent" names a thing they came
- * to do.
+ * someone must already understand. "Check your agent" was tried and read as
+ * "look up my minted agent" — the directory's job — when what the page checks
+ * is a document before minting. The label now says when and what, in the
+ * page's own words.
  */
-const ACTION = { href: "/preflight", label: "Check your agent" };
+const ACTION = { href: "/preflight", label: "Check before you mint" };
 
 /**
  * The pages that say what this project is rather than what it measured.

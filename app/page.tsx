@@ -14,7 +14,6 @@ import { aggregateFinding, canonicalRuns, totalAgents } from "@/lib/api/aggregat
 import {
   chainsWithRuns,
   getFindings,
-  getMethodology,
   getRates,
   listAgents,
   listRuns,
@@ -23,6 +22,7 @@ import {
 } from "@/lib/api/endpoints";
 import type { Finding, Findings } from "@/lib/api/schemas";
 import { chainDisplayName, formatChainList } from "@/lib/chains";
+import { LINKAGE, oneIn } from "@/lib/linkage";
 import { getPublishedRuns } from "@/lib/published-runs";
 import { REPORTS } from "@/lib/reports";
 
@@ -97,8 +97,7 @@ export default async function Home({
     throw new Error("no completed run is available yet");
   }
 
-  const [methodology, rates, sample] = await Promise.all([
-    getMethodology(),
+  const [rates, sample] = await Promise.all([
     getRates(run.run_id),
     listAgents({ run: run.run_id, limit: 3 }),
   ]);
@@ -116,9 +115,22 @@ export default async function Home({
     KEYS.map(finding);
 
   const pct = (f: Finding) => (f.percent === null ? "—" : `${f.percent.toFixed(1)}%`);
-  const mustCount = methodology.rung4_must_requirements.length;
-  const allConditional = methodology.rung4_must_requirements.every((r) => r.conditional);
   const population = totalAgents(censusRuns);
+
+  /**
+   * The per-chain attestation line rendered between the tiles and the rate
+   * bars. Two jobs: it puts the report's central finding — attestation varies
+   * by more than an order of magnitude between chains — on the page that
+   * quotes the population-weighted average, and it marks the moment the page
+   * narrows from every chain to one. Census mode only: on a per-chain page
+   * there is nothing to compare.
+   */
+  const perChainAttested = perChain
+    ? []
+    : censusRuns.map((r, i) => ({
+        chain: r.chain,
+        attested: pick(perRunFindings[i].findings, "attested"),
+      }));
 
   /**
    * The Base-only attestation investigation, which the census view must not
@@ -271,40 +283,69 @@ export default async function Home({
             all, or one with nothing in it.
           </FindingTile>
 
+          {/* Leads with the plain fact; the vocabulary (conformant, check 5,
+              unclaimed) follows it instead of gatekeeping it. */}
           <FindingTile index={2} finding={unclaimed}>
-            of conforming documents never say which agent they belong to. The
-            registration entry that would bind a document to its on-chain id is
-            only recommended, so most omit it and check 5 (Claims its
-            identity?) records <StatusWord status="unclaimed" /> — neither a
-            pass nor a fail.
+            of registration files never say which on-chain agent they belong
+            to — the spec only recommends the field that would bind them.
+            Check 5 (Claims its identity?) records those as{" "}
+            <StatusWord status="unclaimed" />: neither a pass nor a fail.
           </FindingTile>
 
           <FindingTile index={3} finding={attested}>
-            have at least one on-chain feedback entry — and those agents are{" "}
-            <em className="not-italic text-text">less</em> likely to have a
-            document that resolves than agents with none:{" "}
-            {pct(attestedResolvable)} against {pct(unattestedResolvable)}.
+            have at least one on-chain feedback entry.{" "}
+            <span className="text-text">
+              Agents with feedback are less likely to have a document that
+              resolves than agents with none
+            </span>{" "}
+            — {pct(attestedResolvable)} against {pct(unattestedResolvable)}.
           </FindingTile>
 
+          {/* The fourth tile answers the economy question the other three
+              lead up to. The MUST-requirement count it replaced lives on
+              /methodology (rung 4's severity table) and in the preflight
+              header, where a reader who cares about spec severity already is.
+              These are published figures with a date, not live census reads —
+              the source line says so, and LINKAGE carries the runs they are
+              scoped to. */}
           <CountTile
             index={4}
-            value={mustCount}
-            source={`spec ${methodology.spec_commit.slice(0, 12)} · checker ${methodology.checker_version}`}
+            value={LINKAGE.total.paid}
+            source={`measured ${LINKAGE.measuredOn} · ${LINKAGE.runs.length} chains · lower bound`}
           >
-            the number of MUST requirements ERC-8004 places on a registration
-            file
-            {allConditional && (
-              <>
-                {mustCount === 1
-                  ? " — and it is conditional"
-                  : " — all of them conditional"}
-                , so a document that omits{" "}
-                <code className="font-mono text-text">registrations</code>{" "}
-                entirely has nothing it must do at all.
-              </>
-            )}
+            agents — {oneIn(LINKAGE.total.paid, LINKAGE.total.agents)} — have
+            ever been paid: an external stablecoin transfer arriving after
+            minting, at the wallet the agent&rsquo;s own document declared.{" "}
+            <Link
+              href="/reports/linkage"
+              className="text-text underline decoration-line underline-offset-4 transition-colors hover:decoration-edge"
+            >
+              The full join is its own report.
+            </Link>
           </CountTile>
         </div>
+
+        {/* The report's central finding, on the page that quotes the average
+            it corrects: attestation is not one number, it spans the chains by
+            an order of magnitude. This line is also the visible seam where
+            the page narrows from the whole census to one chain at a time. */}
+        {perChainAttested.length > 1 && (
+          <div className="mt-10 flex flex-wrap items-baseline gap-x-7 gap-y-2 border-t border-line pt-4">
+            <span className="font-mono text-[0.6875rem] uppercase tracking-[0.14em] text-muted">
+              Has feedback? by chain
+            </span>
+            {perChainAttested.map(({ chain, attested: a }) => (
+              <span key={chain} className="font-mono text-xs">
+                <span className="text-muted">{chain}</span>{" "}
+                <span className="text-text">{pct(a)}</span>
+              </span>
+            ))}
+            <span className="text-xs leading-relaxed text-dead">
+              — one population-weighted average would hide this spread, so the
+              sections below show one chain at a time
+            </span>
+          </div>
+        )}
 
         {/* The report is the long-form argument these figures summarise. Its
             own headline counts come from the report's metadata, not from the
