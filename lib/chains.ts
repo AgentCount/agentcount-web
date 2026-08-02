@@ -38,3 +38,18 @@ export function formatChainList(slugs: readonly string[]): string {
     type: "conjunction",
   }).format(slugs.map(chainDisplayName));
 }
+
+/**
+ * Small counts spelled out, larger ones left as numerals — the usual prose
+ * rule, applied so a derived count can sit in a sentence without reading like
+ * a spreadsheet. Only used where the number is prose; every figure that is a
+ * measurement stays a numeral.
+ */
+const WORDS = [
+  "zero", "one", "two", "three", "four", "five",
+  "six", "seven", "eight", "nine", "ten", "eleven", "twelve",
+];
+
+export function spellCount(n: number): string {
+  return WORDS[n] ?? n.toLocaleString("en-US");
+}

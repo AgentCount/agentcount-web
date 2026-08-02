@@ -52,6 +52,36 @@ export default async function MethodologyPage() {
     <>
       <h1 className="numeral text-[clamp(1.75rem,3.2vw,2.5rem)] text-text">What we measure</h1>
 
+      {/* Why the census exists, at the anchor the homepage links to. The
+          homepage carries three sentences of this; the rest lives here,
+          because a reader who followed "why this exists" has asked for the
+          long version. */}
+      <section id="why" className="mt-8 max-w-prose scroll-mt-8">
+        <h2 className="label">Why this exists</h2>
+        <p className="mt-3 leading-relaxed text-muted">
+          Hundreds of thousands of AI agents are registered on public
+          blockchains under ERC-8004, and those registration counts get cited
+          as evidence that an autonomous agent economy exists. Nobody was
+          checking what stands behind the counts.
+        </p>
+        <p className="mt-4 leading-relaxed text-muted">
+          {BRAND.name} reads every registered agent on the chains it sweeps at
+          a pinned block and asks seven checkable questions: does the
+          registration point at a document, does the document work, does
+          anyone attest to the agent, does money actually reach it. Every
+          answer is published with the evidence to recompute it, and none of
+          them is combined into a score.
+        </p>
+        <p className="mt-4 leading-relaxed text-muted">
+          What the checks show so far: three-quarters of registration
+          documents declare no way to reach an agent, most reputation is
+          written by a few automated clients, and a few hundred of the
+          registered agents have ever been paid. The registry is real. What it
+          is being taken as proof of is not, and counting is the honest way to
+          say so.
+        </p>
+      </section>
+
       {/* The summary block. Five bullets, before the long-form detail, for the
           reader who arrived from a shared agent link and wants to know what
           they are looking at without reading two thousand words first. Every

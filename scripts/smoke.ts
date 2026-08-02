@@ -253,15 +253,17 @@ async function checkHeaderShape() {
     /<form[^>]*action="\/search"[^>]*>/.test(html) && /name="q"/.test(html),
     "masthead carries the search form, posting to /search",
   );
-  // The label is asserted as a RULE, not as a string: the action must not be
-  // named after the page ("Pre-flight"), because that name asks a reader to
-  // already know what the feature is. Pinning the exact wording here would
-  // mean every copy edit lands as a red build, which trains people to edit
-  // the test rather than think about the label.
+  // The pre-flight checker moved from the masthead to the footer's Tools
+  // list, so what has to hold is that EVERY page still links it — a tool
+  // nothing links to is a tool nobody finds. The label is asserted as a rule
+  // rather than a string: it must not be named after the page
+  // ("Pre-flight"), because that name asks a reader to already know what the
+  // feature is. Pinning exact wording would make every copy edit a red
+  // build, which trains people to edit the test instead of the label.
   const action = html.match(/href="\/preflight"[^>]*>([^<]+)</)?.[1]?.trim() ?? "";
   check(
     action.length > 0 && !/^pre-?flight$/i.test(action),
-    `masthead carries the one action, labelled for the errand ("${action}")`,
+    `every page links the checker, labelled for the errand ("${action}")`,
   );
   check(
     /<summary[^>]*>/.test(html),

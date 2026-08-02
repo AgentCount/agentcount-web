@@ -38,22 +38,45 @@ export function RateBar({ rung, total }: { rung: RungRate; total: number }) {
   const notChecked = Math.max(0, total - sum);
   const pct = (n: number) => (total > 0 ? (n / total) * 100 : 0);
 
+  // One list, largest share first, with the unreached gap as its own entry.
+  // Ordering by size is the distribution's own order, not a judgement about
+  // which status matters — and it puts the number that explains the bar at
+  // the top of every row, so the rows compare to each other by eye.
+  const rows = [
+    ...rung.counts.map((c) => ({
+      status: c.status,
+      count: c.count,
+      glyph: statusGlyph(c.status),
+      ink: statusInkClass(c.status),
+    })),
+    ...(notChecked > 0
+      ? [{ status: "not checked", count: notChecked, glyph: "·", ink: "text-dead" }]
+      : []),
+  ].sort((a, b) => b.count - a.count);
+
   return (
-    <div className="grid grid-cols-1 gap-x-8 gap-y-3 lg:grid-cols-[13rem_1fr]">
-      <div className="flex items-baseline gap-3 lg:flex-col lg:items-start lg:gap-1">
+    <div className="grid grid-cols-1 gap-x-8 gap-y-2 lg:grid-cols-[15rem_1fr]">
+      {/* The label column is one shape on every row: number and question on
+          the first line, the checker's own name and the denominator on the
+          second. It used to let the internal name wrap inline after the
+          question, so rows 3 and 5 set it on the same line and the rest set
+          it below — a ragged column that made seven rows look like seven
+          decisions. */}
+      <div className="flex items-baseline gap-2.5 lg:block">
         <div className="flex items-baseline gap-2">
-          <span className="numeral text-2xl text-dead">{rung.rung}</span>
+          <span className="numeral text-xl text-dead">{rung.rung}</span>
           <h3 className="font-mono text-sm uppercase tracking-[0.1em] text-text">
-            {questionFor(rung.rung, rung.name)}{" "}
-            <span className="text-dead">{rung.name}</span>
+            {questionFor(rung.rung, rung.name)}
           </h3>
         </div>
-        <span className="label">of {total.toLocaleString("en-US")}</span>
+        <p className="label lg:mt-1.5">
+          {rung.name} · {total.toLocaleString("en-US")}
+        </p>
       </div>
 
       <div>
         <div
-          className="flex h-2.5 w-full overflow-hidden bg-panel"
+          className="flex h-2 w-full overflow-hidden bg-panel"
           role="img"
           aria-label={`${checkLabel(rung.rung, rung.name)}: ${rung.counts
             .map((c) => `${c.status} ${c.count.toLocaleString("en-US")}`)
@@ -78,28 +101,22 @@ export function RateBar({ rung, total }: { rung: RungRate; total: number }) {
           )}
         </div>
 
-        <ul className="mt-2.5 flex flex-wrap gap-x-6 gap-y-1.5">
-          {rung.counts.map((c) => (
-            <li key={c.status} className="flex items-baseline gap-1.5 font-mono text-xs">
-              <span aria-hidden="true" className={statusInkClass(c.status)}>
-                {statusGlyph(c.status)}
-              </span>
-              <span className="text-muted">{c.status}</span>
-              <span className="text-text">{c.count.toLocaleString("en-US")}</span>
-              <span className="text-dead">{pct(c.count).toFixed(1)}%</span>
-            </li>
+        {/* Fixed columns, not a wrapping row of chips. Every count sits under
+            the count above it and every percent under the percent above it,
+            which is what lets a reader compare check 2's fail rate to check
+            4's without reading either sentence. */}
+        <dl className="mt-2 grid grid-cols-[1rem_7.5rem_minmax(0,5rem)_4rem] items-baseline gap-y-0.5 font-mono text-xs">
+          {rows.map((r) => (
+            <div key={r.status} className="contents">
+              <dt aria-hidden="true" className={r.ink}>
+                {r.glyph}
+              </dt>
+              <dd className="text-muted">{r.status}</dd>
+              <dd className="text-right text-text">{r.count.toLocaleString("en-US")}</dd>
+              <dd className="text-right text-dead">{pct(r.count).toFixed(1)}%</dd>
+            </div>
           ))}
-          {notChecked > 0 && (
-            <li className="flex items-baseline gap-1.5 font-mono text-xs">
-              <span aria-hidden="true" className="text-dead">
-                ·
-              </span>
-              <span className="text-muted">not checked</span>
-              <span className="text-text">{notChecked.toLocaleString("en-US")}</span>
-              <span className="text-dead">{pct(notChecked).toFixed(1)}%</span>
-            </li>
-          )}
-        </ul>
+        </dl>
       </div>
     </div>
   );
@@ -117,23 +134,26 @@ export function RateBar({ rung, total }: { rung: RungRate; total: number }) {
  */
 export function MissingRateBar({ rungNumber }: { rungNumber: number }) {
   return (
-    <div className="grid grid-cols-1 gap-x-8 gap-y-3 lg:grid-cols-[13rem_1fr]">
-      <div className="flex items-baseline gap-3 lg:flex-col lg:items-start lg:gap-1">
+    <div className="grid grid-cols-1 gap-x-8 gap-y-2 lg:grid-cols-[15rem_1fr]">
+      <div className="flex items-baseline gap-2.5 lg:block">
         <div className="flex items-baseline gap-2">
-          <span className="numeral text-2xl text-dead">{rungNumber}</span>
+          <span className="numeral text-xl text-dead">{rungNumber}</span>
           <h3 className="font-mono text-sm uppercase tracking-[0.1em] text-dead">
-            {questionFor(rungNumber)}{" "}
-            <span className="text-dead/70">{checkFor(rungNumber)?.internal}</span>
+            {questionFor(rungNumber)}
           </h3>
         </div>
+        <p className="label lg:mt-1.5">{checkFor(rungNumber)?.internal}</p>
       </div>
       <div>
         <div
           aria-hidden="true"
-          className="h-[10px] w-full bg-[repeating-linear-gradient(135deg,transparent,transparent_3px,rgba(232,228,220,.06)_3px,rgba(232,228,220,.06)_6px)]"
+          className="h-2 w-full bg-[repeating-linear-gradient(135deg,transparent,transparent_3px,rgba(232,228,220,.06)_3px,rgba(232,228,220,.06)_6px)]"
         />
+        {/* One sentence. This read "not checked — this check was never asked
+            — this check is not asked of anyone yet", because the shared
+            label already ends in the clause that was appended to it. */}
         <p className="mt-2 font-mono text-xs text-dead">
-          · {NOT_CHECKED_LABEL} — this check is not asked of anyone yet
+          · not checked — this check is not asked of anyone yet
         </p>
       </div>
     </div>

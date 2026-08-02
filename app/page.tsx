@@ -22,7 +22,7 @@ import {
   statusVocabulary,
 } from "@/lib/api/endpoints";
 import type { Finding, Findings } from "@/lib/api/schemas";
-import { chainDisplayName, formatChainList } from "@/lib/chains";
+import { chainDisplayName, formatChainList, spellCount } from "@/lib/chains";
 import { LINKAGE, oneIn } from "@/lib/linkage";
 import { getPublishedRuns } from "@/lib/published-runs";
 import { REPORTS } from "@/lib/reports";
@@ -228,64 +228,71 @@ export default async function Home({
           </>
         ) : (
           <>
-            {/* The population IS the claim, so it is the sentence — with its
-                scope named in the same breath. See `scope` above for why "all"
-                is only permissible next to the population it is all of. Both
-                the number and the scope come from the runs, never typed, so a
-                fifth chain or an unfinished sweep moves them without an edit
-                here. */}
-            <h1 className="numeral max-w-[22ch] text-[clamp(2rem,4.2vw,3.25rem)] text-text">
-              We checked all {population.toLocaleString("en-US")} AI agents
-              registered on{" "}
-              {/* The chain list links to the page that says what those chains
-                  are and are not: every known deployment, counted, with the
-                  swept share computed rather than claimed. The scope claim
-                  and its evidence should be one click apart. */}
+            {/* The claim is short enough to read in one breath; the scope
+                it is true of sits under it as data.
+
+                It used to be one sentence carrying both — "We checked all
+                354,858 AI agents registered on BNB Chain, Base, Ethereum
+                mainnet, and Celo." Naming the chains was the honest fix for
+                a false ranking, but it cost the headline four lines of
+                display type and put a link underline through the middle of
+                it. Splitting the two keeps every fact and gives each one the
+                weight it can carry: the claim as a headline, the population,
+                chains and sweep count as the mono line that qualifies it.
+
+                Both halves still derive from the runs, so a fifth chain
+                moves them without an edit here. */}
+            <h1 className="numeral max-w-[20ch] text-[clamp(2rem,4.4vw,3.5rem)] text-text">
+              We check every AI agent registered under{" "}
+              <span className="whitespace-nowrap">ERC-8004</span> on{" "}
               <Link
                 href="/coverage"
-                className="underline decoration-line underline-offset-8 transition-colors hover:decoration-edge"
+                className="underline decoration-line underline-offset-[0.14em] transition-colors hover:decoration-edge"
               >
-                {scope}
+                {spellCount(censusRuns.length)} chains
               </Link>
               .
             </h1>
-            {/* Why this census exists, in the one place a first-time visitor
-                actually is. Every figure in it is derived — the population
-                from the runs, the rate from the findings, the paid count from
-                the published linkage — so the paragraph moves with the data.
-                The old sub ("no scores, no rankings — counts") restated the
-                masthead greeting two inches above it; the runs table moved to
-                the Provenance section, where provenance lives, reachable by
-                the one-line summary below. */}
-            <p className="mt-5 max-w-prose text-lg leading-relaxed text-muted">
-              Registration counts like the one above get cited as evidence
-              that an autonomous agent economy exists, and nobody was checking
-              what stands behind them. This census reads every registered
-              agent at a pinned block and asks seven checkable questions —
-              does the registration point at a document, does the document
-              work, does anyone attest to the agent, does money actually reach
-              it — and publishes every answer with the evidence to recompute
-              it, and no score. So far:{" "}
-              <span className="text-text">
-                {pct(unreachable)} of registration documents declare no way to
-                reach an agent
+
+            <p className="mt-6 flex flex-wrap items-baseline gap-x-4 gap-y-2 font-mono text-xs text-dead">
+              <span>
+                <span className="text-muted">
+                  {population.toLocaleString("en-US")}
+                </span>{" "}
+                agents
               </span>
-              , most feedback is written by a few automated clients, and{" "}
-              <span className="text-text">
-                {LINKAGE.total.paid.toLocaleString("en-US")} of{" "}
-                {LINKAGE.total.agents.toLocaleString("en-US")} agents have ever
-                been paid
+              <span className="text-line">·</span>
+              <span className="text-muted">{scope}</span>
+              <span className="text-line">·</span>
+              <span>
+                <span className="text-muted">{censusRuns.length}</span> sweeps
               </span>
-              .
-            </p>
-            <p className="mt-5 font-mono text-xs text-dead">
-              {censusRuns.length} sweeps · {censusRuns.length} chains ·{" "}
+              <span className="text-line">·</span>
               <a
                 href="#provenance"
                 className="underline decoration-line underline-offset-4 transition-colors hover:text-muted"
               >
                 provenance ↓
               </a>
+            </p>
+
+            {/* Three sentences, not the eight-line block this used to be.
+                The argument is the same one; the rest of it lives on the
+                method page, which is where a reader who wants it goes. */}
+            <p className="mt-7 max-w-[52ch] text-lg leading-relaxed text-muted">
+              Registration counts get cited as proof that an agent economy
+              exists. Nobody was checking what stands behind them. This census
+              asks seven checkable questions of every registered agent and
+              publishes each answer with the evidence to recompute it, and{" "}
+              <span className="text-text">no score</span>.
+            </p>
+            <p className="mt-4">
+              <Link
+                href="/methodology#why"
+                className="font-mono text-xs uppercase tracking-[0.1em] text-muted underline decoration-line underline-offset-4 transition-colors hover:text-text hover:decoration-edge"
+              >
+                Why this exists →
+              </Link>
             </p>
           </>
         )}
@@ -354,8 +361,8 @@ export default async function Home({
             value={LINKAGE.total.paid}
             source={`measured ${LINKAGE.measuredOn} · ${LINKAGE.runs.length} chains · lower bound`}
           >
-            agents — {oneIn(LINKAGE.total.paid, LINKAGE.total.agents)} — have
-            ever been paid: an external stablecoin transfer arriving after
+            agents — {oneIn(LINKAGE.total.paid, LINKAGE.total.agents)}{" "}
+            — have ever been paid: an external stablecoin transfer arriving after
             minting, at the wallet the agent&rsquo;s own document declared.{" "}
             <Link
               href="/reports/linkage"
