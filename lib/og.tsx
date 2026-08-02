@@ -54,7 +54,7 @@ export const OG_CONTENT_TYPE = "image/png";
  * poster length, and it is also what the exported banner in `public/brand/`
  * says, so a shared card and a profile header cannot disagree.
  */
-export const OG_TAGLINE = "Counts, not scores — the independent ERC-8004 census";
+export const OG_TAGLINE = "The independent ERC-8004 census — evidence attached";
 
 /** Copied from `app/globals.css`'s `@theme` block. See the module doc. */
 export const COLOR = {

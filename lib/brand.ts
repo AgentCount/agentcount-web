@@ -27,19 +27,22 @@ export const BRAND = {
   tagline:
     "An independent ERC-8004 conformance census: seven rungs per agent, evidence attached, no score.",
   /**
-   * The greeting: positioning, not method.
+   * The greeting: what makes this register unusual, in two words.
    *
-   * The masthead said "ERC-8004 conformance census", which is an accurate
-   * self-description and a poor greeting — it asks a first-time visitor to
-   * already know what ERC-8004 is before it tells them anything, and it
-   * describes the METHOD when the first second should carry the CLAIM.
+   * The masthead first said "ERC-8004 conformance census", which asks a
+   * first-time visitor to know what ERC-8004 is before it tells them
+   * anything. It then said "Counts, not scores." for a while, which was
+   * better positioning and two other problems: it is the same negation
+   * construction this project's prose leans on everywhere (see the 2026-08
+   * review), and it defines the product by what a competitor does, which
+   * gives the competitor the frame.
    *
-   * "Counts, not scores" is the whole argument in three words, and it is the
-   * one thing about this project that is unusual enough to be worth the
-   * masthead. The technical self-description does not disappear — see
-   * [`selfDescription`].
+   * "Evidence attached" is the promise that is actually unusual and actually
+   * kept: every check on this site carries the evidence that produced it, and
+   * every published number can be recomputed from an archive anyone can
+   * download. It says what a reader gets rather than what someone else does.
    */
-  greeting: "Counts, not scores.",
+  greeting: "Evidence attached.",
   /**
    * The technical self-description, kept verbatim and moved rather than
    * dropped: the footer and the meta description are where a reader who wants
