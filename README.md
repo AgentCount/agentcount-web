@@ -42,7 +42,7 @@ pnpm dev                # http://localhost:3000
 | `lib/api/` | Zod schemas, the fetch client, and one function per endpoint. |
 | `lib/paging.ts` | Page-number ↔ offset maths. |
 | `lib/status.ts` | Status → colour, glyph, and spelled-out label. The status *word* is never chosen here — only how it is drawn. |
-| `app/` | Routes. Every page is a Server Component. The two client files, `app/error.tsx` (required by Next for error boundaries) and `app/preflight/PreflightForm.tsx`, are not pages. |
+| `app/` | Routes. Every page is a Server Component. The two client files, `app/error.tsx` (required by Next for error boundaries) and `app/preflight/PreflightForm.tsx`, are not pages. `loading.tsx` sits on segments that only ever answer 200 — a loading file makes its segment stream, and a streamed response cannot still become a 404. |
 | `components/` | Presentational pieces only. |
 | `scripts/check-api.ts` | Validates every endpoint against a live API. |
 
@@ -51,21 +51,20 @@ pnpm dev                # http://localhost:3000
 | Route | What |
 |------|------|
 | `/` | The homepage: this run's findings, the per-check base rates, and the run's provenance. Every figure comes from the API already computed. |
-| `/directory` | Every agent, searchable by name, description or owner prefix, filterable on any combination of check statuses. Filters live in the URL, so a filtered view is linkable. |
+| `/search` | One query across every published chain, grouped by chain. Falls back to per-chain links when the API predates `/api/search`. |
+| `/directory` | Every agent on one chain, filterable on any combination of check statuses. Filters live in the URL, so a filtered view is linkable. |
 | `/agent/[chain]/[id]` | The permalink: every check with its status and its evidence in full, plus the on-chain snapshot and the run's provenance. Rendered on demand with ISR, with a per-agent OG image. |
 | `/methodology` | What each check asks, plus the live `spec_commit` and the rung-4 MUST/SHOULD/MAY lists, read from the API rather than duplicated here. |
 | `/reports` | The report index. Static — the list is a hand-maintained registry. |
 | `/reports/[slug]` | One dated report, prerendered from markdown in `content/reports/`. |
 | `/reports/linkage` | The identity-to-payments join, as its own route. |
 | `/data` | Every canonical run as a downloadable archive with its sha256. Static, so it works when the API is down. |
+| `/coverage` | Every chain the registry is deployed on, counted the same way the census counts, and which of them are swept. The swept share is computed from the committed probe output, never typed. |
 | `/preflight` | Paste a registration file and see what the checker says before it is minted. Nothing is stored. |
 | `/neutrality` | Who pays for this, and what payment cannot buy. |
 | `/subscribed` | Where the subscribe form lands. Not indexed. |
 | `/healthz` | Health JSON that distinguishes "this site is broken" from "its backend is broken". |
 | `/api/subscribe` | The subscribe form's POST target. It forwards to the census API server-side, so the API's address never reaches the browser. |
-
-A `/coverage` page (every registry deployment counted, with the swept share)
-is landing in an open PR.
 
 Retired paths — `/census`, `/stats`, `/working`, `/linkage` — redirect
 permanently; the full list lives in `next.config.ts`.
