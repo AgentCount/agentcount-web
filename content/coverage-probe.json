@@ -1,0 +1,327 @@
+{
+ "generated_at": "2026-08-01T20:11:42.719Z",
+ "registry": "0x8004a169fb4a3325136eb29fa0ceb6d2e539a432",
+ "method": "ownerOf binary search",
+ "chains": [
+  {
+   "slug": "bsc",
+   "name": "BNB Smart Chain",
+   "chain_id": 56,
+   "rpc_used": "https://bsc-dataseed.bnbchain.org",
+   "deployed": true,
+   "agents": 247637,
+   "id_basis": 0,
+   "status": "ok"
+  },
+  {
+   "slug": "base",
+   "name": "Base",
+   "chain_id": 8453,
+   "rpc_used": "https://base-rpc.publicnode.com",
+   "deployed": true,
+   "agents": 60415,
+   "id_basis": 0,
+   "status": "ok"
+  },
+  {
+   "slug": "mainnet",
+   "name": "Ethereum",
+   "chain_id": 1,
+   "rpc_used": "https://ethereum-rpc.publicnode.com",
+   "deployed": true,
+   "agents": 46958,
+   "id_basis": 0,
+   "status": "ok"
+  },
+  {
+   "slug": "billions",
+   "name": "Billions",
+   "chain_id": 45056,
+   "rpc_used": "https://rpc.billions.gateway.fm",
+   "deployed": true,
+   "agents": 25974,
+   "id_basis": 0,
+   "status": "ok"
+  },
+  {
+   "slug": "megaeth",
+   "name": "MegaETH",
+   "chain_id": 4326,
+   "rpc_used": "https://mainnet.megaeth.com/rpc",
+   "deployed": true,
+   "agents": 12727,
+   "id_basis": 0,
+   "status": "ok"
+  },
+  {
+   "slug": "xlayer",
+   "name": "X Layer",
+   "chain_id": 196,
+   "rpc_used": "https://rpc.xlayer.tech",
+   "deployed": true,
+   "agents": 10406,
+   "id_basis": 0,
+   "status": "ok"
+  },
+  {
+   "slug": "monad",
+   "name": "Monad",
+   "chain_id": 143,
+   "rpc_used": "https://rpc.monad.xyz",
+   "deployed": true,
+   "agents": 10188,
+   "id_basis": 0,
+   "status": "ok"
+  },
+  {
+   "slug": "celo",
+   "name": "Celo",
+   "chain_id": 42220,
+   "rpc_used": "https://forno.celo.org",
+   "deployed": true,
+   "agents": 9754,
+   "id_basis": 0,
+   "status": "ok"
+  },
+  {
+   "slug": "gnosis",
+   "name": "Gnosis",
+   "chain_id": 100,
+   "rpc_used": "https://rpc.gnosischain.com",
+   "deployed": true,
+   "agents": 4105,
+   "id_basis": 0,
+   "status": "ok"
+  },
+  {
+   "slug": "shape",
+   "name": "Shape",
+   "chain_id": 360,
+   "rpc_used": "https://mainnet.shape.network",
+   "deployed": true,
+   "agents": 2098,
+   "id_basis": 0,
+   "status": "ok"
+  },
+  {
+   "slug": "skale-base",
+   "name": "SKALE Base",
+   "chain_id": 1187947933,
+   "rpc_used": "https://skale-base.skalenodes.com/v1/base",
+   "deployed": true,
+   "agents": 2090,
+   "id_basis": 0,
+   "status": "ok"
+  },
+  {
+   "slug": "avalanche",
+   "name": "Avalanche",
+   "chain_id": 43114,
+   "rpc_used": "https://api.avax.network/ext/bc/C/rpc",
+   "deployed": true,
+   "agents": 1790,
+   "id_basis": 0,
+   "status": "ok"
+  },
+  {
+   "slug": "arbitrum",
+   "name": "Arbitrum One",
+   "chain_id": 42161,
+   "rpc_used": "https://arb1.arbitrum.io/rpc",
+   "deployed": true,
+   "agents": 1221,
+   "id_basis": 0,
+   "status": "ok"
+  },
+  {
+   "slug": "abstract",
+   "name": "Abstract",
+   "chain_id": 2741,
+   "rpc_used": "https://api.mainnet.abs.xyz",
+   "deployed": true,
+   "agents": 1216,
+   "id_basis": 0,
+   "status": "ok"
+  },
+  {
+   "slug": "injective",
+   "name": "Injective EVM",
+   "chain_id": 1776,
+   "rpc_used": "https://sentry.evm-rpc.injective.network",
+   "deployed": true,
+   "agents": 931,
+   "id_basis": 0,
+   "status": "ok"
+  },
+  {
+   "slug": "polygon",
+   "name": "Polygon",
+   "chain_id": 137,
+   "rpc_used": "https://polygon-bor-rpc.publicnode.com",
+   "deployed": true,
+   "agents": 595,
+   "id_basis": 0,
+   "status": "ok"
+  },
+  {
+   "slug": "optimism",
+   "name": "Optimism",
+   "chain_id": 10,
+   "rpc_used": "https://mainnet.optimism.io",
+   "deployed": true,
+   "agents": 533,
+   "id_basis": 0,
+   "status": "ok"
+  },
+  {
+   "slug": "tempo",
+   "name": "Tempo",
+   "chain_id": 4217,
+   "rpc_used": "https://rpc.mainnet.tempo.xyz",
+   "deployed": true,
+   "agents": 251,
+   "id_basis": 0,
+   "status": "ok"
+  },
+  {
+   "slug": "mantle",
+   "name": "Mantle",
+   "chain_id": 5000,
+   "rpc_used": "https://rpc.mantle.xyz",
+   "deployed": true,
+   "agents": 144,
+   "id_basis": 0,
+   "status": "ok"
+  },
+  {
+   "slug": "metis",
+   "name": "Metis",
+   "chain_id": 1088,
+   "rpc_used": "https://andromeda.metis.io/?owner=1088",
+   "deployed": true,
+   "agents": 138,
+   "id_basis": 0,
+   "status": "ok"
+  },
+  {
+   "slug": "linea",
+   "name": "Linea",
+   "chain_id": 59144,
+   "rpc_used": "https://rpc.linea.build",
+   "deployed": true,
+   "agents": 115,
+   "id_basis": 0,
+   "status": "ok"
+  },
+  {
+   "slug": "scroll",
+   "name": "Scroll",
+   "chain_id": 534352,
+   "rpc_used": "https://rpc.scroll.io",
+   "deployed": true,
+   "agents": 108,
+   "id_basis": 0,
+   "status": "ok"
+  },
+  {
+   "slug": "taiko",
+   "name": "Taiko",
+   "chain_id": 167000,
+   "rpc_used": "https://rpc.mainnet.taiko.xyz",
+   "deployed": true,
+   "agents": 94,
+   "id_basis": 0,
+   "status": "ok"
+  },
+  {
+   "slug": "goat",
+   "name": "GOAT Network",
+   "chain_id": 2345,
+   "rpc_used": "https://rpc.goat.network",
+   "deployed": true,
+   "agents": 84,
+   "id_basis": 0,
+   "status": "ok"
+  },
+  {
+   "slug": "lukso",
+   "name": "LUKSO",
+   "chain_id": 42,
+   "rpc_used": "https://rpc.mainnet.lukso.network",
+   "deployed": true,
+   "agents": 10,
+   "id_basis": 0,
+   "status": "ok"
+  },
+  {
+   "slug": "gatelayer",
+   "name": "Gate Layer",
+   "chain_id": 10088,
+   "rpc_used": "https://gatelayer-mainnet.gatenode.cc",
+   "deployed": true,
+   "agents": 0,
+   "id_basis": null,
+   "status": "ok"
+  },
+  {
+   "slug": "hyperevm",
+   "name": "HyperEVM",
+   "chain_id": 999,
+   "rpc_used": "https://rpc.hyperliquid.xyz/evm",
+   "deployed": true,
+   "agents": 0,
+   "id_basis": null,
+   "status": "ok"
+  },
+  {
+   "slug": "ink",
+   "name": "Ink",
+   "chain_id": 57073,
+   "rpc_used": "https://rpc-gel.inkonchain.com",
+   "deployed": true,
+   "agents": 0,
+   "id_basis": null,
+   "status": "ok"
+  },
+  {
+   "slug": "robinhood",
+   "name": "Robinhood Chain",
+   "chain_id": 4663,
+   "rpc_used": "https://rpc.mainnet.chain.robinhood.com",
+   "deployed": true,
+   "agents": 0,
+   "id_basis": null,
+   "status": "ok"
+  },
+  {
+   "slug": "soneium",
+   "name": "Soneium",
+   "chain_id": 1868,
+   "rpc_used": "https://rpc.soneium.org",
+   "deployed": true,
+   "agents": 0,
+   "id_basis": null,
+   "status": "ok"
+  },
+  {
+   "slug": "fantom",
+   "name": "Fantom Opera",
+   "chain_id": 250,
+   "rpc_used": "https://rpcapi.fantom.network",
+   "deployed": false,
+   "agents": null,
+   "id_basis": null,
+   "status": "not_deployed"
+  },
+  {
+   "slug": "plasma",
+   "name": "Plasma",
+   "chain_id": 9745,
+   "rpc_used": "https://rpc.plasma.to",
+   "deployed": false,
+   "agents": null,
+   "id_basis": null,
+   "status": "not_deployed"
+  }
+ ]
+}

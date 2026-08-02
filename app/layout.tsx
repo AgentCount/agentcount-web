@@ -136,6 +136,10 @@ const ACTION = { href: "/preflight", label: "Check your agent" };
  */
 const ABOUT = [
   { href: "/neutrality", label: "Who pays for this" },
+  // What the census does and does not cover, with the probe that keeps the
+  // answer honest. In the footer for the same reason the others are: it is
+  // the page a reader wants at the moment they start asking about scope.
+  { href: "/coverage", label: "What this covers" },
   // Linkage is a report now, not a section — it is the long-form join between
   // the identity layer and the payments layer, which is what the reports index
   // is for. Census and Working needed no footer entry once they became a
