@@ -117,6 +117,13 @@ export function RateBar({ rung, total }: { rung: RungRate; total: number }) {
             </div>
           ))}
         </dl>
+
+        {/* Under the number, not on the method page. See `Check.caveat`. */}
+        {checkFor(rung.rung)?.caveat && (
+          <p className="mt-2 max-w-prose text-xs leading-relaxed text-dead">
+            {checkFor(rung.rung)?.caveat}
+          </p>
+        )}
       </div>
     </div>
   );

@@ -44,6 +44,16 @@ export type Check = {
   question: string;
   /** One line, no jargon: what a pass on this check actually establishes. */
   meaning: string;
+  /**
+   * The one thing a reader will over-read this check to mean, in a clause.
+   *
+   * It travels with the RATE, not with the method page. A population figure
+   * gets screenshotted, quoted and pasted without its methodology, so a
+   * caveat that lives only on /methodology is a caveat that is never read
+   * next to the number it qualifies. Only checks whose name promises more
+   * than they measure carry one.
+   */
+  caveat?: string;
 };
 
 /**
@@ -62,6 +72,8 @@ export const CHECKS: readonly Check[] = [
     number: 2,
     internal: "resolvable",
     question: "Reachable?",
+    caveat:
+      "Counts documents stored on-chain, which resolve by construction — this is not a server-uptime rate.",
     meaning: "The document URL it declared actually answers when fetched.",
   },
   {
@@ -87,11 +99,14 @@ export const CHECKS: readonly Check[] = [
     internal: "live",
     question: "Answers?",
     meaning: "A declared endpoint responds to a probe. Not implemented yet, so nobody passes or fails it.",
+    caveat:
+      "Something answered — not that it works, speaks any protocol, or is the agent.",
   },
   {
     number: 7,
     internal: "attested",
     question: "Has feedback?",
+    caveat: "Someone left feedback — not that they were independent of the agent.",
     meaning: "At least one on-chain feedback entry names this agent.",
   },
 ];
