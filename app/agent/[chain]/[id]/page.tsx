@@ -6,6 +6,7 @@ import { RungStrip } from "@/components/RungStrip";
 import { RunProvenance } from "@/components/RunProvenance";
 import { Section } from "@/components/Section";
 import { OutboundLink } from "@/components/OutboundLink";
+import { UncheckedAgent } from "@/components/UncheckedAgent";
 import { StatusLegend } from "@/components/StatusLegend";
 import {
   getAgent,
@@ -13,7 +14,7 @@ import {
   resolveRun,
   statusVocabulary,
 } from "@/lib/api/endpoints";
-import type { RungDetail } from "@/lib/api/schemas";
+import { isTailAgent, type RungDetail } from "@/lib/api/schemas";
 import { pageTitle } from "@/lib/brand";
 import { addressUrl, blockUrl, explorerFor, resourceLink, tokenUrl } from "@/lib/links";
 
@@ -82,7 +83,10 @@ export async function generateMetadata({
   // sharing a link to should say the agent's actual name in the tab, the
   // search result, and the link preview. `null` for a document that never
   // resolved falls back to the id, exactly as the directory does.
-  const agent = await getAgent(chain, id);
+  const found = await getAgent(chain, id);
+  // A tail agent has never had its document read, so it has neither name nor
+  // description — the id fallback is the honest title.
+  const agent = found && !isTailAgent(found) ? found : null;
   const name = agent?.name ?? `Agent #${id}`;
   const description = agent?.description
     ? agent.description.slice(0, 200)
@@ -145,8 +149,17 @@ export default async function AgentDetail({
   const { run: runParam } = await searchParams;
   if (!isValidAgentId(id)) notFound();
 
-  const agent = await getAgent(chain, id, runParam);
-  if (!agent) notFound();
+  const found = await getAgent(chain, id, runParam);
+  if (!found) notFound();
+
+  // Registered, but no census run has swept it yet. This page cannot show
+  // seven answers because none have been asked, and showing the census
+  // furniture with blanks in it would read as seven failures. It gets its
+  // own panel instead.
+  if (isTailAgent(found)) {
+    return <UncheckedAgent agent={found} />;
+  }
+  const agent = found;
 
   const [run, rates] = await Promise.all([
     resolveRun(agent.run_id),
