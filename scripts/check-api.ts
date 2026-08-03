@@ -3,6 +3,7 @@
  * change to `crates/api`: it fetches every endpoint from a LIVE API and
  * validates each response through the schema this app will use.
  */
+import { isTailAgent } from "@/lib/api/schemas";
 import {
   getAgent,
   getFindings,
@@ -53,6 +54,9 @@ async function main() {
   } else {
     const detail = await getAgent(first.chain, String(first.agent_id), completed.run_id);
     if (!detail) throw new Error("the agent just listed was not found");
+    if (isTailAgent(detail)) {
+      throw new Error("a run-scoped lookup returned a tail agent — the API is mixing the two");
+    }
     console.log(
       `✓ /api/agents/${first.chain}/${first.agent_id} — ${detail.rungs.length} rungs, ` +
         `evidence keys on rung 1: ${Object.keys(detail.rungs[0]?.evidence ?? {}).length}`,
@@ -66,9 +70,10 @@ async function main() {
   const shortCircuited = wide.items.find((a) => a.rungs.length < 7);
   if (shortCircuited) {
     const d = await getAgent(shortCircuited.chain, String(shortCircuited.agent_id), completed.run_id);
+    const rungCount = d && !isTailAgent(d) ? d.rungs.length : 0;
     console.log(
       `✓ short-circuited agent ${shortCircuited.chain}/${shortCircuited.agent_id} — ` +
-        `${d?.rungs.length} of 7 rungs have a row`,
+        `${rungCount} of 7 rungs have a row`,
     );
   } else {
     console.log("SKIPPED — no short-circuited agent in the sample");

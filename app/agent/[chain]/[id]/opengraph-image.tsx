@@ -1,5 +1,6 @@
 import { ImageResponse } from "next/og";
 import { getAgent, resolveRun } from "@/lib/api/endpoints";
+import { isTailAgent } from "@/lib/api/schemas";
 import { questionFor } from "@/lib/checks";
 import { brandFonts, COLOR, Masthead, OG_CONTENT_TYPE, OG_SIZE } from "@/lib/og";
 
@@ -91,7 +92,11 @@ export default async function Image({
   // A bad id must still produce an image — a broken preview on a shared link is
   // worse than a plain one, so every failure below falls back rather than
   // throwing.
-  const agent = /^\d+$/.test(id) ? await getAgent(chain, id).catch(() => null) : null;
+  const found = /^\d+$/.test(id) ? await getAgent(chain, id).catch(() => null) : null;
+  // A tail agent has no run, no rungs and no name — it has never been read
+  // beyond the registry. The card falls back to the same shape a lookup
+  // failure produces, which is correct: there is nothing measured to show.
+  const agent = found && !isTailAgent(found) ? found : null;
   const run = agent ? await resolveRun(agent.run_id).catch(() => null) : null;
   const byRung = new Map((agent?.rungs ?? []).map((r) => [r.rung, r]));
   const name = toRenderableName(agent?.name ?? null) ?? `Agent #${id}`;

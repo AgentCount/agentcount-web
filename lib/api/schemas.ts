@@ -138,7 +138,30 @@ export const archiveSchema = z.object({
   elapsed_ms: z.number().nullable(),
 });
 
-export const agentDetailSchema = z.object({
+/**
+ * An agent the registry contains but no census run has swept yet.
+ *
+ * Deliberately shares only `chain` and `agent_id` with the census shape: no
+ * `run_id`, no `snapshot`, and no `rungs` — not an empty array, no array at
+ * all. "All seven checks are missing" and "all seven checks failed" render
+ * identically in most UIs, so the absence has to be structural. A discriminated
+ * union on `source` makes the compiler enforce that a caller handles both.
+ */
+export const tailAgentSchema = z.object({
+  source: z.literal("tail"),
+  chain: z.string(),
+  agent_id: z.number(),
+  token_id: z.string(),
+  owner: z.string(),
+  agent_uri: z.string(),
+  discovery_block: z.number(),
+  discovered_at: z.string(),
+  checks_available: z.literal(false),
+});
+
+export const censusAgentDetailSchema = z.object({
+  /** Absent on an API that predates the tail; treated as census either way. */
+  source: z.literal("census").optional(),
   run_id: z.string(),
   chain: z.string(),
   agent_id: z.number(),
@@ -150,6 +173,12 @@ export const agentDetailSchema = z.object({
   // sends `null`. Same drift as `elapsed_ms` above, same consequence.
   archive: archiveSchema.nullable(),
 });
+
+/** Either shape. Callers branch on `source`. */
+export const agentDetailSchema = z.union([
+  tailAgentSchema,
+  censusAgentDetailSchema,
+]);
 
 export const rung4FieldSchema = z.object({
   field: z.string(),
@@ -219,6 +248,13 @@ export type RungDetail = z.infer<typeof rungDetailSchema>;
 export type Snapshot = z.infer<typeof snapshotSchema>;
 export type Archive = z.infer<typeof archiveSchema>;
 export type AgentDetail = z.infer<typeof agentDetailSchema>;
+export type TailAgent = z.infer<typeof tailAgentSchema>;
+export type CensusAgentDetail = z.infer<typeof censusAgentDetailSchema>;
+
+/** Narrows the union. The one place the discriminator is read. */
+export function isTailAgent(a: AgentDetail): a is TailAgent {
+  return "source" in a && a.source === "tail";
+}
 /**
  * The pre-flight checker's answer.
  *

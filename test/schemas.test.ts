@@ -13,6 +13,7 @@ import {
   methodologySchema,
   ratesSchema,
   runsSchema,
+  isTailAgent,
 } from "@/lib/api/schemas";
 
 /**
@@ -116,14 +117,36 @@ describe("schemas accept what the API actually returns", () => {
 
   it("parses an agent detail including its evidence, whatever shape it takes", () => {
     const detail = agentDetailSchema.parse(agentDetail);
+    if (isTailAgent(detail)) throw new Error("census fixture parsed as tail");
     expect(detail.rungs.length).toBeGreaterThan(0);
     expect(detail.rungs[0].evidence).toBeTruthy();
     expect(detail.archive?.scheme).toBeTruthy();
     expect(detail.name).toBe("ClawNews");
   });
 
+  // The whole point of the discriminated union: a tail agent must never
+  // satisfy the census shape, so nothing downstream can read seven statuses
+  // off an agent that has none.
+  it("parses a tail agent and keeps it distinguishable from a census one", () => {
+    const tail = agentDetailSchema.parse({
+      source: "tail",
+      chain: "base",
+      agent_id: 60123,
+      token_id: "60123",
+      owner: "0x1111111111111111111111111111111111111111",
+      agent_uri: "https://example.test/agent.json",
+      discovery_block: 41900123,
+      discovered_at: "2026-08-03T10:15:00Z",
+      checks_available: false,
+    });
+    expect(isTailAgent(tail)).toBe(true);
+    expect("rungs" in tail).toBe(false);
+    expect("run_id" in tail).toBe(false);
+  });
+
   it("parses an agent detail whose pipeline short-circuited (error then skipped)", () => {
     const detail = agentDetailSchema.parse(agentDetailError);
+    if (isTailAgent(detail)) throw new Error("census fixture parsed as tail");
     const byRung = new Map(detail.rungs.map((r) => [r.rung, r]));
     expect(byRung.get(2)?.status).toBe("error");
     expect(byRung.get(3)?.status).toBe("skipped");
