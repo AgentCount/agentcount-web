@@ -6,6 +6,7 @@ import findings from "./fixtures/findings.json";
 import methodology from "./fixtures/methodology.json";
 import rates from "./fixtures/rates.json";
 import runs from "./fixtures/runs.json";
+import spotCheck from "./fixtures/spot-check.json";
 import {
   agentDetailSchema,
   agentPageSchema,
@@ -14,6 +15,7 @@ import {
   ratesSchema,
   runsSchema,
   isTailAgent,
+  spotCheckSchema,
 } from "@/lib/api/schemas";
 
 /**
@@ -197,6 +199,58 @@ describe("schemas accept what the API actually returns", () => {
   });
 });
 
+/**
+ * `spot-check.json` is HAND-WRITTEN, and that is a weaker fixture than the
+ * captured ones above — the endpoint is not deployed yet (agentcount#25), so
+ * there is no live response to capture. It is transcribed field by field from
+ * that PR's `SpotCheckResponse` serde structs, and it should be replaced with
+ * a real captured body the day the API ships, exactly as this file's header
+ * argues: a fixture that is not refreshed from the thing it models tests only
+ * itself.
+ */
+describe("the spot check is not a census result, and its schema says so", () => {
+  it("parses an on-demand spot check", () => {
+    const s = spotCheckSchema.parse(spotCheck);
+    expect(s.source).toBe("spot_check");
+    expect(s.notice).toBeTruthy();
+    expect(s.checks.length).toBeGreaterThan(0);
+  });
+
+  it("borrows none of the census detail's structural names, and no run_id", () => {
+    const s = spotCheckSchema.parse(spotCheck);
+    const detail = agentDetailSchema.parse(agentDetail);
+    // The API's own guarantee, asserted from this side too. The two shapes do
+    // share the names that IDENTIFY an agent — `chain` and `agent_id` name
+    // the same agent either way — but they share none of the names that carry
+    // a measurement, which is what stops a spot check being read, pasted or
+    // rendered as a census result.
+    const shared = Object.keys(s).filter((k) => k in detail);
+    expect(shared.sort()).toEqual(["agent_id", "chain"]);
+    for (const censusOnly of ["run_id", "rungs", "archive", "snapshot"]) {
+      expect(s).not.toHaveProperty(censusOnly);
+    }
+    for (const spotOnly of ["source", "notice", "checks", "fetch", "identity"]) {
+      expect(detail).not.toHaveProperty(spotOnly);
+    }
+  });
+
+  it("says why rung 6 was not checked, rather than giving it a status", () => {
+    const s = spotCheckSchema.parse(spotCheck);
+    const six = s.not_checked.find((n) => n.rung === 6);
+    expect(six?.reason).toBeTruthy();
+    // Absence is the claim; the reason explains it. A rung in `not_checked`
+    // must never also appear in `checks` wearing a guessed status.
+    expect(s.checks.some((c) => c.rung === 6)).toBe(false);
+  });
+
+  it("accepts a check that sent no request at all", () => {
+    // Rung 1 did not pass, so nothing was fetched — `fetch` is null rather
+    // than an object full of nulls, and the panel says so in words.
+    const noFetch = { ...structuredClone(spotCheck), fetch: null };
+    expect(spotCheckSchema.safeParse(noFetch).success).toBe(true);
+  });
+});
+
 describe("schemas reject what they should", () => {
   it("rejects an agent page whose total went missing", () => {
     const broken = { ...agents, page: { limit: 1, offset: 0 } };
@@ -221,5 +275,11 @@ describe("schemas reject what they should", () => {
     const broken = structuredClone(methodology) as Record<string, unknown>;
     delete broken.rung4_must_requirements;
     expect(methodologySchema.safeParse(broken).success).toBe(false);
+  });
+
+  it("rejects a spot check that lost the notice it must be published with", () => {
+    const broken = structuredClone(spotCheck) as Record<string, unknown>;
+    delete broken.notice;
+    expect(spotCheckSchema.safeParse(broken).success).toBe(false);
   });
 });

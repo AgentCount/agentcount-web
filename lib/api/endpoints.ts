@@ -2,7 +2,7 @@
  * One function per endpoint. Pages call these, never `get()` directly, so the
  * URL shapes and their schemas stay paired in one file.
  */
-import { get, postRaw } from "./client";
+import { get, postNoBody, postRaw } from "./client";
 import { CENSUS } from "../brand";
 import {
   agentDetailSchema,
@@ -12,6 +12,7 @@ import {
   methodologySchema,
   ratesSchema,
   runsSchema,
+  spotCheckSchema,
   validateResponseSchema,
   type AgentDetail,
   type AgentPage,
@@ -20,6 +21,7 @@ import {
   type Methodology,
   type Rates,
   type Run,
+  type SpotCheck,
   type ValidateResponse,
 } from "./schemas";
 
@@ -258,6 +260,31 @@ export async function validateDocument(
   }
   const qs = q.toString();
   return postRaw(`/api/validate${qs ? `?${qs}` : ""}`, document, validateResponseSchema);
+}
+
+/**
+ * Run the ladder for one agent, right now. Belongs to no run and is stored
+ * nowhere — see the API's `routes::spot_check`.
+ *
+ * POST, and never called from a page render: it makes the API send a real
+ * request to a third party's server, so it must only ever run because somebody
+ * pressed something. Everything that follows links speculatively — prefetch,
+ * link unfurlers, crawlers, `<img src>` — issues GET, which this endpoint does
+ * not answer.
+ *
+ * Returns `null` when the API predates the endpoint, exactly as `searchAgents`
+ * does: the site must keep working against an older API during a deploy
+ * window, and the button's own panel says so rather than the page erroring.
+ * Every other refusal arrives as a `RefusedError` for the caller to render.
+ */
+export async function spotCheckAgent(
+  chain: string,
+  id: string,
+): Promise<SpotCheck | null> {
+  return postNoBody(
+    `/api/agents/${encodeURIComponent(chain)}/${encodeURIComponent(id)}/spot-check`,
+    spotCheckSchema,
+  );
 }
 
 /** Cached for an hour — `spec_commit` and the field list change only when the

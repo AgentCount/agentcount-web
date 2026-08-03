@@ -4,8 +4,8 @@ import Link from "next/link";
 import { BRAND } from "@/lib/brand";
 
 /**
- * The only client component in this app — Next requires it for error
- * boundaries. It used to branch on `error.message` to tell "the API is
+ * The one client component this app did not choose — Next requires it for
+ * error boundaries. It used to branch on `error.message` to tell "the API is
  * unreachable" apart from "the API answered in a shape we do not
  * understand" (see lib/api/client.ts, which still distinguishes
  * UpstreamError from ContractError for exactly that reason). Do not

@@ -6,7 +6,7 @@
  * A native `method="get"` form, exactly like `DirectoryControls`: submitting
  * navigates to `/directory?q=…`, which is a real, bookmarkable, shareable URL
  * rendered on the server. There is no `useState`, no `router.push`, and no
- * client bundle — this app ships two client components in total, and a search
+ * client bundle — this app ships three client components in total, and a search
  * box that needs JavaScript to put a string in a query parameter would be the
  * third for no gain. It also means search works before hydration and with
  * scripting off, which for a public register is the point.

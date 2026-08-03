@@ -42,7 +42,7 @@ pnpm dev                # http://localhost:3000
 | `lib/api/` | Zod schemas, the fetch client, and one function per endpoint. |
 | `lib/paging.ts` | Page-number ↔ offset maths. |
 | `lib/status.ts` | Status → colour, glyph, and spelled-out label. The status *word* is never chosen here — only how it is drawn. |
-| `app/` | Routes. Every page is a Server Component. The two client files, `app/error.tsx` (required by Next for error boundaries) and `app/preflight/PreflightForm.tsx`, are not pages. `loading.tsx` sits on segments that only ever answer 200 — a loading file makes its segment stream, and a streamed response cannot still become a 404. |
+| `app/` | Routes. Every page is a Server Component. The three client files — `app/error.tsx` (required by Next for error boundaries), `app/preflight/PreflightForm.tsx` and `app/agent/[chain]/[id]/SpotCheck.tsx` (both a `useActionState` form over a server action) — are not pages. `loading.tsx` sits on segments that only ever answer 200 — a loading file makes its segment stream, and a streamed response cannot still become a 404. |
 | `components/` | Presentational pieces only. |
 | `scripts/check-api.ts` | Validates every endpoint against a live API. |
 
@@ -53,7 +53,7 @@ pnpm dev                # http://localhost:3000
 | `/` | The homepage: this run's findings, the per-check base rates, and the run's provenance. Every figure comes from the API already computed. |
 | `/search` | One query across every published chain, grouped by chain. Falls back to per-chain links when the API predates `/api/search`. |
 | `/directory` | Every agent on one chain, filterable on any combination of check statuses. Filters live in the URL, so a filtered view is linkable. |
-| `/agent/[chain]/[id]` | The permalink: every check with its status and its evidence in full, plus the on-chain snapshot and the run's provenance. Rendered on demand with ISR, with a per-agent OG image. |
+| `/agent/[chain]/[id]` | The permalink: every check with its status and its evidence in full, plus the on-chain snapshot and the run's provenance. Rendered on demand with ISR, with a per-agent OG image. Carries the spot-check button — a POST, fired only by a press, whose answer is drawn as a bordered panel that cannot be mistaken for the census record above it. Degrades to "not available here" against an API without the endpoint. |
 | `/methodology` | What each check asks, plus the live `spec_commit` and the rung-4 MUST/SHOULD/MAY lists, read from the API rather than duplicated here. |
 | `/reports` | The report index. Static — the list is a hand-maintained registry. |
 | `/reports/[slug]` | One dated report, prerendered from markdown in `content/reports/`. |

@@ -296,3 +296,97 @@ export type MustRequirement = z.infer<typeof mustRequirementSchema>;
 export type Methodology = z.infer<typeof methodologySchema>;
 export type Finding = z.infer<typeof findingSchema>;
 export type Findings = z.infer<typeof findingsSchema>;
+
+/**
+ * The on-demand spot check: one agent, right now, belonging to no run.
+ *
+ * ## Why this is not `agentDetailSchema` with a flag
+ *
+ * The API deliberately shares NO top-level field name with the census's agent
+ * detail: `checks`/`fetch`/`identity` here against `rungs`/`archive`/
+ * `snapshot`/`run_id` there, and there is no `run_id` at all because there is
+ * no run. That separation is the API's own safeguard against a spot check
+ * being read — or screenshotted, or pasted — as a census measurement, and it
+ * only holds if this app keeps the two shapes apart too. A shared schema with
+ * an optional `run_id` would quietly re-merge them on the first refactor that
+ * looked at the two files together.
+ *
+ * `source` is the discriminator and `notice` is the sentence the API wants
+ * carried with the data. Both are parsed as free strings rather than pinned to
+ * literals: this app renders the API's words untouched, and a reworded notice
+ * must not become a ContractError that hides the result entirely.
+ */
+export const spotIdentitySchema = z.object({
+  chain_id: z.number(),
+  registry: z.string(),
+  /** Decimal STRING: a `uint256` token id does not survive a JSON number. */
+  token_id: z.string(),
+  owner: z.string(),
+  agent_uri: z.string(),
+});
+
+/**
+ * What the one document fetch looked like — never the body.
+ *
+ * Same fields as the census's `archive` plus `via_gateway`, and deliberately
+ * NOT called an archive on either side: nothing was archived, these bytes were
+ * read and dropped. Every field is nullable for the same reason the archive's
+ * are, and the whole object is nullable because no fetch is attempted at all
+ * when rung 1 did not pass.
+ */
+export const spotFetchSchema = z.object({
+  scheme: z.string(),
+  request_url: z.string().nullable(),
+  final_url: z.string().nullable(),
+  http_status: z.number().nullable(),
+  content_type: z.string().nullable(),
+  body_bytes: z.number().nullable(),
+  body_sha256: z.string().nullable(),
+  truncated: z.boolean(),
+  error: z.string().nullable(),
+  elapsed_ms: z.number().nullable(),
+  via_gateway: z.string().nullable(),
+});
+
+export const spotCheckRungSchema = z.object({
+  rung: z.number(),
+  name: z.string(),
+  status: z.string(),
+  evidence: z.record(z.string(), z.unknown()),
+  checked_at: z.string(),
+});
+
+/** A rung this check never asked, and the API's own reason. Same shape as the
+ * pre-flight checker's `not_applicable`, and kept as its own schema because
+ * the two lists answer different questions and the API is free to change one
+ * without the other. */
+export const spotNotCheckedSchema = z.object({
+  rung: z.number(),
+  name: z.string(),
+  reason: z.string(),
+});
+
+export const spotCheckSchema = z.object({
+  source: z.string(),
+  notice: z.string(),
+  chain: z.string(),
+  agent_id: z.number(),
+  checked_at: z.string(),
+  block_number: z.number(),
+  checker_version: z.string(),
+  checker_commit: z.string(),
+  schema_version: z.number(),
+  spec_commit: z.string(),
+  identity: spotIdentitySchema,
+  // `Option<SpotFetch>` in Rust: null when rung 1 did not pass and the ladder
+  // would have discarded the answer, so no request was ever sent.
+  fetch: spotFetchSchema.nullable(),
+  checks: z.array(spotCheckRungSchema),
+  not_checked: z.array(spotNotCheckedSchema),
+});
+
+export type SpotIdentity = z.infer<typeof spotIdentitySchema>;
+export type SpotFetch = z.infer<typeof spotFetchSchema>;
+export type SpotCheckRung = z.infer<typeof spotCheckRungSchema>;
+export type SpotNotChecked = z.infer<typeof spotNotCheckedSchema>;
+export type SpotCheck = z.infer<typeof spotCheckSchema>;
