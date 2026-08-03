@@ -125,7 +125,6 @@ const ROUTES: { path: string; expect: number; card: boolean }[] = [
   { path: "/reports", expect: 200, card: true },
   { path: "/reports/2026-07-census", expect: 200, card: true },
   { path: "/reports/linkage", expect: 200, card: true },
-  { path: "/neutrality", expect: 200, card: true },
   { path: "/data", expect: 200, card: true },
   // The subscribe form's landing page, in both its shapes. `card: false`
   // because it is `noindex` — a page nobody should ever arrive at from a
@@ -163,6 +162,7 @@ const REDIRECTS: { from: string; to: string }[] = [
   { from: "/census", to: "/" },
   { from: "/stats", to: "/" },
   { from: "/linkage", to: "/reports/linkage" },
+  { from: "/neutrality", to: "/methodology#independence" },
   {
     from: "/working",
     // Unencoded colons: Next normalises `%3A` in a redirect destination back
@@ -195,6 +195,7 @@ async function checkLegacyRedirects() {
   for (const from of [
     "/linkage/opengraph-image",
     "/census/opengraph-image",
+    "/neutrality/opengraph-image",
     "/working/opengraph-image",
   ]) {
     const res = await fetch(`${BASE}${from}`, {

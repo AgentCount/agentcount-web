@@ -22,7 +22,7 @@ import {
   statusVocabulary,
 } from "@/lib/api/endpoints";
 import type { Finding, Findings } from "@/lib/api/schemas";
-import { chainDisplayName, formatChainList, spellCount } from "@/lib/chains";
+import { chainDisplayName, formatChainList } from "@/lib/chains";
 import { LINKAGE, oneIn } from "@/lib/linkage";
 import { getPublishedRuns } from "@/lib/published-runs";
 import { REPORTS } from "@/lib/reports";
@@ -216,14 +216,7 @@ export default async function Home({
               <span>
                 run <span className="text-muted">{run.run_id.slice(0, 8)}</span>
               </span>
-              <span className="text-line">|</span>
-              {/* "no per-agent aggregate", not "no aggregate": this page now
-                  publishes a population-weighted rate, and a line claiming
-                  otherwise directly under one would be the site contradicting
-                  itself. The promise that actually holds — and the one that
-                  matters — is that an agent's seven checks are never summed
-                  into a score. See `components/RungStrip.tsx`. */}
-              <span>no score, no ranking, no per-agent aggregate</span>
+              
             </div>
           </>
         ) : (
@@ -242,18 +235,19 @@ export default async function Home({
 
                 Both halves still derive from the runs, so a fifth chain
                 moves them without an edit here. */}
-            <h1 className="numeral max-w-[20ch] text-[clamp(2rem,4.4vw,3.5rem)] text-text">
+            <h1 className="numeral max-w-[18ch] text-[clamp(2rem,4.4vw,3.5rem)] text-text">
               We check every AI agent registered under{" "}
-              <span className="whitespace-nowrap">ERC-8004</span> on{" "}
-              <Link
-                href="/coverage"
-                className="underline decoration-line underline-offset-[0.14em] transition-colors hover:decoration-edge"
-              >
-                {spellCount(censusRuns.length)} chains
-              </Link>
-              .
+              <span className="whitespace-nowrap">ERC-8004</span>.
             </h1>
 
+            {/* The scope, immediately under the claim and derived from the
+                published runs: the headline says what we do, this says what
+                it is true of. The chain list carries the /coverage link, so
+                the claim and the evidence for its scope are one click apart.
+
+                "N sweeps" used to sit here and was redundant by
+                construction — `canonicalRuns` takes exactly one published run
+                per chain, so the sweep count is always the chain count. */}
             <p className="mt-6 flex flex-wrap items-baseline gap-x-4 gap-y-2 font-mono text-xs text-dead">
               <span>
                 <span className="text-muted">
@@ -262,11 +256,12 @@ export default async function Home({
                 agents
               </span>
               <span className="text-line">·</span>
-              <span className="text-muted">{scope}</span>
-              <span className="text-line">·</span>
-              <span>
-                <span className="text-muted">{censusRuns.length}</span> sweeps
-              </span>
+              <Link
+                href="/coverage"
+                className="text-muted underline decoration-line underline-offset-4 transition-colors hover:text-text hover:decoration-edge"
+              >
+                {scope}
+              </Link>
               <span className="text-line">·</span>
               <a
                 href="#provenance"
@@ -276,23 +271,11 @@ export default async function Home({
               </a>
             </p>
 
-            {/* Three sentences, not the eight-line block this used to be.
-                The argument is the same one; the rest of it lives on the
-                method page, which is where a reader who wants it goes. */}
             <p className="mt-7 max-w-[52ch] text-lg leading-relaxed text-muted">
               Registration counts get cited as proof that an agent economy
               exists. Nobody was checking what stands behind them. This census
               asks seven checkable questions of every registered agent and
-              publishes each answer with the evidence to recompute it, and{" "}
-              <span className="text-text">no score</span>.
-            </p>
-            <p className="mt-4">
-              <Link
-                href="/methodology#why"
-                className="font-mono text-xs uppercase tracking-[0.1em] text-muted underline decoration-line underline-offset-4 transition-colors hover:text-text hover:decoration-edge"
-              >
-                Why this exists →
-              </Link>
+              publishes each answer with the evidence behind it.
             </p>
           </>
         )}

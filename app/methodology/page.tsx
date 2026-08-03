@@ -96,42 +96,60 @@ export default async function MethodologyPage() {
           <li>
             Every agent registered under ERC-8004 on the chains this census
             sweeps ({chains}) gets the{" "}
-            <strong>same seven questions</strong>, called rungs here and{" "}
-            <strong>checks 1&ndash;7</strong> everywhere else on the site, and
-            every
-            answer carries the evidence collected to reach it.
+            <strong>same seven checks</strong>, and every answer carries the
+            evidence collected to reach it.
           </li>
           <li>
-            An answer is one of{" "}
-            <em>pass</em>, <em>fail</em>, <em>skipped</em>, <em>error</em>, or —
-            rung 5 only — <em>unclaimed</em>. A rung with no row at all was
-            never reached, which this site shows as{" "}
-            <strong>not checked</strong>: a different claim from any of the
-            five.
+            <strong>Check 6 is not implemented.</strong> It reads as not
+            checked for every agent, never as a failure — the question is not
+            being asked of anyone yet.
           </li>
           <li>
-            <strong>Rung 6 (<em>live</em>) is not implemented.</strong> It shows
-            as not checked for every agent, never as a failure — the question is
-            not being asked of anyone yet.
-          </li>
-          <li>
-            There is <strong>no score, grade, tier, or ranking</strong> anywhere
-            in this product, and no count of how many rungs an agent passed.
-            Compressing seven independent questions into one number is the move
-            this census exists to refuse.
-          </li>
-          <li>
-            Rungs measure <strong>conformance to a spec</strong> — not safety,
-            intent, or quality. Passing everything is not an endorsement, and
+            Checks measure <strong>conformance to a spec</strong>, not safety,
+            intent or quality. Passing everything is not an endorsement, and
             failing is not proof of bad intent.
           </li>
         </ul>
       </section>
 
-      {/* Who is who. Placed before the rungs because every rung's wording
+      {/* Who is who. Placed before the checks because every check's wording
           depends on which of these six parties it is talking about, and the
           identity-role audit found a published claim that turned on exactly
           that distinction. */}
+      {/* What the retired /neutrality page said, compressed to the four
+          commitments that are actually falsifiable. It sits here because a
+          reader wondering who paid for a finding is already reading the
+          method behind it. */}
+      <section id="independence" className="mt-12 max-w-prose scroll-mt-8">
+        <h2 className="label">Independence</h2>
+        <ul className="mt-3 list-disc space-y-2 pl-5 text-sm leading-relaxed text-muted">
+          <li>
+            <span className="text-text">Nobody in the census pays us.</span> No
+            payment is accepted from any agent operator, platform, registry or
+            chain that appears in these results. Every agent here was checked
+            without its owner&rsquo;s knowledge, at a block pinned in advance.
+          </li>
+          <li>
+            <span className="text-text">There is nothing to buy.</span> No
+            badge, no certification, no placement, no listing. The directory is
+            ordered by agent id and the census by population.
+          </li>
+          <li>
+            <span className="text-text">No payment changes a finding.</span> A
+            finding is corrected when it is wrong, and for no other reason.
+            Every correction this project has made to itself is published in
+            the methodology changelog.
+          </li>
+          <li>
+            <span className="text-text">
+              We run no launchpad and mint nothing.
+            </span>{" "}
+            If a probe identity is ever registered, it is flagged as ours in
+            the dataset and excluded from every published rate.
+          </li>
+        </ul>
+      </section>
+
       <section aria-label="Who is who" className="mt-14 max-w-4xl">
         <h2 className="font-mono text-sm uppercase tracking-[0.12em] text-text">
           Who is who
@@ -145,41 +163,36 @@ export default async function MethodologyPage() {
         {BRAND.name} is a conformance census, not a rating agency. Every agent
         registered under ERC-8004 on the chains this census sweeps (
         {chains}) gets the same seven yes/no/skip/error
-        questions, called rungs, and every answer carries the evidence the
+        questions, called checks, and every answer carries the evidence the
         checker collected to reach it. There is deliberately no score, grade,
         tier, or ranking anywhere in this product. Reaching your own conclusion
         from the seven answers is the point.
       </p>
 
       <section className="mt-14 max-w-4xl">
-        <h2 className="font-mono text-sm uppercase tracking-[0.12em] text-text">The seven rungs</h2>
-        {/* The two vocabularies, side by side.
-
-            This page keeps `rung` and the checker's own names, because they
-            are what the schema, the API, the evidence keys and the archives
-            are written in — a reader checking a claim against a downloaded
-            run meets those words, not ours. Everywhere else on the site the
-            same seven appear as plain questions, and the mapping has to be
-            stated rather than left for a reader to infer from position. */}
-        <p className="mt-3 text-muted">
-          On the rest of the site these appear as{" "}
-          <strong>checks 1&ndash;7</strong>, each written as the plain question
-          it answers. The ladder vocabulary below is the technical one: it is
-          what the API sends, what the evidence is keyed by, and what a
-          downloaded archive contains.
+        <h2 className="font-mono text-sm uppercase tracking-[0.12em] text-text">The seven checks</h2>
+        {/* One place names the machine vocabulary, and it is this table.
+            The page used to teach `rung` and `check` in parallel throughout,
+            which is two words for one thing on every paragraph. */}
+        <p className="mt-3 max-w-prose text-muted">
+          Each check has a short machine name. The API, the evidence keys and
+          the downloaded archives call these{" "}
+          <code className="font-mono text-sm text-text">rung</code> 1&ndash;7
+          and use the names in the second column, so anyone re-deriving a
+          figure from an archive meets those words rather than these.
         </p>
         <div className="mt-5 overflow-x-auto">
           <table className="w-full min-w-[34rem] border-collapse text-left">
             <caption className="sr-only">
-              How each rung is named on this page and elsewhere on the site
+              How each check is named on this page and elsewhere on the site
             </caption>
             <thead>
               <tr>
                 <th scope="col" className="label border-b border-line pb-2 pr-4">
-                  rung
+                  check
                 </th>
                 <th scope="col" className="label border-b border-line pb-2 pr-4">
-                  checker name
+                  machine name
                 </th>
                 <th scope="col" className="label border-b border-line pb-2 pr-4">
                   shown as
@@ -244,7 +257,7 @@ export default async function MethodologyPage() {
               id, registry, and chain that the on-chain lookup used to find
               it — the card and the registry entry agree about who this is.
               Since a registration entry is only recommended, not required
-              (rung 4), a document can pass conformance while making no
+              (check 4), a document can pass conformance while making no
               binding claim at all — that case is neither a pass nor a fail;
               it renders as <em>unclaimed</em>. See &ldquo;What a status
               means&rdquo; below.
@@ -256,7 +269,7 @@ export default async function MethodologyPage() {
               Whether the endpoints the card declares in{" "}
               <code className="font-mono text-text">services[]</code> actually
               respond. Not yet implemented — every agent currently shows no
-              row for this rung, rendered on this site as &ldquo;not
+              row for this check, rendered on this site as &ldquo;not
               checked&rdquo;, never as a guessed status.
             </dd>
           </div>
@@ -265,11 +278,11 @@ export default async function MethodologyPage() {
             <dd className="mt-2 max-w-prose text-sm leading-relaxed text-muted sm:mt-0">
               Whether this agent has received at least one Reputation
               Registry feedback entry, from any client address at all.
-              Runs for every agent that passes rung 1 — it does not depend on
+              Runs for every agent that passes check 1 — it does not depend on
               whether the document itself ever resolved, parsed, conformed,
               or bound.{" "}
               <strong>
-                This rung does not, and cannot, check whether the feedback
+                This check does not, and cannot, check whether the feedback
                 came from the agent&rsquo;s own owner or an approved operator
               </strong>
               . The pinned spec (line 217) bans both:{" "}
@@ -279,7 +292,7 @@ export default async function MethodologyPage() {
               </em>{" "}
               That is a contract-level invariant — such feedback cannot be
               submitted in the first place — so there is nothing here for this
-              rung to detect. Verified against the deployed contract on
+              check to detect. Verified against the deployed contract on
               2026-08-01, not assumed from the spec: the Reputation
               Registry&rsquo;s verified source (
               <code className="font-mono text-xs">giveFeedback</code> at{" "}
@@ -305,18 +318,18 @@ export default async function MethodologyPage() {
         </dl>
       </section>
 
-      {/* Rung 4's three severity buckets. This section read
+      {/* Check 4's three severity buckets. This section read
           `m.rung4_required_fields` until 2026-07-29 — a field the API stopped
-          sending when rung 4 was split by RFC 2119 severity — so every load of
+          sending when check 4 was split by RFC 2119 severity — so every load of
           this page threw a ContractError and showed the error panel instead.
           Every list below is read from the API, never restated here. */}
       <section className="mt-14 max-w-4xl">
         <h2 className="font-mono text-sm uppercase tracking-[0.12em] text-text">
-          Rung 4&rsquo;s fields, by severity
+          Check 4&rsquo;s fields, by severity
         </h2>
         <p className="mt-2 max-w-prose text-muted">
           The spec invokes RFC 2119, so MUST, SHOULD and MAY are three
-          different promises and rung 4 keeps them apart. Pinned against spec
+          different promises and check 4 keeps them apart. Pinned against spec
           commit{" "}
           <code className="break-all font-mono text-xs text-text">{m.spec_commit}</code>
           , checker version {m.checker_version} (schema {m.schema_version}).
@@ -327,7 +340,7 @@ export default async function MethodologyPage() {
         </p>
 
         <h3 className="mt-7 font-mono text-xs uppercase tracking-[0.12em] text-muted">
-          MUST — the only fields whose absence fails the rung
+          MUST — the only fields whose absence fails the check
         </h3>
         <p className="mt-1 max-w-prose text-sm text-muted">
           {m.rung4_must_requirements.length === 1 ? "One requirement" : `${m.rung4_must_requirements.length} requirements`}
@@ -390,25 +403,25 @@ export default async function MethodologyPage() {
       <section className="mt-14 max-w-4xl">
         <h2 className="font-mono text-sm uppercase tracking-[0.12em] text-text">What a status means</h2>
         <p className="mt-2 text-muted">
-          Each rung answers with one of a small fixed vocabulary, always in
+          Each check answers with one of a small fixed vocabulary, always in
           the checker&rsquo;s own words: <em>pass</em>, <em>fail</em>,{" "}
-          <em>skipped</em> (a rung this one depends on didn&rsquo;t pass, so
+          <em>skipped</em> (a check this one depends on didn&rsquo;t pass, so
           this question could not be meaningfully asked — for example, an
-          agent that fails rung 2 cannot meaningfully be asked rung 3;
-          dependencies run within a rung&rsquo;s own track, not across every
-          rung number in order — rung 7 depends only on rung 1, so a rung-2
+          agent that fails check 2 cannot meaningfully be asked check 3;
+          dependencies run within a check&rsquo;s own track, not across every
+          check number in order — check 7 depends only on check 1, so a check-2
           failure never skips it), or{" "}
           <em>error</em> (the check itself could not complete — a timeout, a
           malformed response — which is a different claim from a clean
-          fail). A rung with no row at all was never reached this run, which
+          fail). A check with no row at all was never reached this run, which
           this site renders as &ldquo;not checked&rdquo; — distinct from
           <em> skipped</em>, since &ldquo;not checked&rdquo; and &ldquo;we
           couldn&rsquo;t ask&rdquo; are different claims.
         </p>
         <p className="mt-2 text-muted">
-          <strong>Rung 5 alone</strong> can also answer <em>unclaimed</em>,
+          <strong>Check 5 alone</strong> can also answer <em>unclaimed</em>,
           added 2026-07-29: the document made no binding claim (no
-          registration entry, or an empty one) for this rung to check. That
+          registration entry, or an empty one) for this check to check. That
           is neither a pass (nothing was verified) nor a fail (a
           merely-recommended field, not a broken one) — it is its own,
           honest word for &ldquo;there was nothing here to check&rdquo;. Any
@@ -452,9 +465,9 @@ export default async function MethodologyPage() {
       <section className="mt-14 max-w-4xl">
         <h2 className="font-mono text-sm uppercase tracking-[0.12em] text-text">What this does not tell you</h2>
         <p className="mt-2 text-muted">
-          A pass on every rung is not a safety guarantee, and a fail is not
-          proof of bad intent — the rungs measure conformance to a spec, not
-          intent or quality. Absence of an implemented rung 6 today does not
+          A pass on every check is not a safety guarantee, and a fail is not
+          proof of bad intent — the checks measure conformance to a spec, not
+          intent or quality. Absence of an implemented check 6 today does not
           mean an agent&rsquo;s endpoints work; it means that question is not
           yet being asked of anyone. Every claim here is scoped to exactly
           what the evidence attached to it shows.

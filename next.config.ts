@@ -70,6 +70,11 @@ nextConfig.redirects = async () => [
   },
   // The identity-to-payments join is a report: long-form, dated, cited.
   { source: "/linkage", destination: "/reports/linkage", permanent: true },
+  // The funding/independence page was written before this project had any
+  // readers. Its substance — nobody we audit pays us, there is nothing to
+  // buy, no payment changes a finding — is now four lines on the method
+  // page, which is where someone checking our numbers already is.
+  { source: "/neutrality", destination: "/methodology#independence", permanent: true },
 
   /**
    * The old cards, kept alive.
@@ -91,6 +96,11 @@ nextConfig.redirects = async () => [
     permanent: true,
   },
   { source: "/census/opengraph-image", destination: "/opengraph-image", permanent: true },
+  {
+    source: "/neutrality/opengraph-image",
+    destination: "/methodology/opengraph-image",
+    permanent: true,
+  },
   {
     source: "/working/opengraph-image",
     destination: "/directory/opengraph-image",

@@ -36,11 +36,11 @@ export function NavSearch() {
         id="nav-q"
         type="search"
         name="q"
-        placeholder="Search name, description or owner"
+        placeholder="Agent name or 0x owner address"
         // `w-full` on mobile where the form owns its own row; a fixed measure
         // from `sm` up, where it shares the masthead with the nav and must not
         // push the CTA off the end.
-        className="w-full border border-line bg-panel px-2.5 py-1.5 font-mono text-xs text-text placeholder:text-dead focus:border-edge focus:outline-none sm:w-56"
+        className="w-full border border-line bg-panel px-2.5 py-1.5 font-mono text-xs text-text placeholder:text-dead focus:border-edge focus:outline-none sm:w-72"
       />
       <button
         type="submit"
