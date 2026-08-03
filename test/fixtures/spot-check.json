@@ -1,0 +1,110 @@
+{
+    "source": "spot_check",
+    "notice": "This is an on-demand spot check of one agent at the block named below. It is NOT a census measurement: it belongs to no run, it is not stored, and it never enters a published rate, finding or archive. Census results come from GET /api/agents/{chain}/{id}, which names its run.",
+    "chain": "base",
+    "agent_id": 1,
+    "checked_at": "2026-08-03T09:14:02.118431Z",
+    "block_number": 49903118,
+    "checker_version": "0.1.0",
+    "checker_commit": "9f2c1a4b7de0c3915f0a2b6d84e7c1f0a3b95d22",
+    "schema_version": 3,
+    "spec_commit": "5f0d9c1e2ab34c6d7e8f90a1b2c3d4e5f6a7b8c9",
+    "identity": {
+        "chain_id": 8453,
+        "registry": "0x8004a169fb4a3325136eb29fa0ceb6d2e539a432",
+        "token_id": "1",
+        "owner": "0x89e9e1ab11dd1b138b1dce6d6a4a0926aafd5029",
+        "agent_uri": "https://clawnews.io/.well-known/agent.json"
+    },
+    "fetch": {
+        "scheme": "https",
+        "request_url": "https://clawnews.io/.well-known/agent.json",
+        "final_url": "https://clawnews.io/.well-known/agent.json",
+        "http_status": 200,
+        "content_type": "application/json",
+        "body_bytes": 1679,
+        "body_sha256": "e4558fe88117abcc2ff2666cf144fbc90bcae27c594e679bcf550363f203d8a6",
+        "truncated": false,
+        "error": null,
+        "elapsed_ms": 214,
+        "via_gateway": null
+    },
+    "checks": [
+        {
+            "rung": 1,
+            "name": "registered",
+            "status": "pass",
+            "evidence": {
+                "block_number": 49903118,
+                "chain_id": 8453,
+                "owner": "0x89e9e1ab11dd1b138b1dce6d6a4a0926aafd5029",
+                "registry": "0x8004a169fb4a3325136eb29fa0ceb6d2e539a432",
+                "token_id": "1",
+                "tx_hash": null
+            },
+            "checked_at": "2026-08-03T09:14:02.118431Z"
+        },
+        {
+            "rung": 2,
+            "name": "resolvable",
+            "status": "pass",
+            "evidence": {
+                "bytes": 1679,
+                "content_type": "application/json",
+                "final_url": "https://clawnews.io/.well-known/agent.json",
+                "http_status": 200,
+                "scheme": "https"
+            },
+            "checked_at": "2026-08-03T09:14:02.334902Z"
+        },
+        {
+            "rung": 3,
+            "name": "parseable",
+            "status": "pass",
+            "evidence": {
+                "body_bytes": 1679,
+                "body_sha256": "e4558fe88117abcc2ff2666cf144fbc90bcae27c594e679bcf550363f203d8a6",
+                "content_type": "application/json"
+            },
+            "checked_at": "2026-08-03T09:14:02.334902Z"
+        },
+        {
+            "rung": 4,
+            "name": "conformant",
+            "status": "fail",
+            "evidence": {
+                "fields_found": ["type", "name", "description", "registrations"],
+                "fields_missing": ["image"],
+                "must_violations": []
+            },
+            "checked_at": "2026-08-03T09:14:02.334902Z"
+        },
+        {
+            "rung": 5,
+            "name": "bound",
+            "status": "skipped",
+            "evidence": {
+                "skipped_because_rung": 4,
+                "skipped_because_status": "fail"
+            },
+            "checked_at": "2026-08-03T09:14:02.334902Z"
+        },
+        {
+            "rung": 7,
+            "name": "attested",
+            "status": "unclaimed",
+            "evidence": {
+                "feedback_count": 0,
+                "reputation_registry": "0x8004b169fb4a3325136eb29fa0ceb6d2e539a433"
+            },
+            "checked_at": "2026-08-03T09:14:02.401118Z"
+        }
+    ],
+    "not_checked": [
+        {
+            "rung": 6,
+            "name": "live",
+            "reason": "not probed on demand: rung 6 sends one request per DECLARED endpoint, and a document may declare any number of them, at any hosts its author chooses — so a single spot check would become an unbounded burst aimed at a target the caller picks. The census probes them under a per-host budget of 500 distinct URLs per run with a deterministic sample, which is a discipline no one-off check can reproduce. See the run's own rung 6 for this agent."
+        }
+    ]
+}

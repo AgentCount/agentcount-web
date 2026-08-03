@@ -17,6 +17,7 @@ import {
 import { isTailAgent, type RungDetail } from "@/lib/api/schemas";
 import { pageTitle } from "@/lib/brand";
 import { addressUrl, blockUrl, explorerFor, resourceLink, tokenUrl } from "@/lib/links";
+import { SpotCheck } from "./SpotCheck";
 
 // The largest value axum's `Path<(String, i64)>` extractor will accept; a digit
 // run beyond this cannot be an agent id, so it is a bad URL, not an upstream
@@ -245,18 +246,26 @@ export default async function AgentDetail({
       </header>
 
       <div className="mt-10 grid grid-cols-1 gap-x-14 gap-y-16 xl:grid-cols-[minmax(0,1.9fr)_minmax(0,1fr)]">
-        <Section
-          title="The seven checks, with their evidence"
-          aside={`${agent.rungs.length} recorded`}
-          intro={
-            <>
-              Every field the checker recorded, rendered in full rather than
-              summarised, with the timestamp it was recorded at.
-            </>
-          }
-        >
-          <RungLadder rungs={agent.rungs} chain={agent.chain} />
-        </Section>
+        <div>
+          <Section
+            title="The seven checks, with their evidence"
+            aside={`${agent.rungs.length} recorded`}
+            intro={
+              <>
+                Every field the checker recorded, rendered in full rather than
+                summarised, with the timestamp it was recorded at.
+              </>
+            }
+          >
+            <RungLadder rungs={agent.rungs} chain={agent.chain} />
+          </Section>
+
+          {/* Below the census record, never above it: the published run is what
+              this page is for, and a spot check is an aside a reader may take
+              after reading it. The button fires only on a press — see
+              `SpotCheck.tsx` and the API's reasons for making this a POST. */}
+          <SpotCheck chain={agent.chain} agentId={agent.agent_id} />
+        </div>
 
         <div className="space-y-16">
           <Section title="On-chain snapshot" aside={agent.chain}>

@@ -9,7 +9,8 @@ import { StatusLegend } from "@/components/StatusLegend";
 import { runPreflight, type PreflightState } from "./actions";
 
 /**
- * The second client component in this app, and the first by choice.
+ * The second client component in this app, and the first by choice. (The
+ * third is `app/agent/[chain]/[id]/SpotCheck.tsx`, on the same pattern.)
  *
  * `app/error.tsx` is a client component because Next requires it. This one is
  * because a paste-and-check tool is genuinely interactive: the result has to

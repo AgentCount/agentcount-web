@@ -72,6 +72,17 @@ function startStubApi(): Promise<Server> {
     // matches than it returns rows for, and one with none — so the page's
     // "all N on this chain" link and its per-chain empty group both render.
     if (path === "/api/search") return send(fixture("search"));
+    // The on-demand spot check. POST-only here as on the real API: a stub
+    // that answered GET would let a prefetch or an unfurler trigger the one
+    // call this app must never make speculatively, and the smoke run would
+    // stop being evidence about that.
+    if (/^\/api\/agents\/[^/]+\/[^/]+\/spot-check$/.test(path)) {
+      if (req.method !== "POST") {
+        res.writeHead(405, { "content-type": "text/plain" });
+        return res.end("method not allowed");
+      }
+      return send(fixture("spot-check"));
+    }
     // Only agent 1 exists. Every other id 404s, which is what lets the test
     // below assert that a missing agent renders the app's own not-found page
     // rather than an error.
@@ -272,6 +283,47 @@ async function checkHeaderShape() {
   );
 }
 
+/**
+ * The spot check is a POST a person presses, and nothing else.
+ *
+ * This is the one control on the site whose failure mode lands on somebody
+ * else's server: a spot check makes the API fetch a stranger's document. So
+ * the shape that must hold is that nothing which follows links speculatively
+ * can reach it — browser prefetch, a link unfurler, a crawler, an `<img src>`
+ * — all of which issue GET and none of which submits a form.
+ *
+ * Asserted as structure rather than as pixels or copy: a `<form method="POST">`
+ * carrying the agent's identity, a submit button inside it, and no anchor
+ * anywhere on the page pointing at a spot-check URL. A regression here would
+ * most likely arrive as somebody "simplifying" the button into a link, which
+ * is exactly what this catches.
+ */
+async function checkSpotCheckButton() {
+  const html = await fetch(`${BASE}/agent/base/1`, {
+    signal: AbortSignal.timeout(30_000),
+  }).then((r) => r.text());
+
+  const form =
+    html
+      .match(/<form\b[^>]*method="post"[^>]*>[\s\S]*?<\/form>/gi)
+      ?.find((f) => /name="chain"/.test(f) && /name="agent_id"/.test(f)) ?? "";
+  check(form.length > 0, "agent page carries a POST form naming the agent to check");
+
+  const label = form.match(/<button\b[^>]*type="submit"[^>]*>([^<]+)</)?.[1]?.trim() ?? "";
+  // Labelled for the errand, like the footer's link to the checker: a button
+  // named after the internal feature ("Spot check") asks the reader to know
+  // what that is before pressing it. Wording is not pinned — the rule is.
+  check(
+    label.length > 0 && !/^spot ?check$/i.test(label),
+    `the button says what pressing it does ("${label}")`,
+  );
+
+  check(
+    !/href="[^"]*spot-check/i.test(html),
+    "nothing on the page links to a spot check — a link is a GET, and a GET is a prefetch",
+  );
+}
+
 async function run(): Promise<void> {
   const api = await startStubApi();
   const web: ChildProcess = spawn("pnpm", ["exec", "next", "start", "--port", String(WEB_PORT)], {
@@ -316,6 +368,7 @@ async function run(): Promise<void> {
       );
     }
     await checkHeaderShape();
+    await checkSpotCheckButton();
     await checkLegacyRedirects();
   } finally {
     web.kill("SIGTERM");

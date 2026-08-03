@@ -36,7 +36,7 @@ import {
  * keyboard, and — the part that makes it work on a phone — a `tabindex` on the
  * cell, so a tap focuses it and shows the panel, and a tap elsewhere blurs it
  * and hides it again. That is the whole touch "toggle", with no state and no
- * client bundle in an app that ships two client components in total.
+ * client bundle in an app that ships three client components in total.
  *
  * ## Never summed
  *

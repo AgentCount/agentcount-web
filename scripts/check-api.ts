@@ -2,6 +2,13 @@
  * The contract test between this repo and the Rust API. Run it after any
  * change to `crates/api`: it fetches every endpoint from a LIVE API and
  * validates each response through the schema this app will use.
+ *
+ * Every READ endpoint, that is. `POST …/spot-check` is deliberately not here:
+ * running it would make the API fetch a real agent's document from a real
+ * third-party server, so a routine contract check would send traffic to
+ * somebody who did not ask for it — once per developer, per run, forever. Its
+ * schema is covered by `test/fixtures/spot-check.json` instead, and that
+ * fixture is transcribed rather than captured until the endpoint ships.
  */
 import { isTailAgent } from "@/lib/api/schemas";
 import {

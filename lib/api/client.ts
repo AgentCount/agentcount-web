@@ -31,6 +31,26 @@ export class SubmissionError extends Error {
   }
 }
 
+/**
+ * The API declined to do the work, and said why in words meant for a human.
+ *
+ * Distinct from both of the above: the service is healthy and the request was
+ * well-formed — a rate limit bound, or a chain this deployment has no RPC for.
+ * `retryAfterSeconds` is carried separately from the message because the wait
+ * is the only part of a 429 a reader can act on, and it must not have to be
+ * scraped back out of a sentence.
+ */
+export class RefusedError extends Error {
+  constructor(
+    message: string,
+    readonly status: number,
+    readonly retryAfterSeconds: number | null = null,
+  ) {
+    super(message);
+    this.name = "RefusedError";
+  }
+}
+
 export class ContractError extends Error {
   constructor(
     readonly path: string,
@@ -134,6 +154,104 @@ export async function postRaw<T>(
   // document, so it is surfaced rather than swallowed as an upstream fault.
   if (res.status === 400) {
     throw new SubmissionError((await res.text()).trim());
+  }
+  if (!res.ok) {
+    throw new UpstreamError(`the ${BRAND.name} API returned ${res.status}`, res.status);
+  }
+
+  const parsed = schema.safeParse(await res.json());
+  if (!parsed.success) {
+    const issues = parsed.error.issues
+      .map((i) => `${i.path.join(".") || "(root)"}: ${i.message}`)
+      .join("; ");
+    console.error(`[agentcount] contract mismatch on ${path}`, parsed.error.issues);
+    throw new ContractError(path, issues);
+  }
+  return parsed.data;
+}
+
+/**
+ * The API's error bodies are PLAIN TEXT, not JSON — `ApiError::into_response`
+ * returns `(status, String)`. Read as text and trimmed, with a fallback so a
+ * body this app cannot read never becomes an empty panel.
+ */
+async function refusalText(res: Response, fallback: string): Promise<string> {
+  try {
+    const text = (await res.text()).trim();
+    return text.length > 0 ? text : fallback;
+  } catch {
+    return fallback;
+  }
+}
+
+/**
+ * POST with NO body, for an endpoint that does work rather than returning a
+ * stored row.
+ *
+ * Separate from `postRaw` (which posts bytes a reader pasted) and from `get`
+ * (which caches) because the refusals are the point here: a 429 carries a wait
+ * the reader has to be shown, a 503 means a capability is unconfigured, and a
+ * 404 has two entirely different meanings that must not be merged.
+ *
+ * Returns `null` when the ROUTE is absent — an API deployed before this
+ * endpoint existed. That case is told apart from the API's own "no such agent"
+ * 404 by the body: axum's unmatched-route fallback sends an empty one, while
+ * `ApiError::NotFound` sends the words `not found`. It is a heuristic and it
+ * is the only one available (both are 404s, and asking the API what it
+ * supports would need a capabilities endpoint that does not exist), so it errs
+ * toward "the deployment is old": a CDN's HTML 404 page also lands here, and
+ * telling a reader the feature is unavailable is honest in that case too,
+ * whereas claiming their agent vanished from the chain would not be.
+ */
+export async function postNoBody<T>(
+  path: string,
+  schema: ZodType<T>,
+  timeoutMs = 50_000,
+): Promise<T | null> {
+  const url = `${baseUrl()}${path}`;
+  let res: Response;
+  try {
+    res = await fetch(url, {
+      method: "POST",
+      // No body and no content-type: the endpoint takes everything it needs
+      // from the path. Sending an empty JSON object would be this app
+      // inventing a request shape the API never asked for.
+      cache: "no-store",
+      // Longer than the 8s the read path allows, because this is not a read:
+      // the API pins a block, reads two contracts and fetches a stranger's
+      // document under its own 45s ceiling. Giving up first would report a
+      // timeout for work the API was still about to answer.
+      signal: AbortSignal.timeout(timeoutMs),
+    });
+  } catch (e) {
+    if (e instanceof Error && e.name === "TimeoutError") {
+      throw new UpstreamError(`the ${BRAND.name} API at ${url} did not answer in time`);
+    }
+    throw new UpstreamError(`could not reach the ${BRAND.name} API at ${url}`);
+  }
+
+  if (res.status === 404) {
+    const text = await refusalText(res, "");
+    if (!/^not found$/i.test(text)) return null;
+    throw new RefusedError(text, 404);
+  }
+  if (res.status === 429) {
+    // Whole seconds per RFC 9110; the API never sends the date form. An
+    // unparsable header becomes `null` rather than a guessed number — "try
+    // again in NaN seconds" is worse than not saying.
+    const header = res.headers.get("retry-after");
+    const seconds = header !== null && /^\d+$/.test(header.trim()) ? Number(header) : null;
+    throw new RefusedError(
+      await refusalText(res, "this check is rate limited — try again shortly"),
+      429,
+      seconds,
+    );
+  }
+  if (res.status === 400 || res.status === 503) {
+    throw new RefusedError(
+      await refusalText(res, `the ${BRAND.name} API returned ${res.status}`),
+      res.status,
+    );
   }
   if (!res.ok) {
     throw new UpstreamError(`the ${BRAND.name} API returned ${res.status}`, res.status);
