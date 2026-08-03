@@ -82,34 +82,38 @@ export const metadata: Metadata = {
 };
 
 /**
- * Two places, because there are two things a reader comes here to do: look an
- * agent up, or read what the census found.
+ * Four items: three places and one tool.
  *
  * "Agents" is the list of agents. It was called "Directory", which names the
- * shape of the page rather than what is in it — a reader scanning a nav bar
- * should not have to translate. The URL stays `/directory`: labels are for
- * readers, URLs are identifiers other people have linked to.
+ * shape of the page rather than what is in it. The URL stays `/directory`:
+ * labels are for readers, URLs are identifiers other people have linked to.
  *
- * Method moved to the footer with the other reference material. It is what
- * you read when you are checking a number, not what you come for.
+ * Coverage is here rather than buried because it answers the question the
+ * headline provokes — every AI agent on WHICH chains — and it is the page
+ * that keeps the scope claim honest.
+ *
+ * "Check a file" is an action among places, and it is set exactly like the
+ * places on purpose. It spent a while as a bordered button floating at the
+ * far right of the masthead, where it read as an advertisement rather than a
+ * door and had to be guessed at from three words.
+ *
+ * Method is not here. It is what you read while checking a number, not what
+ * you arrive for, so it sits in the footer with the archives.
  */
 const NAV = [
   { href: "/directory", label: "Agents" },
   { href: "/reports", label: "Reports" },
+  { href: "/coverage", label: "Coverage" },
+  { href: "/preflight", label: "Check a file" },
 ];
 
 /**
- * Reference and tools, in the footer.
- *
- * The pre-flight checker used to be a bordered button in the masthead, which
- * asked a reader to guess what it was from three words. "Check a file" says
- * what you hand it.
+ * Reference, in the footer: what you consult while checking a figure, rather
+ * than what you came to read.
  */
 const TOOLS = [
   { href: "/methodology", label: "Method" },
-  { href: "/preflight", label: "Check a file" },
   { href: "/data", label: "Archives" },
-  { href: "/coverage", label: "Coverage" },
 ];
 
 
@@ -317,7 +321,7 @@ export default function RootLayout({
               <p className="mt-3 font-mono text-xs text-muted">{BRAND.domain}</p>
             </div>
             <div className="flex flex-col items-start gap-2">
-              <span className="label">Tools</span>
+              <span className="label">Reference</span>
               {TOOLS.map((item) => (
                 <Link
                   key={item.href}
