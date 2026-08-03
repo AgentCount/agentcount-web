@@ -138,7 +138,7 @@ const SOURCE = [
   {
     href: "https://github.com/AgentCount/agentcount",
     label: "Core (Rust)",
-    title: "Indexer, probe and checker — the code behind every rung",
+    title: "Indexer, probe and checker — the code behind every check",
   },
   {
     href: "https://github.com/AgentCount/agentcount-web",

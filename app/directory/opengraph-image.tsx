@@ -9,6 +9,6 @@ export default function Image() {
   return ogCard({
     title: "Search every agent",
     blurb:
-      "Filter by any rung and any status, search names, descriptions and owner addresses. Every row links to its evidence.",
+      "Filter by any check and any status, search names, descriptions and owner addresses. Every row links to its evidence.",
   });
 }

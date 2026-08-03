@@ -64,7 +64,7 @@ const ROLES: Role[] = [
         An address the owner has authorised to act on the token. The spec bans
         feedback from operators as well as owners (line 217), but{" "}
         <strong>this census never reads approvals</strong> — so it cannot
-        identify an operator, and no rung or report may claim otherwise.
+        identify an operator, and no check or report may claim otherwise.
       </>
     ),
   },
@@ -124,7 +124,7 @@ const ROLES: Role[] = [
         ERC-8004 distinguishes it from any other EOA: a key in a TEE and a key on
         a founder&rsquo;s laptop are the same 20 bytes on-chain. So the census{" "}
         <strong>cannot tell autonomous action from human action</strong>, and no
-        rung or report may imply it can.
+        check or report may imply it can.
       </>
     ),
   },
