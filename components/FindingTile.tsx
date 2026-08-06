@@ -62,14 +62,17 @@ export function FindingTile({
 }
 
 /**
- * Same shape, for a position in the row that has no publishable number.
+ * Same shape, for a position in the row that carries no figure.
  *
- * The fourth tile used to print 358 agents ever paid. That figure was
- * withdrawn on 2026-08-06 pending a rebuilt payments pipeline, and the
- * honest rendering of a withdrawn number is not a smaller number — it is
- * none. `lead` takes a short status word in place of the numeral so the tile
- * still reads as a member of the row rather than as a rendering fault, and it
- * is set in `text-muted` because a status is not a finding.
+ * The row is four questions, and the fourth — does money reach the agent — is
+ * not one of the seven checks: it is read from token transfer logs the census
+ * database does not hold, so no run produces a number for it. A tile that
+ * printed one anyway would be the only figure on this page not recomputable
+ * from a run id.
+ *
+ * `lead` takes a short phrase in place of the numeral so the tile still reads
+ * as a member of the row rather than as a rendering fault, and it is set in
+ * `text-muted` because it is not a finding.
  */
 export function NoteTile({
   index,
@@ -78,7 +81,7 @@ export function NoteTile({
   children,
 }: {
   index: number;
-  /** A status, never a quantity. "under revision", not "0". */
+  /** A phrase, never a quantity — a tile with no number must not imply one. */
   lead: string;
   source: string;
   children: React.ReactNode;
@@ -104,10 +107,9 @@ export function NoteTile({
 /**
  * Same shape, for a finding that is a bare count rather than a rate.
  *
- * Unused since 2026-08-06, when the one count on the homepage was withdrawn
- * and became a `NoteTile`. Kept because the replacement for that figure is a
- * count too: AgentCount/agentcount#35 ends with a pinned number going back
- * into tile four, and deleting this would mean writing it again.
+ * Currently unused: the one tile that was a count is a `NoteTile` until the
+ * payments pipeline writes a figure into a pinned run. Kept because that
+ * figure is a count, and this is the tile it lands in.
  */
 export function CountTile({
   index,

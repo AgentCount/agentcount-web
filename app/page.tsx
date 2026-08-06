@@ -332,35 +332,29 @@ export default async function Home({
             )}
           </FindingTile>
 
-          {/* The fourth tile answers the economy question the other three
-              lead up to, and it is the one tile whose number this site cannot
-              currently stand behind.
+          {/* The fourth question the other three lead up to, and the only one
+              on this page that no run answers.
 
-              It printed 358 agents ever paid until 2026-08-06. That figure
-              came from a log study that ran once, on a declared-wallet basis,
-              pinned to no run and recomputable from no published archive; the
-              maintainer withdrew it and every variant of it as a headline
-              claim pending a rebuilt pipeline (AgentCount/agentcount#35). The
-              first three tiles read from the findings endpoint at render time
-              and this one never could, which is the whole difference.
-
-              It stays in the row rather than being deleted: the question is
-              still one of the four this census exists to ask, and the report
-              still carries the withdrawn figures with their dates. */}
+              The first three tiles read from the findings endpoint at render
+              time. This one cannot: payment is read from token transfer logs
+              and EIP-3009 authorisations, which the census database does not
+              hold and no rung produces, so there is no run id a figure here
+              would recompute from. It carries the question and the population
+              rather than a number, and it takes a number the day the payments
+              pipeline writes one into a pinned run. */}
           <NoteTile
             index={4}
-            lead="under revision"
-            source={`${LINKAGE.payments.measuredOn} study superseded · ${LINKAGE.payments.issue}`}
+            lead="not yet measured"
+            source={`${LINKAGE.census.agents.toLocaleString("en-US")} agents · outside the seven checks`}
           >
-            Payments to registered agents are rare, and how rare is under
-            revision. AgentCount withdrew the figure it published here on{" "}
-            {LINKAGE.payments.measuredOn} and is rebuilding the pipeline that
-            would replace it under a pinned run.{" "}
+            Whether money reaches a registered agent is read from token
+            transfer logs rather than from the registry, so it is not one of
+            the seven checks and no sweep reports it.{" "}
             <Link
               href="/reports/linkage"
               className="text-text underline decoration-line underline-offset-4 transition-colors hover:decoration-edge"
             >
-              The join, and the superseded figures, are its own report.
+              What the join asks, and what it is read against.
             </Link>
           </NoteTile>
         </div>

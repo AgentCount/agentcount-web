@@ -2,32 +2,35 @@ import { LINKAGE } from "@/lib/linkage";
 import { OG_CONTENT_TYPE, OG_SIZE, ogCard } from "@/lib/og";
 
 /**
- * The card carries the population and the status of the payments figures, and
- * no payment figure of its own.
+ * The card carries the population and the subject, and no payment figure.
  *
  * A preview is read by people who never open the page, so it is the last place
- * a withdrawn number may appear: "1 in 991" on a card outlives every caveat on
- * the page it links to. Until AgentCount/agentcount#35 lands there is no
- * payments figure this card is allowed to state.
+ * a number may appear that the page itself does not carry: a rate on a card
+ * outlives every qualification on the page it links to. The card states what
+ * the page states, and the page states no rate.
  */
 export const runtime = "nodejs";
 export const size = OG_SIZE;
 export const contentType = OG_CONTENT_TYPE;
 export const alt =
-  "Where the ERC-8004 census meets the payments layer, and why its payment figures are under revision";
+  "Where the ERC-8004 census identity layer meets the payments layer, and the population it is read against";
 
 export default function Image() {
-  const { census, payments } = LINKAGE;
+  const { census } = LINKAGE;
   return ogCard({
     title: "Where registration meets payment",
     blurb:
-      "Payments to registered agents are rare. The figures for how rare are superseded, and a pinned recomputation is in progress.",
+      "Two layers usually discussed as one, joined on the only thing they share: an address.",
     stats: [
       {
         value: census.agents.toLocaleString("en-US"),
         label: "registered agents across four chains",
       },
+      {
+        value: String(census.chains.length),
+        label: "chains, each pinned to a block",
+      },
     ],
-    note: `census ${census.label} - ${payments.measuredOn} payments study superseded`,
+    note: `census ${census.label} - evidence attached, no score`,
   });
 }

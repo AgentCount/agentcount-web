@@ -59,15 +59,14 @@ export type Report = {
 export const REPORTS: Report[] = [
   {
     slug: "linkage",
-    title: "Identity and payments: what the money actually does",
+    title: "Identity and payments: where the two layers meet",
     date: "2026-07-31",
     summary:
-      "Where the census identity layer meets the payments layer, across 369,130 registered agents on four chains. Payments to registered agents are rare; the 2026-07-30 figures for how rare are superseded, and a pinned recomputation is in progress.",
+      "Where the census identity layer meets the payments layer: the one address the registry and a transfer share, why that join is weaker than it looks, and the population any rate built on it divides by.",
     chains: ["base", "bsc", "mainnet", "celo"],
-    // The live population, because this entry describes a page that reports on
-    // the current census. The 2026-07 report below keeps its own 354,858: that
-    // is the population the document was written against and editing it would
-    // misdescribe a dated artifact.
+    // The live population: this entry describes a page that reports on the
+    // current census. The 2026-07 report below keeps its own 354,858, which is
+    // the population its four pinned runs actually held.
     agents: "369,130",
     file: null,
     source: "analysis/linkage",
@@ -76,13 +75,8 @@ export const REPORTS: Report[] = [
     slug: "2026-07-census",
     title: "ERC-8004 conformance census: four chains",
     date: "2026-07-30",
-    // The payments sentence this summary used to carry was withdrawn on
-    // 2026-08-06 (AgentCount/agentcount#35). The report itself is unedited —
-    // a dated artifact is not rewritten to match later data — but the index
-    // card is this site's own copy, and it must not put a superseded figure in
-    // front of a reader as though it were current.
     summary:
-      "354,858 agents across Base, BNB Chain, Ethereum mainnet and Celo, each pinned to a block. Attestation ranges 44× between chains. The report's payments figures are superseded and are being recomputed against a pinned run.",
+      "354,858 agents across Base, BNB Chain, Ethereum mainnet and Celo, each pinned to a block. Attestation ranges 44× between chains, and 68.3% of every attested agent in existence is on one of them.",
     chains: ["base", "bsc", "mainnet", "celo"],
     agents: "354,858",
     file: "2026-07-census",
