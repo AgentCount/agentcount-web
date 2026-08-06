@@ -61,7 +61,54 @@ export function FindingTile({
   );
 }
 
-/** Same shape, for a finding that is a bare count rather than a rate. */
+/**
+ * Same shape, for a position in the row that has no publishable number.
+ *
+ * The fourth tile used to print 358 agents ever paid. That figure was
+ * withdrawn on 2026-08-06 pending a rebuilt payments pipeline, and the
+ * honest rendering of a withdrawn number is not a smaller number — it is
+ * none. `lead` takes a short status word in place of the numeral so the tile
+ * still reads as a member of the row rather than as a rendering fault, and it
+ * is set in `text-muted` because a status is not a finding.
+ */
+export function NoteTile({
+  index,
+  lead,
+  source,
+  children,
+}: {
+  index: number;
+  /** A status, never a quantity. "under revision", not "0". */
+  lead: string;
+  source: string;
+  children: React.ReactNode;
+}) {
+  return (
+    <div className="group relative flex h-full flex-col border-t border-edge pt-5">
+      <span className="label absolute -top-px right-0 hidden translate-y-[-50%] bg-bg pl-2 xl:block">
+        {String(index).padStart(2, "0")}
+      </span>
+      <div className="numeral text-[clamp(1.5rem,2.4vw,2rem)] leading-tight text-muted">
+        {lead}
+      </div>
+      <p className="mt-4 max-w-[34ch] flex-1 text-[0.9375rem] leading-relaxed text-muted">
+        {children}
+      </p>
+      <p className="mt-4 border-t border-line pt-2 font-mono text-[0.6875rem] leading-relaxed text-dead">
+        {source}
+      </p>
+    </div>
+  );
+}
+
+/**
+ * Same shape, for a finding that is a bare count rather than a rate.
+ *
+ * Unused since 2026-08-06, when the one count on the homepage was withdrawn
+ * and became a `NoteTile`. Kept because the replacement for that figure is a
+ * count too: AgentCount/agentcount#35 ends with a pinned number going back
+ * into tile four, and deleting this would mean writing it again.
+ */
 export function CountTile({
   index,
   value,

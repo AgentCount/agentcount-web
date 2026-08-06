@@ -62,9 +62,13 @@ export const REPORTS: Report[] = [
     title: "Identity and payments: what the money actually does",
     date: "2026-07-31",
     summary:
-      "Where the census identity layer meets the payments layer: 358 agents of 354,858 have ever been paid, 34 have ever settled through x402, and agent-linked value is 0.017% of x402's top-100 volume.",
+      "Where the census identity layer meets the payments layer, across 369,130 registered agents on four chains. Payments to registered agents are rare; the 2026-07-30 figures for how rare are superseded, and a pinned recomputation is in progress.",
     chains: ["base", "bsc", "mainnet", "celo"],
-    agents: "354,858",
+    // The live population, because this entry describes a page that reports on
+    // the current census. The 2026-07 report below keeps its own 354,858: that
+    // is the population the document was written against and editing it would
+    // misdescribe a dated artifact.
+    agents: "369,130",
     file: null,
     source: "analysis/linkage",
   },
@@ -72,8 +76,13 @@ export const REPORTS: Report[] = [
     slug: "2026-07-census",
     title: "ERC-8004 conformance census: four chains",
     date: "2026-07-30",
+    // The payments sentence this summary used to carry was withdrawn on
+    // 2026-08-06 (AgentCount/agentcount#35). The report itself is unedited —
+    // a dated artifact is not rewritten to match later data — but the index
+    // card is this site's own copy, and it must not put a superseded figure in
+    // front of a reader as though it were current.
     summary:
-      "354,858 agents across Base, BNB Chain, Ethereum mainnet and Celo, each pinned to a block. Attestation ranges 44× between chains, 358 agents have ever been paid, and 34 have ever settled through x402.",
+      "354,858 agents across Base, BNB Chain, Ethereum mainnet and Celo, each pinned to a block. Attestation ranges 44× between chains. The report's payments figures are superseded and are being recomputed against a pinned run.",
     chains: ["base", "bsc", "mainnet", "celo"],
     agents: "354,858",
     file: "2026-07-census",

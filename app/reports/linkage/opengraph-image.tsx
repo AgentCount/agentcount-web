@@ -1,24 +1,33 @@
-import { LINKAGE, oneIn } from "@/lib/linkage";
+import { LINKAGE } from "@/lib/linkage";
 import { OG_CONTENT_TYPE, OG_SIZE, ogCard } from "@/lib/og";
 
+/**
+ * The card carries the population and the status of the payments figures, and
+ * no payment figure of its own.
+ *
+ * A preview is read by people who never open the page, so it is the last place
+ * a withdrawn number may appear: "1 in 991" on a card outlives every caveat on
+ * the page it links to. Until AgentCount/agentcount#35 lands there is no
+ * payments figure this card is allowed to state.
+ */
 export const runtime = "nodejs";
 export const size = OG_SIZE;
 export const contentType = OG_CONTENT_TYPE;
 export const alt =
-  "How much of the payment activity on x402 happens at registered ERC-8004 identities";
+  "Where the ERC-8004 census meets the payments layer, and why its payment figures are under revision";
 
 export default function Image() {
-  const { total, crossCheck, measuredOn } = LINKAGE;
+  const { census, payments } = LINKAGE;
   return ogCard({
     title: "Where registration meets payment",
     blurb:
-      "Two layers usually discussed as one, joined on the only thing they share: an address.",
+      "Payments to registered agents are rare. The figures for how rare are superseded, and a pinned recomputation is in progress.",
     stats: [
-      { value: oneIn(total.paid, total.agents), label: "agents has ever been paid" },
-      { value: oneIn(total.x402, total.agents), label: "has ever settled through x402" },
-      { value: `${crossCheck.agentLinkedShare}%`, label: "of x402 top-100 volume is agent-linked" },
-      { value: String(crossCheck.declaredAgentWallet), label: "of its 138 top sellers are declared agent wallets" },
+      {
+        value: census.agents.toLocaleString("en-US"),
+        label: "registered agents across four chains",
+      },
     ],
-    note: `${measuredOn} - four chains, each pinned to a block`,
+    note: `census ${census.label} - ${payments.measuredOn} payments study superseded`,
   });
 }

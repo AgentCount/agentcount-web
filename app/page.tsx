@@ -2,7 +2,7 @@ import Link from "next/link";
 import { AgentTable } from "@/components/AgentTable";
 import { AllRunsProvenance } from "@/components/AllRunsProvenance";
 
-import { CountTile, FindingTile } from "@/components/FindingTile";
+import { FindingTile, NoteTile } from "@/components/FindingTile";
 import { allPassFacets } from "@/components/DirectoryControls";
 import { StatusWord } from "@/components/StatusWord";
 import { MissingRateBar, RateBar } from "@/components/RateBar";
@@ -23,7 +23,7 @@ import {
 } from "@/lib/api/endpoints";
 import type { Finding, Findings } from "@/lib/api/schemas";
 import { chainDisplayName, formatChainList } from "@/lib/chains";
-import { LINKAGE, oneIn } from "@/lib/linkage";
+import { LINKAGE } from "@/lib/linkage";
 import { getPublishedRuns } from "@/lib/published-runs";
 import { REPORTS } from "@/lib/reports";
 
@@ -333,27 +333,36 @@ export default async function Home({
           </FindingTile>
 
           {/* The fourth tile answers the economy question the other three
-              lead up to. The MUST-requirement count it replaced lives on
-              /methodology (rung 4's severity table) and in the preflight
-              header, where a reader who cares about spec severity already is.
-              These are published figures with a date, not live census reads —
-              the source line says so, and LINKAGE carries the runs they are
-              scoped to. */}
-          <CountTile
+              lead up to, and it is the one tile whose number this site cannot
+              currently stand behind.
+
+              It printed 358 agents ever paid until 2026-08-06. That figure
+              came from a log study that ran once, on a declared-wallet basis,
+              pinned to no run and recomputable from no published archive; the
+              maintainer withdrew it and every variant of it as a headline
+              claim pending a rebuilt pipeline (AgentCount/agentcount#35). The
+              first three tiles read from the findings endpoint at render time
+              and this one never could, which is the whole difference.
+
+              It stays in the row rather than being deleted: the question is
+              still one of the four this census exists to ask, and the report
+              still carries the withdrawn figures with their dates. */}
+          <NoteTile
             index={4}
-            value={LINKAGE.total.paid}
-            source={`measured ${LINKAGE.measuredOn} · ${LINKAGE.runs.length} chains · lower bound`}
+            lead="under revision"
+            source={`${LINKAGE.payments.measuredOn} study superseded · ${LINKAGE.payments.issue}`}
           >
-            agents — {oneIn(LINKAGE.total.paid, LINKAGE.total.agents)}{" "}
-            — have ever been paid: an external stablecoin transfer arriving after
-            minting, at the wallet the agent&rsquo;s own document declared.{" "}
+            Payments to registered agents are rare, and how rare is under
+            revision. AgentCount withdrew the figure it published here on{" "}
+            {LINKAGE.payments.measuredOn} and is rebuilding the pipeline that
+            would replace it under a pinned run.{" "}
             <Link
               href="/reports/linkage"
               className="text-text underline decoration-line underline-offset-4 transition-colors hover:decoration-edge"
             >
-              The full join is its own report.
+              The join, and the superseded figures, are its own report.
             </Link>
-          </CountTile>
+          </NoteTile>
         </div>
 
         {/* The report's central finding, on the page that quotes the average
