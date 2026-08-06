@@ -61,7 +61,56 @@ export function FindingTile({
   );
 }
 
-/** Same shape, for a finding that is a bare count rather than a rate. */
+/**
+ * Same shape, for a position in the row that carries no figure.
+ *
+ * The row is four questions, and the fourth — does money reach the agent — is
+ * not one of the seven checks: it is read from token transfer logs the census
+ * database does not hold, so no run produces a number for it. A tile that
+ * printed one anyway would be the only figure on this page not recomputable
+ * from a run id.
+ *
+ * `lead` takes a short phrase in place of the numeral so the tile still reads
+ * as a member of the row rather than as a rendering fault, and it is set in
+ * `text-muted` because it is not a finding.
+ */
+export function NoteTile({
+  index,
+  lead,
+  source,
+  children,
+}: {
+  index: number;
+  /** A phrase, never a quantity — a tile with no number must not imply one. */
+  lead: string;
+  source: string;
+  children: React.ReactNode;
+}) {
+  return (
+    <div className="group relative flex h-full flex-col border-t border-edge pt-5">
+      <span className="label absolute -top-px right-0 hidden translate-y-[-50%] bg-bg pl-2 xl:block">
+        {String(index).padStart(2, "0")}
+      </span>
+      <div className="numeral text-[clamp(1.5rem,2.4vw,2rem)] leading-tight text-muted">
+        {lead}
+      </div>
+      <p className="mt-4 max-w-[34ch] flex-1 text-[0.9375rem] leading-relaxed text-muted">
+        {children}
+      </p>
+      <p className="mt-4 border-t border-line pt-2 font-mono text-[0.6875rem] leading-relaxed text-dead">
+        {source}
+      </p>
+    </div>
+  );
+}
+
+/**
+ * Same shape, for a finding that is a bare count rather than a rate.
+ *
+ * Currently unused: the one tile that was a count is a `NoteTile` until the
+ * payments pipeline writes a figure into a pinned run. Kept because that
+ * figure is a count, and this is the tile it lands in.
+ */
 export function CountTile({
   index,
   value,

@@ -9,8 +9,9 @@
  * was wrong at the level of who the money reached.
  *
  * The `reads` field is the part that keeps the census honest: a role we do not
- * read is a role we must never make claims about. `ownerOf` is read; ERC-721
- * approvals are not, so nothing here can speak to approved operators.
+ * read is a role we must never make claims about. `ownerOf` is read, and the
+ * minter has been since schema 6; ERC-721 approvals are not, so nothing here
+ * can speak to approved operators.
  *
  * Seven, not six: PAYMENT-CONTRACT CONTROLLER was added because it appeared in
  * none of the original six and is exactly what broke the 97.9% claim — it is
@@ -42,16 +43,18 @@ const ROLES: Role[] = [
   },
   {
     name: "Minter",
-    source: "sender of the registration transaction — not stored",
-    reads: "not read",
+    source: "sender of the registration transaction — stored since schema 6",
+    reads: "read",
     body: (
       <>
         Who called <code className="font-mono text-text">register()</code>. Often
         but not always the first owner, and frequently a platform registering on
-        a customer&rsquo;s behalf. The census does{" "}
-        <strong>not currently store this</strong>; where a report names a minter
-        it was pulled by hand from the mint transaction and says so. 8004scan
-        displays it as CREATOR; capturing it is on the sweeper backlog.
+        a customer&rsquo;s behalf, which makes it the one role that separates
+        the party that created an identity from the party that holds it. The
+        census records it from <strong>schema 6</strong> onward; a run swept
+        under an earlier schema carries no minter, so a figure covering those
+        runs was pulled by hand from the mint transaction and says so. 8004scan
+        displays the same address as CREATOR.
       </>
     ),
   },

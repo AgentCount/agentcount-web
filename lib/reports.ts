@@ -59,12 +59,15 @@ export type Report = {
 export const REPORTS: Report[] = [
   {
     slug: "linkage",
-    title: "Identity and payments: what the money actually does",
+    title: "Identity and payments: where the two layers meet",
     date: "2026-07-31",
     summary:
-      "Where the census identity layer meets the payments layer: 358 agents of 354,858 have ever been paid, 34 have ever settled through x402, and agent-linked value is 0.017% of x402's top-100 volume.",
+      "Where the census identity layer meets the payments layer: the one address the registry and a transfer share, why that join is weaker than it looks, and the population any rate built on it divides by.",
     chains: ["base", "bsc", "mainnet", "celo"],
-    agents: "354,858",
+    // The live population: this entry describes a page that reports on the
+    // current census. The 2026-07 report below keeps its own 354,858, which is
+    // the population its four pinned runs actually held.
+    agents: "369,130",
     file: null,
     source: "analysis/linkage",
   },
@@ -73,7 +76,7 @@ export const REPORTS: Report[] = [
     title: "ERC-8004 conformance census: four chains",
     date: "2026-07-30",
     summary:
-      "354,858 agents across Base, BNB Chain, Ethereum mainnet and Celo, each pinned to a block. Attestation ranges 44× between chains, 358 agents have ever been paid, and 34 have ever settled through x402.",
+      "354,858 agents across Base, BNB Chain, Ethereum mainnet and Celo, each pinned to a block. Attestation ranges 44× between chains, and 68.3% of every attested agent in existence is on one of them.",
     chains: ["base", "bsc", "mainnet", "celo"],
     agents: "354,858",
     file: "2026-07-census",

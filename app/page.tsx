@@ -2,7 +2,7 @@ import Link from "next/link";
 import { AgentTable } from "@/components/AgentTable";
 import { AllRunsProvenance } from "@/components/AllRunsProvenance";
 
-import { CountTile, FindingTile } from "@/components/FindingTile";
+import { FindingTile, NoteTile } from "@/components/FindingTile";
 import { allPassFacets } from "@/components/DirectoryControls";
 import { StatusWord } from "@/components/StatusWord";
 import { MissingRateBar, RateBar } from "@/components/RateBar";
@@ -23,7 +23,7 @@ import {
 } from "@/lib/api/endpoints";
 import type { Finding, Findings } from "@/lib/api/schemas";
 import { chainDisplayName, formatChainList } from "@/lib/chains";
-import { LINKAGE, oneIn } from "@/lib/linkage";
+import { LINKAGE } from "@/lib/linkage";
 import { getPublishedRuns } from "@/lib/published-runs";
 import { REPORTS } from "@/lib/reports";
 
@@ -332,28 +332,31 @@ export default async function Home({
             )}
           </FindingTile>
 
-          {/* The fourth tile answers the economy question the other three
-              lead up to. The MUST-requirement count it replaced lives on
-              /methodology (rung 4's severity table) and in the preflight
-              header, where a reader who cares about spec severity already is.
-              These are published figures with a date, not live census reads —
-              the source line says so, and LINKAGE carries the runs they are
-              scoped to. */}
-          <CountTile
+          {/* The fourth question the other three lead up to, and the only one
+              on this page that no run answers.
+
+              The first three tiles read from the findings endpoint at render
+              time. This one cannot: payment is read from token transfer logs
+              and EIP-3009 authorisations, which the census database does not
+              hold and no rung produces, so there is no run id a figure here
+              would recompute from. It carries the question and the population
+              rather than a number, and it takes a number the day the payments
+              pipeline writes one into a pinned run. */}
+          <NoteTile
             index={4}
-            value={LINKAGE.total.paid}
-            source={`measured ${LINKAGE.measuredOn} · ${LINKAGE.runs.length} chains · lower bound`}
+            lead="not yet measured"
+            source={`${LINKAGE.census.agents.toLocaleString("en-US")} agents · outside the seven checks`}
           >
-            agents — {oneIn(LINKAGE.total.paid, LINKAGE.total.agents)}{" "}
-            — have ever been paid: an external stablecoin transfer arriving after
-            minting, at the wallet the agent&rsquo;s own document declared.{" "}
+            Whether money reaches a registered agent is read from token
+            transfer logs rather than from the registry, so it is not one of
+            the seven checks and no sweep reports it.{" "}
             <Link
               href="/reports/linkage"
               className="text-text underline decoration-line underline-offset-4 transition-colors hover:decoration-edge"
             >
-              The full join is its own report.
+              What the join asks, and what it is read against.
             </Link>
-          </CountTile>
+          </NoteTile>
         </div>
 
         {/* The report's central finding, on the page that quotes the average
