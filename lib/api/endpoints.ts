@@ -8,6 +8,7 @@ import {
   agentDetailSchema,
   agentPageSchema,
   findingsSchema,
+  isCompletedRun,
   searchResponseSchema,
   methodologySchema,
   ratesSchema,
@@ -52,13 +53,13 @@ export async function resolveRun(preferRunId?: string, chain?: string): Promise<
   // adding a second chain would make the homepage's numbers change chain
   // underneath the reader with no visible cause.
   const pool = chain ? runs.filter((r) => r.chain === chain) : runs;
-  const completed = pool.find((r) => r.finished_at !== null);
+  const completed = pool.find(isCompletedRun);
   if (completed) return completed;
 
   // A chain that was asked for but has never finished a sweep falls back to
   // whatever HAS been swept, rather than erroring: an empty site is worse than
   // a different one, and every page names the chain it is showing.
-  const anyCompleted = runs.find((r) => r.finished_at !== null);
+  const anyCompleted = runs.find(isCompletedRun);
   if (!anyCompleted) {
     throw new Error("no completed run is available yet");
   }
@@ -90,7 +91,7 @@ export async function resolveRunForRequest(params: {
 export function chainsWithRuns(runs: Run[]): string[] {
   const seen: string[] = [];
   for (const r of runs) {
-    if (r.finished_at !== null && !seen.includes(r.chain)) seen.push(r.chain);
+    if (isCompletedRun(r) && !seen.includes(r.chain)) seen.push(r.chain);
   }
   return seen;
 }
