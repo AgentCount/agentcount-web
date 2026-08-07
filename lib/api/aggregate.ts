@@ -28,6 +28,7 @@
  * written to correct, and the reason its headline attestation rate is 12.2%
  * rather than the 33.7% a per-chain mean produces.
  */
+import { isCompletedRun } from "./schemas";
 import type { Finding, Findings, Run } from "./schemas";
 
 /**
@@ -36,6 +37,20 @@ import type { Finding, Findings, Run } from "./schemas";
  * In-flight sweeps (`finished_at: null`) are skipped for the same reason
  * `resolveRun` skips them: their counts move while the page is being read.
  *
+ * So are runs that ended badly. `finished_at` is stamped when a sweep *stops*,
+ * including when it dies, so it does not distinguish a complete run from a
+ * failed one — and this function picking the most recent by date meant a
+ * failed run outranked a good one. Base run `24d4d0e0` failed after two and a
+ * half minutes on 2026-08-05 having written nothing, and the directory
+ * consequently told readers there were **0 agents on Base** while a
+ * 60,589-agent run sat directly behind it.
+ *
+ * `status` is the field that settles it, and it did not exist here until the
+ * API began serving it on 2026-08-07 — which is why this could not simply have
+ * been written correctly the first time. Runs from an older API carry no
+ * status; those are kept, because dropping every run an older API describes
+ * would empty the site rather than correct it.
+ *
  * Ordered by population rather than by date so the reader meets the chains in
  * the order they weigh on every aggregate — the top row of the provenance
  * table is the chain doing most of the work in the headline number.
@@ -43,7 +58,7 @@ import type { Finding, Findings, Run } from "./schemas";
 export function latestRunPerChain(runs: Run[]): Run[] {
   const newest = new Map<string, Run>();
   for (const r of runs) {
-    if (r.finished_at === null) continue;
+    if (!isCompletedRun(r)) continue;
     const held = newest.get(r.chain);
     if (!held || r.started_at > held.started_at) newest.set(r.chain, r);
   }

@@ -31,6 +31,18 @@ export const runSchema = z.object({
   pinned_block: z.number().nullable(),
   started_at: z.string(),
   finished_at: z.string().nullable(),
+  /**
+   * `running`, `finished`, `failed` or `stalled`.
+   *
+   * A free string, like every other status here, so a state the sweeper adds
+   * later parses instead of throwing a ContractError.
+   *
+   * Optional because runs published before 2026-08-07 were served without it.
+   * `undefined` means "this API does not say", which is treated as usable —
+   * the alternative is a schema bump that empties the site against an older
+   * API. Once nothing serves the old shape this can become required.
+   */
+  status: z.string().optional(),
   agent_count: z.number().nullable(),
   schema_version: z.number(),
   checker_version: z.string(),
@@ -237,6 +249,31 @@ export const findingsSchema = z.object({
 });
 
 export type Run = z.infer<typeof runSchema>;
+
+/**
+ * Whether a run may be shown to a reader as a census.
+ *
+ * The one predicate, in one place, because it was previously written out at
+ * four call sites as `finished_at !== null` and every one of them was wrong in
+ * the same way. `finished_at` records when a sweep STOPPED, and a sweep that
+ * dies is stamped with the moment it died — so a failed run and a complete one
+ * are indistinguishable by that column alone.
+ *
+ * Base run `24d4d0e0` is the cost of the omission: it failed after two and a
+ * half minutes on 2026-08-05 having written zero agents, and being the most
+ * recent base run with a `finished_at`, it became the default everywhere. The
+ * directory reported **0 agents on Base** with a complete 60,589-agent run one
+ * row behind it.
+ *
+ * A run whose `status` is absent is accepted: that is an API older than
+ * 2026-08-07, which did not serve the column. Rejecting those would empty the
+ * site against an older API rather than correct it.
+ */
+export function isCompletedRun(r: Run): boolean {
+  if (r.finished_at === null) return false;
+  return r.status === undefined || r.status === "finished";
+}
+
 export type RateCount = z.infer<typeof rateCountSchema>;
 export type RungRate = z.infer<typeof rungRateSchema>;
 export type Rates = z.infer<typeof ratesSchema>;

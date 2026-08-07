@@ -1,5 +1,6 @@
 import { RoleGlossary } from "@/components/RoleGlossary";
 import { getMethodology, getRates, listRuns, statusVocabulary } from "@/lib/api/endpoints";
+import { isCompletedRun } from "@/lib/api/schemas";
 import { BRAND } from "@/lib/brand";
 import { formatChainList } from "@/lib/chains";
 import { getPublishedRuns, sweptChains } from "@/lib/published-runs";
@@ -43,7 +44,7 @@ export default async function MethodologyPage() {
    * would break every `StatusWord` link pointing at it.
    */
   const vocabulary = await listRuns()
-    .then((runs) => runs.find((r) => r.finished_at !== null))
+    .then((runs) => runs.find(isCompletedRun))
     .then((run) => (run ? getRates(run.run_id) : null))
     .then((rates) => (rates ? statusVocabulary(rates) : KNOWN_STATUSES))
     .catch(() => KNOWN_STATUSES);
