@@ -3,6 +3,7 @@ import agents from "./fixtures/agents.json";
 import agentDetail from "./fixtures/agent-detail.json";
 import agentDetailError from "./fixtures/agent-detail-error.json";
 import delta from "./fixtures/delta.json";
+import deltaMethodChanged from "./fixtures/delta-method-changed.json";
 import findings from "./fixtures/findings.json";
 import methodology from "./fixtures/methodology.json";
 import rates from "./fixtures/rates.json";
@@ -21,8 +22,13 @@ import {
 } from "@/lib/api/schemas";
 
 /**
- * These fixtures are CAPTURED FROM A LIVE API, not hand-written — every one but
- * `runs.json` is the literal body of a real request against run cfbfcc01.
+ * These fixtures are CAPTURED FROM A LIVE API, not hand-written — apart from
+ * the exceptions named below, each is the literal body of a real request
+ * against run cfbfcc01 (`delta.json` against run 56129cc8, the first run the
+ * endpoint existed for). The exceptions — `runs.json`,
+ * `delta-method-changed.json`, `spot-check.json` — are hand-written because
+ * they carry shapes the live API has no example of, and each says so where it
+ * is used.
  *
  * That distinction is the point of this file. The previous fixtures were
  * hand-maintained, and when rung 4 was split by RFC 2119 severity the API
@@ -202,31 +208,50 @@ describe("schemas accept what the API actually returns", () => {
 });
 
 /**
- * `delta.json` is HAND-WRITTEN, transcribed field by field from
- * `crates/api/src/routes/deltas.rs`'s `DeltaResponse` (agentcount#57) — the
- * endpoint is not deployed yet, so there is no live body to capture. Replace
- * it with a captured one the day the API ships, per this file's header. Its
- * values are the 2026-08 BSC shape from the methodology changelog: the pair
- * the `refused` rule was written for.
+ * `delta.json` is CAPTURED — the literal body of
+ * `GET /api/runs/56129cc8…/delta` (BSC, the 2026-08 census run) against the
+ * live API on 2026-08-14, the day the endpoint deployed. Refresh it per this
+ * file's header.
+ *
+ * `delta-method-changed.json` stays HAND-WRITTEN, for the same reason
+ * `runs.json` does: it carries a shape the live API has no example of. Every
+ * stored pair to date was computed by the same checker (0.7.0 → 0.7.0,
+ * schema 8 → 8), so no live body has `method_changed: true` — yet the ledger's
+ * method-changed marker must render when one does. Its values are the 2026-08
+ * BSC shape from the methodology changelog, transcribed from
+ * `crates/api/src/routes/deltas.rs`'s `DeltaResponse` (agentcount#57).
+ * Replace it with a captured body after the first sweep that spans a checker
+ * or schema change.
  */
 describe("a delta carries its own caveats", () => {
-  it("parses, and the confound fields cannot be absent", () => {
+  it("parses a captured body, and the confound fields cannot be absent", () => {
     const d = deltaSchema.parse(delta);
-    expect(d.method_changed).toBe(true);
-    expect(d.checker_before).not.toBe(d.checker_after);
+    // A same-method pair says so explicitly rather than omitting the fields.
+    expect(d.method_changed).toBe(false);
+    expect(d.checker_before).toBe(d.checker_after);
   });
 
   it("the declined volume the headline series exclude stays visible", () => {
     const d = deltaSchema.parse(delta);
-    // The famous shape: 10 real losses, 19,962 declined — the number that
-    // was briefly published as 19,983 agents going dark.
-    expect(d.stopped_resolving).toBe(10);
-    expect(d.rung2_declined).toBe(19962);
+    // The captured BSC pair: 12 real losses, 57,745 declined-either-way —
+    // the same order-of-magnitude gap the 2026-08-06 rule exists for.
+    expect(d.stopped_resolving).toBe(12);
+    expect(d.rung2_declined).toBe(57745);
     // The excluded transitions remain in flips, per METHODOLOGY §9.
     const refused = d.flips.filter(
       (f) => f.rung === 2 && (f.from === "refused" || f.to === "refused"),
     );
     expect(refused.length).toBeGreaterThan(0);
+  });
+
+  it("a pair that spans a method change says so", () => {
+    const d = deltaSchema.parse(deltaMethodChanged);
+    // The famous shape: 10 real losses, 19,962 declined — the number that
+    // was briefly published as 19,983 agents going dark.
+    expect(d.method_changed).toBe(true);
+    expect(d.checker_before).not.toBe(d.checker_after);
+    expect(d.stopped_resolving).toBe(10);
+    expect(d.rung2_declined).toBe(19962);
   });
 });
 

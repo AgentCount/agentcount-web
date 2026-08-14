@@ -67,7 +67,12 @@ function startStubApi(): Promise<Server> {
     if (path === "/api/methodology") return send(fixture("methodology"));
     if (/^\/api\/runs\/[^/]+\/rates$/.test(path)) return send(fixture("rates"));
     if (/^\/api\/runs\/[^/]+\/findings$/.test(path)) return send(fixture("findings"));
-    if (/^\/api\/runs\/[^/]+\/delta$/.test(path)) return send(fixture("delta"));
+    // The method-changed variant, not the captured `delta.json`: the smoke
+    // run asserts the "method changed" marker renders, and no live pair spans
+    // a method change yet — same reason the stub's `runs.json` carries an
+    // in-flight run the live API has no example of.
+    if (/^\/api\/runs\/[^/]+\/delta$/.test(path))
+      return send(fixture("delta-method-changed"));
     if (path === "/api/agents") return send(fixture("agents"));
     // Cross-run search. The fixture carries three groups — one with more
     // matches than it returns rows for, and one with none — so the page's
