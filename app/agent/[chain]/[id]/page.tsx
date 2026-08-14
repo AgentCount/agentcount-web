@@ -1,5 +1,4 @@
 import type { Metadata } from "next";
-import Link from "next/link";
 import { notFound } from "next/navigation";
 import { RungLadder } from "@/components/RungLadder";
 import { RungStrip } from "@/components/RungStrip";
@@ -8,6 +7,7 @@ import { Section } from "@/components/Section";
 import { OutboundLink } from "@/components/OutboundLink";
 import { UncheckedAgent } from "@/components/UncheckedAgent";
 import { StatusLegend } from "@/components/StatusLegend";
+import { TextLink } from "@/components/TextLink";
 import {
   getAgent,
   getRates,
@@ -399,12 +399,12 @@ export default async function AgentDetail({
           >
             <RunProvenance run={run} />
             <p className="mt-6">
-              <Link
+              <TextLink
                 href="/methodology"
-                className="font-mono text-xs uppercase tracking-[0.1em] text-muted underline decoration-line underline-offset-4 transition-colors hover:text-text hover:decoration-edge"
+                className="font-mono text-xs uppercase tracking-[0.1em]"
               >
                 What each check measures →
-              </Link>
+              </TextLink>
             </p>
           </Section>
         </div>

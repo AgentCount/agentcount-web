@@ -1,6 +1,6 @@
 "use client";
 
-import Link from "next/link";
+import { TextLink } from "@/components/TextLink";
 import { BRAND } from "@/lib/brand";
 
 /**
@@ -44,12 +44,12 @@ export default function Error({
         >
           Try again
         </button>
-        <Link
+        <TextLink
           href="/"
-          className="self-center font-mono text-xs uppercase tracking-[0.1em] text-muted underline decoration-line underline-offset-4 transition-colors hover:text-text"
+          className="self-center font-mono text-xs uppercase tracking-[0.1em]"
         >
           ← Back to the census
-        </Link>
+        </TextLink>
       </p>
       {error.digest && (
         <p className="mt-5 font-mono text-xs text-dead">Reference: {error.digest}</p>

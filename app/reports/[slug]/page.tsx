@@ -1,8 +1,8 @@
 import type { Metadata } from "next";
-import Link from "next/link";
 import { notFound } from "next/navigation";
 import { OutboundLink } from "@/components/OutboundLink";
 import { ReportBody } from "@/components/ReportBody";
+import { TextLink } from "@/components/TextLink";
 import { CORE_REPO, findReport, markdownReports } from "@/lib/reports";
 import { readReportMarkdown, stripLeadingH1 } from "@/lib/reports-content";
 
@@ -100,24 +100,9 @@ export default async function ReportPage({ params }: { params: Promise<Params> }
           repository.
         </p>
         <p className="mt-5 flex flex-wrap gap-x-8 gap-y-2 font-mono text-xs uppercase tracking-[0.1em]">
-          <Link
-            href="/methodology"
-            className="text-muted underline decoration-line underline-offset-4 transition-colors hover:text-text hover:decoration-edge"
-          >
-            How each rung is measured →
-          </Link>
-          <Link
-            href="/methodology#independence"
-            className="text-muted underline decoration-line underline-offset-4 transition-colors hover:text-text hover:decoration-edge"
-          >
-            Who pays for this →
-          </Link>
-          <Link
-            href="/reports"
-            className="text-muted underline decoration-line underline-offset-4 transition-colors hover:text-text hover:decoration-edge"
-          >
-            All reports →
-          </Link>
+          <TextLink href="/methodology">How each rung is measured →</TextLink>
+          <TextLink href="/methodology#independence">Who pays for this →</TextLink>
+          <TextLink href="/reports">All reports →</TextLink>
         </p>
       </footer>
     </article>

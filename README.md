@@ -50,7 +50,8 @@ pnpm dev                # http://localhost:3000
 
 | Route | What |
 |------|------|
-| `/` | The homepage: this run's findings, the per-check base rates, and the run's provenance. Every figure comes from the API already computed. |
+| `/` | The product overview: what AgentCount is, the instruments it runs (one today: the registration census), the census's four headline findings, and the runs' provenance. With `?chain=` or `?run=` it renders the full census view in place — those are legacy deep links from when the census was the homepage, and they cannot redirect (see `next.config.ts` on the cached-308 loop). |
+| `/census` | Instrument 01 in full: this run's findings, the per-check base rates, the sample table, and the run's provenance. Every figure comes from the API already computed. The view itself is `app/census/CensusView.tsx`, shared with the legacy branch of `/`. |
 | `/search` | One query across every published chain, grouped by chain. Falls back to per-chain links when the API predates `/api/search`. |
 | `/directory` | Every agent on one chain, filterable on any combination of check statuses. Filters live in the URL, so a filtered view is linkable. |
 | `/agent/[chain]/[id]` | The permalink: every check with its status and its evidence in full, plus the on-chain snapshot and the run's provenance. Rendered on demand with ISR, with a per-agent OG image. Carries the spot-check button — a POST, fired only by a press, whose answer is drawn as a bordered panel that cannot be mistaken for the census record above it. Degrades to "not available here" against an API without the endpoint. |
@@ -61,13 +62,14 @@ pnpm dev                # http://localhost:3000
 | `/data` | Every canonical run as a downloadable archive with its sha256. Static, so it works when the API is down. |
 | `/coverage` | Every chain the registry is deployed on, counted the same way the census counts, and which of them are swept. The swept share is computed from the committed probe output, never typed. |
 | `/preflight` | Paste a registration file and see what the checker says before it is minted. Nothing is stored. |
-| `/neutrality` | Who pays for this, and what payment cannot buy. |
 | `/subscribed` | Where the subscribe form lands. Not indexed. |
 | `/healthz` | Health JSON that distinguishes "this site is broken" from "its backend is broken". |
 | `/api/subscribe` | The subscribe form's POST target. It forwards to the census API server-side, so the API's address never reaches the browser. |
 
-Retired paths — `/census`, `/stats`, `/working`, `/linkage` — redirect
-permanently; the full list lives in `next.config.ts`.
+Retired paths — `/stats`, `/working`, `/linkage`, `/neutrality` — redirect
+permanently; the full list lives in `next.config.ts`. (`/census` was briefly
+one of them and is a real page again — its old permanent redirect is the
+reason `/` must never redirect back to it.)
 
 ## Accessibility
 

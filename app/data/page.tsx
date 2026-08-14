@@ -1,6 +1,6 @@
-import Link from "next/link";
 import { OutboundLink } from "@/components/OutboundLink";
 import { Section } from "@/components/Section";
+import { TextLink } from "@/components/TextLink";
 import { CORE_REPO } from "@/lib/reports";
 import {
   getPublishedRuns,
@@ -268,18 +268,8 @@ tar --zstd -xf $run.tar.zst`}
           re-deriving a published headline from a download.
         </p>
         <p className="mt-6 flex flex-wrap gap-x-8 gap-y-2 font-mono text-xs uppercase tracking-[0.1em]">
-          <Link
-            href="/reports"
-            className="text-muted underline decoration-line underline-offset-4 transition-colors hover:text-text hover:decoration-edge"
-          >
-            The reports →
-          </Link>
-          <Link
-            href="/methodology"
-            className="text-muted underline decoration-line underline-offset-4 transition-colors hover:text-text hover:decoration-edge"
-          >
-            What each check measures →
-          </Link>
+          <TextLink href="/reports">The reports →</TextLink>
+          <TextLink href="/methodology">What each check measures →</TextLink>
         </p>
       </Section>
     </>

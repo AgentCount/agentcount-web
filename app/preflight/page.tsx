@@ -1,4 +1,4 @@
-import Link from "next/link";
+import { TextLink } from "@/components/TextLink";
 import { getMethodology, getRates, resolveRun, statusVocabulary } from "@/lib/api/endpoints";
 import { PreflightForm } from "./PreflightForm";
 
@@ -71,12 +71,9 @@ export default async function PreflightPage() {
         <p className="mt-3 text-sm leading-relaxed text-muted">
           Passing here is not a guarantee about your agent — it is a statement
           about your document, at this spec pin, today.{" "}
-          <Link
-            href="/methodology"
-            className="underline decoration-line underline-offset-4 transition-colors hover:text-text"
-          >
+          <TextLink href="/methodology" tone="inherit">
             What each check measures →
-          </Link>
+          </TextLink>
         </p>
       </section>
     </>

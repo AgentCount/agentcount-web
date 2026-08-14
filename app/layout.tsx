@@ -4,6 +4,7 @@ import Link from "next/link";
 import { NavSearch } from "@/components/NavSearch";
 import { OutboundLink } from "@/components/OutboundLink";
 import { TallyMark } from "@/components/TallyMark";
+import { TextLink } from "@/components/TextLink";
 import { BRAND, NEWCOMER_SENTENCE } from "@/lib/brand";
 import "./globals.css";
 
@@ -82,29 +83,34 @@ export const metadata: Metadata = {
 };
 
 /**
- * Four items: three places and one tool.
+ * Four places, ordered from the instrument outward.
+ *
+ * "Findings" leads because it is the product's one live instrument — the
+ * homepage is the overview OF it, so the wordmark and the first nav item are
+ * different doors. A future instrument earns a nav item the day it ships,
+ * and the label will be the instrument's name, not "new".
  *
  * "Agents" is the list of agents. It was called "Directory", which names the
  * shape of the page rather than what is in it. The URL stays `/directory`:
  * labels are for readers, URLs are identifiers other people have linked to.
  *
- * Coverage is here rather than buried because it answers the question the
- * headline provokes — every AI agent on WHICH chains — and it is the page
- * that keeps the scope claim honest.
+ * "Data" is the archives — promoted from the footer because downloading a
+ * run is the product's whole reproducibility claim made concrete, not a
+ * reference detail.
  *
- * "Check a file" is an action among places, and it is set exactly like the
- * places on purpose. It spent a while as a bordered button floating at the
- * far right of the masthead, where it read as an advertisement rather than a
- * door and had to be guessed at from three words.
- *
- * Method is not here. It is what you read while checking a number, not what
- * you arrive for, so it sits in the footer with the archives.
+ * Coverage, the pre-flight checker and Method live in the footer: they are
+ * what you consult while checking a claim, not what you arrive for. The
+ * census hero still links /coverage where the scope claim is made.
  */
 const NAV = [
+  // Labelled "Findings", not "Census": the label must work for a reader —
+  // including one whose first language is not English — before they know any
+  // of this product's vocabulary. The URL stays `/census` because URLs are
+  // identifiers other people have linked to.
+  { href: "/census", label: "Findings" },
   { href: "/directory", label: "Agents" },
   { href: "/reports", label: "Reports" },
-  { href: "/coverage", label: "Coverage" },
-  { href: "/preflight", label: "Check a file" },
+  { href: "/data", label: "Data" },
 ];
 
 /**
@@ -113,7 +119,8 @@ const NAV = [
  */
 const TOOLS = [
   { href: "/methodology", label: "Method" },
-  { href: "/data", label: "Archives" },
+  { href: "/coverage", label: "Coverage" },
+  { href: "/preflight", label: "Check a file" },
 ];
 
 
@@ -296,40 +303,28 @@ export default function RootLayout({
                   goes looking — and it is written to be the one sentence
                   that makes the rest legible, not a summary of it. */}
               <p className="text-sm text-text">{NEWCOMER_SENTENCE}</p>
-              {/* The "not a rating agency" paragraph that sat here was the
-                  footer saying the newcomer sentence a second time in
-                  different words; the independence commitments live on the method
-                  reader wondering about it actually goes. */}
               {/* The canonical domain, set as text rather than as a link: a
                   reader on the canonical domain gains nothing from a link to
-                  where they already are.
-
-                  It earns its place because this page is not only served from
-                  there. It is also reachable on the Netlify deploy URL, and —
-                  being a public register whose whole promise is that claims can
-                  be re-checked — it is the kind of page that gets mirrored,
-                  archived and scraped. A reader holding a copy should be able
-                  to tell where the authoritative one lives. Mono, because it is
-                  an identifier rather than prose. */}
-              {/* The technical self-description, displaced from the masthead
-                  by `BRAND.greeting`. It sits with the domain because both
-                  are identifiers rather than prose: what this is, and where
-                  the authoritative copy lives. */}
-              {/* The domain alone. "ERC-8004 conformance census · " used to
-                  precede it and restated, in fewer words, the sentence
-                  directly above — the footer describing itself twice. */}
+                  where they already are. It earns its place because this page
+                  is also reachable on the deploy URL, and — being a public
+                  register whose whole promise is that claims can be
+                  re-checked — it gets mirrored, archived and scraped. A
+                  reader holding a copy should be able to tell where the
+                  authoritative one lives. Mono, because it is an identifier
+                  rather than prose. The self-description would restate the
+                  sentence directly above it, so the domain stands alone. */}
               <p className="mt-3 font-mono text-xs text-muted">{BRAND.domain}</p>
             </div>
             <div className="flex flex-col items-start gap-2">
               <span className="label">Reference</span>
               {TOOLS.map((item) => (
-                <Link
+                <TextLink
                   key={item.href}
                   href={item.href}
-                  className="text-sm text-muted underline decoration-line underline-offset-4 transition-colors hover:text-text hover:decoration-edge"
+                  className="text-sm"
                 >
                   {item.label}
-                </Link>
+                </TextLink>
               ))}
             </div>
 
@@ -358,12 +353,12 @@ export default function RootLayout({
 
             <div className="flex flex-col gap-2">
               <span className="label">Contact</span>
-              <a
+              <TextLink
                 href={`mailto:${BRAND.contactEmail}`}
-                className="font-mono text-sm text-muted underline decoration-line underline-offset-4 transition-colors hover:text-text hover:decoration-edge"
+                className="font-mono text-sm"
               >
                 {BRAND.contactEmail}
-              </a>
+              </TextLink>
             </div>
           </div>
         </footer>

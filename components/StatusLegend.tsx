@@ -1,4 +1,4 @@
-import Link from "next/link";
+import { TextLink } from "./TextLink";
 import {
   NOT_CHECKED_GLYPH,
   NOT_CHECKED_LABEL,
@@ -77,12 +77,9 @@ export function StatusLegend({ statuses }: { statuses: string[] }) {
           word="not checked"
           meaning={meaningOf(NOT_CHECKED_LABEL, "not checked")}
         />
-        <Link
-          href="/methodology"
-          className="text-[0.6875rem] text-muted underline decoration-line underline-offset-4 transition-colors hover:text-text"
-        >
+        <TextLink href="/methodology" className="text-[0.6875rem]">
           Full definitions
-        </Link>
+        </TextLink>
       </div>
     </section>
   );

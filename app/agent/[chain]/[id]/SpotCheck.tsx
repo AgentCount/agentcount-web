@@ -140,7 +140,7 @@ function SpotCheckPanel({ result }: { result: SpotCheckResult }) {
           <span className="font-mono text-xs font-semibold uppercase tracking-[0.24em] text-text">
             Spot check
           </span>
-          <span className="font-mono text-[0.6875rem] uppercase tracking-[0.14em] text-dead">
+          <span className="label">
             no run · not stored · not a census measurement
           </span>
         </div>
@@ -199,7 +199,7 @@ function SpotCheckPanel({ result }: { result: SpotCheckResult }) {
             >
               <div className="min-w-0">
                 <h4 className="flex flex-wrap items-baseline gap-x-3 gap-y-1">
-                  <span className="font-mono text-[0.6875rem] uppercase tracking-[0.14em] text-dead">
+                  <span className="label">
                     check {c.rung}
                   </span>
                   <span className="font-sans text-sm font-semibold text-text">
@@ -256,7 +256,7 @@ function SpotCheckPanel({ result }: { result: SpotCheckResult }) {
                       <span aria-hidden="true">{NOT_CHECKED_GLYPH}</span>
                       not checked
                     </span>
-                    <span className="font-mono text-[0.6875rem] uppercase tracking-[0.14em] text-dead">
+                    <span className="label">
                       check {n.rung} · {n.name}
                     </span>
                     <span className="font-sans text-sm text-text">
@@ -412,7 +412,7 @@ function Refusal({
         <span className="font-mono text-xs font-semibold uppercase tracking-[0.24em] text-text">
           Spot check
         </span>
-        <span className="font-mono text-[0.6875rem] uppercase tracking-[0.14em] text-dead">
+        <span className="label">
           {heading}
         </span>
       </header>
