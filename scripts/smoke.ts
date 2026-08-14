@@ -67,6 +67,7 @@ function startStubApi(): Promise<Server> {
     if (path === "/api/methodology") return send(fixture("methodology"));
     if (/^\/api\/runs\/[^/]+\/rates$/.test(path)) return send(fixture("rates"));
     if (/^\/api\/runs\/[^/]+\/findings$/.test(path)) return send(fixture("findings"));
+    if (/^\/api\/runs\/[^/]+\/delta$/.test(path)) return send(fixture("delta"));
     if (path === "/api/agents") return send(fixture("agents"));
     // Cross-run search. The fixture carries three groups — one with more
     // matches than it returns rows for, and one with none — so the page's
@@ -246,6 +247,25 @@ async function checkLegacyRedirects() {
   check(
     legacyBody.includes("Every check, every status"),
     "/?chain=base renders the census view in place",
+  );
+
+  // The delta section, and the two caveats it may never drop: the declined
+  // footnote always renders, and the method-changed note renders whenever a
+  // row's pair spans a method change (the fixture's does).
+  const censusBody = await fetch(`${BASE}/census`, {
+    signal: AbortSignal.timeout(30_000),
+  }).then((r) => r.text());
+  check(
+    censusBody.includes("Changed since the last sweep"),
+    "/census renders the delta ledger",
+  );
+  check(
+    censusBody.includes("declined is not the agent having gone away"),
+    "  ...with the refused-exclusion footnote",
+  );
+  check(
+    censusBody.includes("method changed"),
+    "  ...and the method-changed marker for a pair that spans one",
   );
 }
 

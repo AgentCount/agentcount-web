@@ -7,6 +7,7 @@ import { CENSUS } from "../brand";
 import {
   agentDetailSchema,
   agentPageSchema,
+  deltaSchema,
   findingsSchema,
   isCompletedRun,
   searchResponseSchema,
@@ -17,6 +18,7 @@ import {
   validateResponseSchema,
   type AgentDetail,
   type AgentPage,
+  type Delta,
   type Findings,
   type SearchGroup,
   type Methodology,
@@ -206,6 +208,19 @@ export async function searchAgents(
 
 export async function getRates(runId: string): Promise<Rates> {
   return (await get(`/api/runs/${encodeURIComponent(runId)}/rates`, ratesSchema)) as Rates;
+}
+
+/**
+ * The stored comparison between `runId` and the previous finished run on its
+ * chain. `null` when there is none — a chain's first sweep has no delta by
+ * design ("first observation" and "nothing changed" are different claims),
+ * and this app renders that absence as absence, never as zeros.
+ */
+export async function getDelta(runId: string): Promise<Delta | null> {
+  return get(`/api/runs/${encodeURIComponent(runId)}/delta`, deltaSchema, {
+    revalidate: 300,
+    allow404: true,
+  }) as Promise<Delta | null>;
 }
 
 /** The numbers the homepage leads with, as numerator/denominator/percent. */

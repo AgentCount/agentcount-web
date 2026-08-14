@@ -13,6 +13,7 @@
 import { isTailAgent } from "@/lib/api/schemas";
 import {
   getAgent,
+  getDelta,
   getFindings,
   getMethodology,
   getRates,
@@ -140,6 +141,18 @@ async function main() {
     `✓ /api/runs/${completed.run_id}/findings — ${f.findings
       .map((x) => `${x.key} ${x.percent === null ? "—" : `${x.percent.toFixed(1)}%`}`)
       .join(", ")}`,
+  );
+
+  // Absence is a valid answer here — a chain's first sweep has no delta, and
+  // an API predating the endpoint 404s the same way — so `null` passes; what
+  // is being validated is that a PRESENT body matches the schema.
+  const d = await getDelta(completed.run_id);
+  console.log(
+    d === null
+      ? `✓ /api/runs/${completed.run_id}/delta — absent (404), rendered as absence`
+      : `✓ /api/runs/${completed.run_id}/delta — vs ${d.previous_run_id.slice(0, 8)}: ` +
+          `${d.newly_registered} new, ${d.stopped_resolving} no longer reachable` +
+          `${d.method_changed ? " (method changed across the pair)" : ""}`,
   );
 
   const m = await getMethodology();
