@@ -1,4 +1,4 @@
-import Link from "next/link";
+import { TextLink } from "@/components/TextLink";
 
 // This sits at the app root, so it answers every unmatched route — not just
 // a missing agent. Agent-specific copy lives at
@@ -10,9 +10,9 @@ export default function NotFound() {
       <p className="mt-3 text-sm leading-relaxed text-muted">
         There is nothing at that address.
       </p>
-      <Link href="/" className="mt-5 inline-block font-mono text-xs uppercase tracking-[0.1em] text-muted underline decoration-line underline-offset-4 transition-colors hover:text-text">
+      <TextLink href="/" className="mt-5 inline-block font-mono text-xs uppercase tracking-[0.1em]">
         ← Back to the census
-      </Link>
+      </TextLink>
     </div>
   );
 }

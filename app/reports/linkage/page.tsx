@@ -1,6 +1,6 @@
-import Link from "next/link";
 import { OutboundLink } from "@/components/OutboundLink";
 import { Section } from "@/components/Section";
+import { TextLink } from "@/components/TextLink";
 import { LINKAGE } from "@/lib/linkage";
 
 export const metadata = {
@@ -201,24 +201,9 @@ export default function LinkagePage() {
           published here.
         </p>
         <p className="mt-6 flex flex-wrap gap-x-8 gap-y-2 font-mono text-xs uppercase tracking-[0.1em]">
-          <Link
-            href="/data"
-            className="text-muted underline decoration-line underline-offset-4 transition-colors hover:text-text hover:decoration-edge"
-          >
-            Every run, with its archive →
-          </Link>
-          <Link
-            href="/coverage"
-            className="text-muted underline decoration-line underline-offset-4 transition-colors hover:text-text hover:decoration-edge"
-          >
-            What the census covers →
-          </Link>
-          <Link
-            href="/methodology"
-            className="text-muted underline decoration-line underline-offset-4 transition-colors hover:text-text hover:decoration-edge"
-          >
-            What each check measures →
-          </Link>
+          <TextLink href="/data">Every run, with its archive →</TextLink>
+          <TextLink href="/coverage">What the census covers →</TextLink>
+          <TextLink href="/methodology">What each check measures →</TextLink>
         </p>
       </Section>
     </>

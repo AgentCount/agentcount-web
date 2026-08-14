@@ -1,7 +1,7 @@
-import Link from "next/link";
 import type { Run } from "@/lib/api/schemas";
 import { blockUrl } from "@/lib/links";
 import { OutboundLink } from "./OutboundLink";
+import { TextLink } from "./TextLink";
 
 /**
  * The sweeps behind an all-chains figure, one row each.
@@ -64,12 +64,9 @@ export function AllRunsProvenance({ runs }: { runs: Run[] }) {
                 <td className="border-b border-line py-2 pr-4 font-mono text-xs text-text">
                   {/* The chain name links to its own single-chain view — the
                     row is also the way into the number behind it. */}
-                  <Link
-                    href={`/?chain=${encodeURIComponent(run.chain)}`}
-                    className="underline decoration-line underline-offset-4 transition-colors hover:decoration-edge"
-                  >
+                  <TextLink href={`/?chain=${encodeURIComponent(run.chain)}`} tone="inherit">
                     {run.chain}
-                  </Link>
+                  </TextLink>
                 </td>
                 <td className="border-b border-line py-2 pr-4 text-right font-mono text-xs text-muted">
                   {run.agent_count !== null

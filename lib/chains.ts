@@ -18,6 +18,9 @@ const CHAIN_DISPLAY: Record<string, string> = {
   celo: "Celo",
   arbitrum: "Arbitrum",
   optimism: "Optimism",
+  // The census's slug for Optimism is `op` (chain id 10) — both spellings
+  // stay, because a slug is whatever the run actually says.
+  op: "OP Mainnet",
   polygon: "Polygon",
   avalanche: "Avalanche",
   gnosis: "Gnosis",
@@ -31,12 +34,31 @@ export function chainDisplayName(slug: string): string {
   return CHAIN_DISPLAY[slug] ?? slug;
 }
 
-/** "BNB Chain, Base, Ethereum mainnet and Celo" — in the order given. */
+/** "BNB Chain, Base, Ethereum mainnet, and Celo" — in the order given. */
 export function formatChainList(slugs: readonly string[]): string {
   return new Intl.ListFormat("en", {
     style: "long",
     type: "conjunction",
   }).format(slugs.map(chainDisplayName));
+}
+
+/**
+ * The chain list at headline length.
+ *
+ * Naming every chain kept the scope claim honest when there were four; at
+ * eleven the same sentence is a paragraph, and a scope line nobody can scan
+ * hides the scope instead of stating it. So: up to four chains are named in
+ * full, and beyond that the largest three stand for the list with the
+ * remainder counted — "BNB Chain, Base, Ethereum mainnet + 8 more". The
+ * order is the caller's, which everywhere in this app is population order,
+ * so "the largest three" is true by construction rather than ranked here.
+ * The count keeps the claim exact, and the line links to the page that
+ * names every chain in full.
+ */
+export function compressChainList(slugs: readonly string[]): string {
+  if (slugs.length <= 4) return formatChainList(slugs);
+  const named = slugs.slice(0, 3).map(chainDisplayName).join(", ");
+  return `${named} + ${slugs.length - 3} more`;
 }
 
 /**

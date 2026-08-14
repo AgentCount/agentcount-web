@@ -1,6 +1,6 @@
-import Link from "next/link";
 import { AgentTable } from "@/components/AgentTable";
 import { Section } from "@/components/Section";
+import { TextLink } from "@/components/TextLink";
 import { canonicalRuns } from "@/lib/api/aggregate";
 import { listRuns, searchAgents } from "@/lib/api/endpoints";
 import { chainDisplayName } from "@/lib/chains";
@@ -89,12 +89,12 @@ export default async function SearchPage({
           <p className="mt-3">
             {censusRuns.map((r, i, all) => (
               <span key={r.chain}>
-                <Link
+                <TextLink
                   href={`/directory?chain=${encodeURIComponent(r.chain)}&q=${encodeURIComponent(q)}`}
-                  className="text-text underline decoration-line underline-offset-4 transition-colors hover:decoration-edge"
+                  tone="bright"
                 >
                   {chainDisplayName(r.chain)}
-                </Link>
+                </TextLink>
                 {i < all.length - 1 ? ", " : ""}
               </span>
             ))}
@@ -113,12 +113,13 @@ export default async function SearchPage({
               ids are not searched, but the permalink works:{" "}
               {censusRuns.map((r, i, all) => (
                 <span key={r.chain}>
-                  <Link
+                  <TextLink
                     href={`/agent/${encodeURIComponent(r.chain)}/${encodeURIComponent(q)}`}
-                    className="font-mono text-text underline decoration-line underline-offset-4 transition-colors hover:decoration-edge"
+                    tone="bright"
+                    className="font-mono"
                   >
                     {r.chain}/{q}
-                  </Link>
+                  </TextLink>
                   {i < all.length - 1 ? ", " : ""}
                 </span>
               ))}
@@ -149,13 +150,13 @@ export default async function SearchPage({
                 <AgentTable agents={g.items} />
                 {g.total > g.items.length && (
                   <p className="mt-4">
-                    <Link
+                    <TextLink
                       href={`/directory?chain=${encodeURIComponent(g.chain)}&q=${encodeURIComponent(q)}`}
-                      className="font-mono text-xs uppercase tracking-[0.1em] text-muted underline decoration-line underline-offset-4 transition-colors hover:text-text"
+                      className="font-mono text-xs uppercase tracking-[0.1em]"
                     >
                       All {g.total.toLocaleString("en-US")} on{" "}
                       {chainDisplayName(g.chain)} →
-                    </Link>
+                    </TextLink>
                   </p>
                 )}
               </Section>

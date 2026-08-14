@@ -122,10 +122,15 @@ async function waitForServer(url: string, timeoutMs = 60_000): Promise<void> {
  */
 const ROUTES: { path: string; expect: number; card: boolean }[] = [
   { path: "/", expect: 200, card: true },
-  // The homepage has two modes and they take different code paths: the
-  // default aggregates one findings document per chain, `?chain=` reads a
-  // single run. The fixtures carry three chains so the first genuinely sums.
+  // A legacy census deep link: `?chain=` on the homepage renders the census
+  // in place (it cannot redirect — see next.config.ts on the cached-308
+  // loop), so this exercises that branch specifically.
   { path: "/?chain=base", expect: 200, card: true },
+  // The census's own address, in both modes: the default aggregates one
+  // findings document per chain, `?chain=` reads a single run. The fixtures
+  // carry three chains so the first genuinely sums.
+  { path: "/census", expect: 200, card: true },
+  { path: "/census?chain=base", expect: 200, card: true },
   { path: "/directory", expect: 200, card: true },
   { path: "/directory?q=trading&facet=1:pass", expect: 200, card: true },
   // Both shapes: the empty form, and a query that reaches the API stub.
@@ -170,8 +175,7 @@ function check(ok: boolean, message: string) {
  * point confidently at a dead page.
  */
 const REDIRECTS: { from: string; to: string }[] = [
-  { from: "/census", to: "/" },
-  { from: "/stats", to: "/" },
+  { from: "/stats", to: "/census" },
   { from: "/linkage", to: "/reports/linkage" },
   { from: "/neutrality", to: "/methodology#independence" },
   {
@@ -220,15 +224,28 @@ async function checkLegacyRedirects() {
     );
   }
 
-  // The query string must survive, or `/census?chain=bsc` silently loses the
+  // The query string must survive, or `/stats?chain=bsc` silently loses the
   // chain it was asking about.
-  const withQuery = await fetch(`${BASE}/census?chain=bsc`, {
+  const withQuery = await fetch(`${BASE}/stats?chain=bsc`, {
     redirect: "manual",
     signal: AbortSignal.timeout(30_000),
   });
   check(
     (withQuery.headers.get("location") ?? "").includes("chain=bsc"),
-    `/census?chain=bsc keeps its query (${withQuery.headers.get("location")})`,
+    `/stats?chain=bsc keeps its query (${withQuery.headers.get("location")})`,
+  );
+
+  // A legacy census deep link on `/` must render the census itself, not the
+  // overview — a 200 alone would pass if the branch silently fell through to
+  // the homepage. "Every check, every status" is the census's rate-bar
+  // section title and appears on no other page.
+  const legacy = await fetch(`${BASE}/?chain=base`, {
+    signal: AbortSignal.timeout(30_000),
+  });
+  const legacyBody = await legacy.text();
+  check(
+    legacyBody.includes("Every check, every status"),
+    "/?chain=base renders the census view in place",
   );
 }
 

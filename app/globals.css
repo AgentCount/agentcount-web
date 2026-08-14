@@ -60,7 +60,11 @@
      dark-mode dashboard. */
   --color-text: #e8e4dc;
   --color-muted: #99a0a9;
-  --color-dead: #5f666f;
+  /* `dead` is the bottom of the text hierarchy, but it is still text: the
+     11px `label` utility and every denominator line are set in it, so it must
+     clear WCAG AA (4.5:1) against --color-bg. #767e88 measures ~4.9:1;
+     test/tokens.test.ts fails the build if this ever regresses. */
+  --color-dead: #767e88;
 
   /* Interactive. Deliberately NOT a hue — see the rule at the top. */
   --color-accent: #fffdf6;
@@ -72,7 +76,7 @@
   --color-live: #3ddc84; /* pass */
   --color-fail: #ff5f56; /* fail */
   --color-warn: #f2b035; /* error */
-  --color-dim: #646c78; /* skipped */
+  --color-dim: #747d8a; /* skipped — the dimmest status, but still AA as text */
   --color-claim: #8b9ac4; /* unclaimed — cool, readable, and neither */
 
   --font-sans: var(--font-plex-sans), ui-sans-serif, system-ui, sans-serif;

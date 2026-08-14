@@ -1,8 +1,8 @@
-import Link from "next/link";
 import type { Run } from "@/lib/api/schemas";
 import { blockUrl } from "@/lib/links";
 import { archiveSize, archiveUrl, checksumUrl, publishedRun } from "@/lib/published-runs";
 import { OutboundLink } from "./OutboundLink";
+import { TextLink } from "./TextLink";
 
 /**
  * Everything needed to reproduce a run, as a two-column register.
@@ -81,12 +81,9 @@ export function RunProvenance({ run }: { run: Run }) {
             <span className="text-line">|</span>
             <OutboundLink href={checksumUrl(archive)}>sha256</OutboundLink>
             <span className="text-line">|</span>
-            <Link
-              href="/data"
-              className="underline decoration-line underline-offset-4 transition-colors hover:text-muted"
-            >
+            <TextLink href="/data" tone="quiet">
               all runs
-            </Link>
+            </TextLink>
           </p>
         </div>
       )}

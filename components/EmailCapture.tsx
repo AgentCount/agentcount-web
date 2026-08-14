@@ -1,4 +1,5 @@
 import { BRAND } from "@/lib/brand";
+import { TextLink } from "./TextLink";
 
 /**
  * "Get each census report by email."
@@ -118,12 +119,9 @@ export function EmailCapture({
         census reports. Nothing is sent yet — there is no sending side built,
         so there is no confirmation email to expect, and you will be asked to
         confirm before the first report goes anywhere. Email{" "}
-        <a
-          href={`mailto:${BRAND.contactEmail}`}
-          className="underline decoration-line underline-offset-4 transition-colors hover:text-muted"
-        >
+        <TextLink href={`mailto:${BRAND.contactEmail}`} tone="quiet">
           {BRAND.contactEmail}
-        </a>{" "}
+        </TextLink>{" "}
         at any point and it is deleted.
       </p>
     </section>

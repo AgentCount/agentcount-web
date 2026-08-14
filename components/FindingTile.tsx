@@ -28,6 +28,40 @@ import { humaniseRungs } from "@/lib/checks";
  * documents landed in one state, out of how many were asked. None is an
  * aggregate across rungs, and none says anything about any individual agent.
  */
+
+/**
+ * The frame the three tile kinds share: hairline top rule, the small ordinal
+ * riding it, the context sentence, and the mono source line pinned to the
+ * bottom. What sits in the numeral slot is the only thing that differs, so
+ * it is the only thing the callers provide.
+ */
+function TileFrame({
+  index,
+  numeral,
+  footer,
+  children,
+}: {
+  index: number;
+  numeral: React.ReactNode;
+  footer: React.ReactNode;
+  children: React.ReactNode;
+}) {
+  return (
+    <div className="group relative flex h-full flex-col border-t border-edge pt-5">
+      <span className="label absolute -top-px right-0 hidden translate-y-[-50%] bg-bg pl-2 xl:block">
+        {String(index).padStart(2, "0")}
+      </span>
+      {numeral}
+      <p className="mt-4 max-w-[34ch] flex-1 text-[0.9375rem] leading-relaxed text-muted">
+        {children}
+      </p>
+      <p className="mt-4 border-t border-line pt-2 font-mono text-[0.6875rem] leading-relaxed text-dead">
+        {footer}
+      </p>
+    </div>
+  );
+}
+
 export function FindingTile({
   index,
   finding,
@@ -42,22 +76,24 @@ export function FindingTile({
   children: React.ReactNode;
 }) {
   return (
-    <div className="group relative flex h-full flex-col border-t border-edge pt-5">
-      <span className="label absolute -top-px right-0 hidden translate-y-[-50%] bg-bg pl-2 xl:block">
-        {String(index).padStart(2, "0")}
-      </span>
-      <div className="numeral text-[clamp(3.5rem,6vw,5.25rem)] text-text">
-        {finding.percent === null ? "—" : finding.percent.toFixed(1)}
-        <span className="ml-0.5 text-[0.45em] font-medium text-muted">%</span>
-      </div>
-      <p className="mt-4 max-w-[34ch] flex-1 text-[0.9375rem] leading-relaxed text-muted">
-        {children}
-      </p>
-      <p className="mt-4 border-t border-line pt-2 font-mono text-[0.6875rem] leading-relaxed text-dead">
-        {finding.numerator.toLocaleString("en-US")} / {finding.denominator.toLocaleString("en-US")}{" "}
-        {humaniseRungs(finding.denominator_label)}
-      </p>
-    </div>
+    <TileFrame
+      index={index}
+      numeral={
+        <div className="numeral text-[clamp(3.5rem,6vw,5.25rem)] text-text">
+          {finding.percent === null ? "—" : finding.percent.toFixed(1)}
+          <span className="ml-0.5 text-[0.45em] font-medium text-muted">%</span>
+        </div>
+      }
+      footer={
+        <>
+          {finding.numerator.toLocaleString("en-US")} /{" "}
+          {finding.denominator.toLocaleString("en-US")}{" "}
+          {humaniseRungs(finding.denominator_label)}
+        </>
+      }
+    >
+      {children}
+    </TileFrame>
   );
 }
 
@@ -87,20 +123,17 @@ export function NoteTile({
   children: React.ReactNode;
 }) {
   return (
-    <div className="group relative flex h-full flex-col border-t border-edge pt-5">
-      <span className="label absolute -top-px right-0 hidden translate-y-[-50%] bg-bg pl-2 xl:block">
-        {String(index).padStart(2, "0")}
-      </span>
-      <div className="numeral text-[clamp(1.5rem,2.4vw,2rem)] leading-tight text-muted">
-        {lead}
-      </div>
-      <p className="mt-4 max-w-[34ch] flex-1 text-[0.9375rem] leading-relaxed text-muted">
-        {children}
-      </p>
-      <p className="mt-4 border-t border-line pt-2 font-mono text-[0.6875rem] leading-relaxed text-dead">
-        {source}
-      </p>
-    </div>
+    <TileFrame
+      index={index}
+      numeral={
+        <div className="numeral text-[clamp(1.5rem,2.4vw,2rem)] leading-tight text-muted">
+          {lead}
+        </div>
+      }
+      footer={source}
+    >
+      {children}
+    </TileFrame>
   );
 }
 
@@ -125,19 +158,16 @@ export function CountTile({
   children: React.ReactNode;
 }) {
   return (
-    <div className="group relative flex h-full flex-col border-t border-edge pt-5">
-      <span className="label absolute -top-px right-0 hidden translate-y-[-50%] bg-bg pl-2 xl:block">
-        {String(index).padStart(2, "0")}
-      </span>
-      <div className="numeral text-[clamp(3.5rem,6vw,5.25rem)] text-text">
-        {value.toLocaleString("en-US")}
-      </div>
-      <p className="mt-4 max-w-[34ch] flex-1 text-[0.9375rem] leading-relaxed text-muted">
-        {children}
-      </p>
-      <p className="mt-4 border-t border-line pt-2 font-mono text-[0.6875rem] leading-relaxed text-dead">
-        {source}
-      </p>
-    </div>
+    <TileFrame
+      index={index}
+      numeral={
+        <div className="numeral text-[clamp(3.5rem,6vw,5.25rem)] text-text">
+          {value.toLocaleString("en-US")}
+        </div>
+      }
+      footer={source}
+    >
+      {children}
+    </TileFrame>
   );
 }

@@ -54,7 +54,15 @@ export const OG_CONTENT_TYPE = "image/png";
  * poster length, and it is also what the exported banner in `public/brand/`
  * says, so a shared card and a profile header cannot disagree.
  */
-export const OG_TAGLINE = "The independent ERC-8004 census — evidence attached";
+export const OG_TAGLINE = "Independent measurement of the agent economy";
+
+/**
+ * The masthead's answer to "of what?", set beside the wordmark. Budget:
+ * ≤ ~27 characters at 21px mono, or it collides with the strip on the
+ * fixed-page cards. `BRAND.selfDescription` is 45 characters — do not
+ * substitute it here.
+ */
+const MASTHEAD_DESCRIPTOR = "INDEPENDENT AUDIT LAYER";
 
 /** Copied from `app/globals.css`'s `@theme` block. See the module doc. */
 export const COLOR = {
@@ -64,11 +72,11 @@ export const COLOR = {
   edge: "#2b323b",
   text: "#e8e4dc",
   muted: "#99a0a9",
-  dead: "#5f666f",
+  dead: "#767e88",
   live: "#3ddc84",
   fail: "#ff5f56",
   warn: "#f2b035",
-  dim: "#646c78",
+  dim: "#747d8a",
   claim: "#8b9ac4",
 } as const;
 
@@ -171,7 +179,7 @@ export function Masthead() {
           {BRAND.name.toUpperCase()}
         </div>
         <div style={{ fontSize: 21, letterSpacing: 2, color: COLOR.dead }}>
-          ERC-8004 CONFORMANCE CENSUS
+          {MASTHEAD_DESCRIPTOR}
         </div>
       </div>
     </div>

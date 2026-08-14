@@ -1,10 +1,10 @@
-import Link from "next/link";
 import { AgentTable } from "@/components/AgentTable";
 import { ChainSwitcher } from "@/components/ChainSwitcher";
 import { chainDisplayName } from "@/lib/chains";
 import { DirectoryControls } from "@/components/DirectoryControls";
 import { Pagination } from "@/components/Pagination";
 import { StatusLegend } from "@/components/StatusLegend";
+import { TextLink } from "@/components/TextLink";
 import {
   chainsWithRuns,
   getRates,
@@ -117,12 +117,9 @@ export async function AgentDirectory({
             </span>
           </span>
           <span className="text-line">|</span>
-          <Link
-            href={`/?chain=${encodeURIComponent(run.chain)}`}
-            className="underline decoration-line underline-offset-4 transition-colors hover:text-text"
-          >
+          <TextLink href={`/?chain=${encodeURIComponent(run.chain)}`} tone="inherit">
             provenance
-          </Link>
+          </TextLink>
         </p>
       </header>
 
@@ -169,12 +166,12 @@ export async function AgentDirectory({
                 .filter((c) => c !== run.chain)
                 .map((chain, i, all) => (
                   <span key={chain}>
-                    <Link
+                    <TextLink
                       href={`/directory?chain=${encodeURIComponent(chain)}&q=${encodeURIComponent(q)}`}
-                      className="text-text underline decoration-line underline-offset-4 transition-colors hover:decoration-edge"
+                      tone="bright"
                     >
                       {chainDisplayName(chain)}
-                    </Link>
+                    </TextLink>
                     {i < all.length - 1 ? ", " : ""}
                   </span>
                 ))}
@@ -214,12 +211,13 @@ export async function AgentDirectory({
               open the permalink directly:{" "}
               {chainsWithRuns(allRuns).map((chain, i, all) => (
                 <span key={chain}>
-                  <Link
+                  <TextLink
                     href={`/agent/${encodeURIComponent(chain)}/${encodeURIComponent(q)}`}
-                    className="font-mono text-text underline decoration-line underline-offset-4 transition-colors hover:decoration-edge"
+                    tone="bright"
+                    className="font-mono"
                   >
                     {chain}/{q}
-                  </Link>
+                  </TextLink>
                   {i < all.length - 1 ? ", " : ""}
                 </span>
               ))}

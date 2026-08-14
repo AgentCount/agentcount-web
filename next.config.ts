@@ -45,11 +45,20 @@ const nextConfig: NextConfig = {
  * destination — so `/census?chain=bsc` lands on the right chain's rates.
  */
 nextConfig.redirects = async () => [
-  // The per-rung base rates are a section of the findings page now. `/stats`
-  // was this page's first address, and pointed at `/census`; both land on the
-  // same content, one hop.
-  { source: "/census", destination: "/", permanent: true },
-  { source: "/stats", destination: "/", permanent: true },
+  /**
+   * `/census` is a real page again — the full census view lives there, and
+   * the homepage is the product overview. This REVERSES a permanent redirect
+   * (`/census → /`) that shipped 2026-08-01, and permanent is forever on the
+   * client: browsers cache a 308 indefinitely, so some returning visitors
+   * will keep landing on `/` for a while. That is also why `/` must NEVER
+   * gain a redirect to `/census`: a client still holding the old 308 would
+   * bounce between the two until the browser gives up
+   * (ERR_TOO_MANY_REDIRECTS). Legacy census deep links (`/?chain=…`) are
+   * handled by rendering the census view in place on `/` instead.
+   */
+  // The per-rung base rates live on the census page. `/stats` was that
+  // page's first address; one hop, as before.
+  { source: "/stats", destination: "/census", permanent: true },
   // "Agents that passed every check" was always a filter rather than a
   // section. The destination is the directory carrying that filter, spelled
   // out as facets so the URL says what it means and can be widened from the
@@ -95,7 +104,6 @@ nextConfig.redirects = async () => [
     destination: "/reports/linkage/opengraph-image",
     permanent: true,
   },
-  { source: "/census/opengraph-image", destination: "/opengraph-image", permanent: true },
   {
     source: "/neutrality/opengraph-image",
     destination: "/methodology/opengraph-image",

@@ -1,4 +1,4 @@
-import Link from "next/link";
+import { TextLink } from "@/components/TextLink";
 import { BRAND } from "@/lib/brand";
 
 export const metadata = {
@@ -92,28 +92,19 @@ export default async function SubscribedPage({
         Your address is stored by {BRAND.name} and used for nothing but the
         census reports. To be removed at any point — including before anything
         is ever sent — email{" "}
-        <a
+        <TextLink
           href={`mailto:${BRAND.contactEmail}`}
-          className="font-mono text-xs underline decoration-line underline-offset-4 transition-colors hover:text-text hover:decoration-edge"
+          tone="inherit"
+          className="font-mono text-xs"
         >
           {BRAND.contactEmail}
-        </a>{" "}
+        </TextLink>{" "}
         and it is deleted.
       </p>
 
       <p className="mt-10 flex flex-wrap gap-x-8 gap-y-2 font-mono text-xs uppercase tracking-[0.1em]">
-        <Link
-          href="/"
-          className="text-muted underline decoration-line underline-offset-4 transition-colors hover:text-text hover:decoration-edge"
-        >
-          Back to the findings →
-        </Link>
-        <Link
-          href="/reports"
-          className="text-muted underline decoration-line underline-offset-4 transition-colors hover:text-text hover:decoration-edge"
-        >
-          The reports →
-        </Link>
+        <TextLink href="/">Back to the findings →</TextLink>
+        <TextLink href="/reports">The reports →</TextLink>
       </p>
     </div>
   );

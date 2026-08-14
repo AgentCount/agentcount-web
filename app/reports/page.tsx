@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { EmailCapture } from "@/components/EmailCapture";
+import { TextLink } from "@/components/TextLink";
 import { REPORTS } from "@/lib/reports";
 
 export const metadata = {
@@ -51,12 +52,12 @@ export default function ReportsIndex() {
               {report.summary}
             </p>
             <p className="mt-4">
-              <Link
+              <TextLink
                 href={`/reports/${report.slug}`}
-                className="font-mono text-xs uppercase tracking-[0.1em] text-muted underline decoration-line underline-offset-4 transition-colors hover:text-text hover:decoration-edge"
+                className="font-mono text-xs uppercase tracking-[0.1em]"
               >
                 Read the full report →
-              </Link>
+              </TextLink>
             </p>
           </li>
         ))}

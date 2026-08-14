@@ -1,5 +1,5 @@
-import Link from "next/link";
 import { OutboundLink } from "./OutboundLink";
+import { TextLink } from "./TextLink";
 import type { TailAgent } from "@/lib/api/schemas";
 import { chainDisplayName } from "@/lib/chains";
 import { addressUrl, blockUrl, resourceLink } from "@/lib/links";
@@ -102,12 +102,9 @@ export function UncheckedAgent({ agent }: { agent: TailAgent }) {
           measurement. Census figures come from a sweep pinned to a block, and
           this agent is not in one yet — so it is counted in no rate, no
           finding and no archive.{" "}
-          <Link
-            href="/methodology"
-            className="text-text underline decoration-line underline-offset-4 transition-colors hover:decoration-edge"
-          >
+          <TextLink href="/methodology" tone="bright">
             What the seven checks ask
-          </Link>
+          </TextLink>
           .
         </p>
       </section>

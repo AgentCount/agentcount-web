@@ -21,28 +21,32 @@ export const BRAND = {
   contactEmail: "probes@agentcount.ai",
   /**
    * One line, observational. Appears in the document description and on the
-   * homepage. It says what the census is, and — because it is the first thing
+   * homepage. It says what the product is, and — because it is the first thing
    * a search result shows — what it refuses to be.
+   *
+   * "agent economy", not "ERC-8004": the census is the first instrument, not
+   * the product. The instrument names itself on its own page.
    */
   tagline:
-    "An independent ERC-8004 conformance census: seven rungs per agent, evidence attached, no score.",
+    "Independent measurement of the agent economy — evidence attached, no score.",
   // No slogan. The wordmark and the headline say what this is; a tagline
   // beside them was a third voice saying it again.
   /**
-   * The technical self-description, kept verbatim and moved rather than
-   * dropped: the footer and the meta description are where a reader who wants
-   * to know exactly what this is will look, and where a search result needs
-   * it to be.
+   * The technical self-description: the footer and the meta description are
+   * where a reader who wants to know exactly what this is will look, and
+   * where a search result needs it to be.
    */
-  selfDescription: "ERC-8004 conformance census",
+  selfDescription: "the independent audit layer for the agent economy",
 } as const;
 
 /**
  * One sentence for someone who arrived knowing nothing at all.
  *
- * Says "AI agent" before it says ERC-8004, because the reader who needs this
- * sentence does not know the second phrase. It names the three things
- * measured in the order the site measures them.
+ * Leads with what the product IS and what it does, and names ERC-8004 only
+ * as the scope of the first instrument — because that is the true shape of
+ * the thing: 8004 is what one instrument reads, not what the product is. It
+ * still says "AI agent" before it says ERC-8004, because the reader who needs
+ * this sentence does not know the second phrase.
  *
  * "on the chains it sweeps" is the scope, and it stays: the registry is
  * deployed on far more chains than this census reads, so the sentence
@@ -50,8 +54,13 @@ export const BRAND = {
  * listed here — /coverage names every one of them and says what share they
  * are, which is a better answer than a parenthetical that grows with every
  * sweep.
+ *
+ * "first instrument" is deliberate and is as far as the sentence goes:
+ * it says the product is bigger than the census without naming, promising
+ * or dating anything that has not shipped. Nothing unshipped gets marketed
+ * on this site — a product that audits claims cannot open with one.
  */
-export const NEWCOMER_SENTENCE = `${BRAND.name} is an independent, open-source census of every AI agent registered under ERC-8004 on the chains it sweeps — what they declare, what actually works, and what the money does. All code and data are public.`;
+export const NEWCOMER_SENTENCE = `${BRAND.name} is an independent, open-source audit layer for the agent economy: it counts what gets claimed, checks what actually stands behind it, and publishes the evidence for both. Its first instrument checks every AI agent registered under ERC-8004 on the chains it sweeps. All code and data are public.`;
 
 /** `<title>` for any page but the homepage. One format, one place. */
 export function pageTitle(page: string): string {
