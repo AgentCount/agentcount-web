@@ -248,6 +248,49 @@ export const findingsSchema = z.object({
   findings: z.array(findingSchema),
 });
 
+/** One status transition between the two runs of a delta's pair. */
+export const flipSchema = z.object({
+  rung: z.number(),
+  from: z.string(),
+  to: z.string(),
+  agents: z.number(),
+});
+
+/**
+ * What changed between one run and the previous finished run on its chain —
+ * computed once at sweep time by the census, never here. Two rules travel
+ * with it (METHODOLOGY §9):
+ *
+ * `stopped_resolving` and `newly_resolving` already exclude transitions
+ * into or out of `refused` (an origin declining a probe is not the agent
+ * going away); `rung2_declined` is the excluded volume, served so the
+ * exclusion is visible without this app summing `flips` itself.
+ *
+ * When `method_changed` is true, the checker or evidence schema differs
+ * across the pair and an unknown share of the movement is method, not the
+ * world — any rendering of this object must say so. The API precomputes the
+ * flag; this app must not re-derive it from the four version fields.
+ */
+export const deltaSchema = z.object({
+  run_id: z.string(),
+  previous_run_id: z.string(),
+  chain: z.string(),
+  agents_before: z.number(),
+  agents_after: z.number(),
+  newly_registered: z.number(),
+  disappeared: z.number(),
+  newly_resolving: z.number(),
+  stopped_resolving: z.number(),
+  rung2_declined: z.number(),
+  flips: z.array(flipSchema),
+  checker_before: z.string(),
+  checker_after: z.string(),
+  schema_before: z.number(),
+  schema_after: z.number(),
+  method_changed: z.boolean(),
+  computed_at: z.string(),
+});
+
 export type Run = z.infer<typeof runSchema>;
 
 /**
@@ -287,6 +330,8 @@ export type Archive = z.infer<typeof archiveSchema>;
 export type AgentDetail = z.infer<typeof agentDetailSchema>;
 export type TailAgent = z.infer<typeof tailAgentSchema>;
 export type CensusAgentDetail = z.infer<typeof censusAgentDetailSchema>;
+export type Delta = z.infer<typeof deltaSchema>;
+export type Flip = z.infer<typeof flipSchema>;
 
 /** Narrows the union. The one place the discriminator is read. */
 export function isTailAgent(a: AgentDetail): a is TailAgent {

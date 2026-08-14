@@ -1,6 +1,7 @@
 import { AgentTable } from "@/components/AgentTable";
 import { AllRunsProvenance } from "@/components/AllRunsProvenance";
 
+import { DeltaLedger } from "./DeltaLedger";
 import { FindingTiles, pickFinding } from "./FindingTiles";
 import { allPassFacets } from "@/components/DirectoryControls";
 import { MissingRateBar, RateBar } from "@/components/RateBar";
@@ -14,6 +15,7 @@ import { aggregateFinding, canonicalRuns, totalAgents } from "@/lib/api/aggregat
 import { CHECKS } from "@/lib/checks";
 import {
   chainsWithRuns,
+  getDelta,
   getFindings,
   getRates,
   listAgents,
@@ -90,6 +92,12 @@ export async function CensusView({ sp }: { sp: { run?: string; chain?: string } 
   const perRunFindings: Findings[] = await Promise.all(
     (perChain ? [run] : censusRuns).map((r) => getFindings(r.run_id)),
   );
+
+  // One stored comparison per run on show, fetched alongside its findings.
+  // `null` — a first sweep, or an API without the endpoint yet — renders as
+  // stated absence, never as zeros. See `DeltaLedger`.
+  const deltaRuns = perChain ? [run] : censusRuns;
+  const deltas = await Promise.all(deltaRuns.map((r) => getDelta(r.run_id)));
   const finding = (key: string): Finding =>
     perChain
       ? pickFinding(perRunFindings[0].findings, key)
@@ -311,6 +319,34 @@ export async function CensusView({ sp }: { sp: { run?: string; chain?: string } 
         </p>
 
       </section>
+
+      {/* The number nobody else can produce: what stopped working since the
+          previous sweep. Registration counts only ever go up and everyone
+          publishes them; this table is the other direction, and it exists
+          because the same seven questions were asked of the same population
+          at two pinned blocks and both answers were kept. */}
+      <Section
+        title="Changed since the last sweep"
+        aside={
+          perChain
+            ? `${run.chain} · against its previous sweep`
+            : "each chain · against its previous sweep"
+        }
+        className="mt-20 max-w-5xl"
+        intro={
+          <>
+            Each row compares a chain&rsquo;s current sweep against the
+            previous one — both pinned to a block, so the comparison itself
+            recomputes. &ldquo;No longer reachable&rdquo; is check 2
+            (Reachable?) moving from pass to not-pass: the quiet decay that
+            registration counts never show.
+          </>
+        }
+      >
+        <DeltaLedger
+          rows={deltaRuns.map((r, i) => ({ run: r, delta: deltas[i] }))}
+        />
+      </Section>
 
       {/* The same seven questions as the tiles above, answered for the whole
           population instead of summarised into four headlines — the next
