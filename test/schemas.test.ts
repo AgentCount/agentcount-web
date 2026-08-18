@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 import agents from "./fixtures/agents.json";
 import agentDetail from "./fixtures/agent-detail.json";
 import agentDetailError from "./fixtures/agent-detail-error.json";
+import delta from "./fixtures/delta.json";
 import findings from "./fixtures/findings.json";
 import methodology from "./fixtures/methodology.json";
 import rates from "./fixtures/rates.json";
@@ -10,6 +11,7 @@ import spotCheck from "./fixtures/spot-check.json";
 import {
   agentDetailSchema,
   agentPageSchema,
+  deltaSchema,
   findingsSchema,
   methodologySchema,
   ratesSchema,
@@ -196,6 +198,35 @@ describe("schemas accept what the API actually returns", () => {
     expect(by.get("attested")?.percent).toBeCloseTo(49.2, 1);
     expect(by.get("attested_resolvable")?.percent).toBeCloseTo(46.8, 1);
     expect(by.get("unattested_resolvable")?.percent).toBeCloseTo(58.6, 1);
+  });
+});
+
+/**
+ * `delta.json` is HAND-WRITTEN, transcribed field by field from
+ * `crates/api/src/routes/deltas.rs`'s `DeltaResponse` (agentcount#57) — the
+ * endpoint is not deployed yet, so there is no live body to capture. Replace
+ * it with a captured one the day the API ships, per this file's header. Its
+ * values are the 2026-08 BSC shape from the methodology changelog: the pair
+ * the `refused` rule was written for.
+ */
+describe("a delta carries its own caveats", () => {
+  it("parses, and the confound fields cannot be absent", () => {
+    const d = deltaSchema.parse(delta);
+    expect(d.method_changed).toBe(true);
+    expect(d.checker_before).not.toBe(d.checker_after);
+  });
+
+  it("the declined volume the headline series exclude stays visible", () => {
+    const d = deltaSchema.parse(delta);
+    // The famous shape: 10 real losses, 19,962 declined — the number that
+    // was briefly published as 19,983 agents going dark.
+    expect(d.stopped_resolving).toBe(10);
+    expect(d.rung2_declined).toBe(19962);
+    // The excluded transitions remain in flips, per METHODOLOGY §9.
+    const refused = d.flips.filter(
+      (f) => f.rung === 2 && (f.from === "refused" || f.to === "refused"),
+    );
+    expect(refused.length).toBeGreaterThan(0);
   });
 });
 

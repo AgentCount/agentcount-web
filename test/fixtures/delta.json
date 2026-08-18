@@ -1,0 +1,25 @@
+{
+  "run_id": "56129cc8-5dc8-486c-ad74-123631e7bdb3",
+  "previous_run_id": "0c37ac1e-6f6a-45b8-9f37-9de1a6bcbf1a",
+  "chain": "bsc",
+  "agents_before": 244208,
+  "agents_after": 263181,
+  "newly_registered": 18973,
+  "disappeared": 0,
+  "newly_resolving": 12,
+  "stopped_resolving": 10,
+  "rung2_declined": 19962,
+  "flips": [
+    { "rung": 2, "from": "pass", "to": "fail", "agents": 10 },
+    { "rung": 2, "from": "pass", "to": "refused", "agents": 19658 },
+    { "rung": 2, "from": "refused", "to": "pass", "agents": 304 },
+    { "rung": 4, "from": "fail", "to": "pass", "agents": 41 },
+    { "rung": 7, "from": "fail", "to": "pass", "agents": 129 }
+  ],
+  "checker_before": "0.6.0",
+  "checker_after": "0.7.0",
+  "schema_before": 7,
+  "schema_after": 8,
+  "method_changed": true,
+  "computed_at": "2026-08-11T06:41:02.114532+00:00"
+}
