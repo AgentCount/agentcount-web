@@ -1,25 +1,188 @@
 {
-  "run_id": "56129cc8-5dc8-486c-ad74-123631e7bdb3",
-  "previous_run_id": "0c37ac1e-6f6a-45b8-9f37-9de1a6bcbf1a",
-  "chain": "bsc",
-  "agents_before": 244208,
-  "agents_after": 263181,
-  "newly_registered": 18973,
-  "disappeared": 0,
-  "newly_resolving": 12,
-  "stopped_resolving": 10,
-  "rung2_declined": 19962,
-  "flips": [
-    { "rung": 2, "from": "pass", "to": "fail", "agents": 10 },
-    { "rung": 2, "from": "pass", "to": "refused", "agents": 19658 },
-    { "rung": 2, "from": "refused", "to": "pass", "agents": 304 },
-    { "rung": 4, "from": "fail", "to": "pass", "agents": 41 },
-    { "rung": 7, "from": "fail", "to": "pass", "agents": 129 }
-  ],
-  "checker_before": "0.6.0",
-  "checker_after": "0.7.0",
-  "schema_before": 7,
-  "schema_after": 8,
-  "method_changed": true,
-  "computed_at": "2026-08-11T06:41:02.114532+00:00"
+    "run_id": "56129cc8-5dc8-486c-ad74-123631e7bdb3",
+    "previous_run_id": "e6f87cdb-4b66-49c8-97ad-f7e51449e426",
+    "chain": "bsc",
+    "agents_before": 251782,
+    "agents_after": 263181,
+    "newly_registered": 11399,
+    "disappeared": 0,
+    "newly_resolving": 8,
+    "stopped_resolving": 12,
+    "rung2_declined": 57745,
+    "flips": [
+        {
+            "agents": 8,
+            "from": "error",
+            "rung": 2,
+            "to": "pass"
+        },
+        {
+            "agents": 7,
+            "from": "fail",
+            "rung": 2,
+            "to": "refused"
+        },
+        {
+            "agents": 11,
+            "from": "pass",
+            "rung": 2,
+            "to": "error"
+        },
+        {
+            "agents": 1,
+            "from": "pass",
+            "rung": 2,
+            "to": "fail"
+        },
+        {
+            "agents": 255,
+            "from": "pass",
+            "rung": 2,
+            "to": "refused"
+        },
+        {
+            "agents": 202,
+            "from": "refused",
+            "rung": 2,
+            "to": "fail"
+        },
+        {
+            "agents": 57281,
+            "from": "refused",
+            "rung": 2,
+            "to": "pass"
+        },
+        {
+            "agents": 1,
+            "from": "fail",
+            "rung": 3,
+            "to": "pass"
+        },
+        {
+            "agents": 267,
+            "from": "pass",
+            "rung": 3,
+            "to": "skipped"
+        },
+        {
+            "agents": 1,
+            "from": "skipped",
+            "rung": 3,
+            "to": "fail"
+        },
+        {
+            "agents": 57288,
+            "from": "skipped",
+            "rung": 3,
+            "to": "pass"
+        },
+        {
+            "agents": 3,
+            "from": "fail",
+            "rung": 4,
+            "to": "pass"
+        },
+        {
+            "agents": 267,
+            "from": "pass",
+            "rung": 4,
+            "to": "skipped"
+        },
+        {
+            "agents": 1,
+            "from": "skipped",
+            "rung": 4,
+            "to": "fail"
+        },
+        {
+            "agents": 57288,
+            "from": "skipped",
+            "rung": 4,
+            "to": "pass"
+        },
+        {
+            "agents": 151,
+            "from": "pass",
+            "rung": 5,
+            "to": "skipped"
+        },
+        {
+            "agents": 3,
+            "from": "pass",
+            "rung": 5,
+            "to": "unclaimed"
+        },
+        {
+            "agents": 264,
+            "from": "skipped",
+            "rung": 5,
+            "to": "fail"
+        },
+        {
+            "agents": 55267,
+            "from": "skipped",
+            "rung": 5,
+            "to": "pass"
+        },
+        {
+            "agents": 1760,
+            "from": "skipped",
+            "rung": 5,
+            "to": "unclaimed"
+        },
+        {
+            "agents": 116,
+            "from": "unclaimed",
+            "rung": 5,
+            "to": "skipped"
+        },
+        {
+            "agents": 8,
+            "from": "fail",
+            "rung": 6,
+            "to": "skipped"
+        },
+        {
+            "agents": 1,
+            "from": "pass",
+            "rung": 6,
+            "to": "error"
+        },
+        {
+            "agents": 2,
+            "from": "pass",
+            "rung": 6,
+            "to": "fail"
+        },
+        {
+            "agents": 106,
+            "from": "pass",
+            "rung": 6,
+            "to": "skipped"
+        },
+        {
+            "agents": 1,
+            "from": "refused",
+            "rung": 6,
+            "to": "skipped"
+        },
+        {
+            "agents": 7,
+            "from": "skipped",
+            "rung": 6,
+            "to": "fail"
+        },
+        {
+            "agents": 943,
+            "from": "skipped",
+            "rung": 6,
+            "to": "pass"
+        }
+    ],
+    "checker_before": "0.7.0",
+    "checker_after": "0.7.0",
+    "schema_before": 8,
+    "schema_after": 8,
+    "method_changed": false,
+    "computed_at": "2026-08-11T07:21:58.107174Z"
 }
