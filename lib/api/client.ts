@@ -71,7 +71,21 @@ function baseUrl(): string {
   return url.replace(/\/$/, "");
 }
 
-export type GetOptions = { revalidate?: number; allow404?: boolean };
+export type GetOptions = {
+  revalidate?: number;
+  allow404?: boolean;
+  /**
+   * How long to wait before giving up, in milliseconds. The 8s default fits
+   * every index-served endpoint with room to spare; free-text search is the
+   * one legitimate exception — a corpus-common term ("agent" matches 88% of
+   * the BSC run's documents) costs the API a full-run scan that measures
+   * 7–9s even after agentcount#64 collapsed it to a single pass, because an
+   * exact count over a saturated corpus has a floor no index can lower.
+   * Search callers pass 15s rather than the default being raised for
+   * everyone: a hung upstream should still fail fast everywhere else.
+   */
+  timeoutMs?: number;
+};
 
 /**
  * Fetch, then validate. Returns `null` only when `allow404` is set and the API
@@ -80,7 +94,7 @@ export type GetOptions = { revalidate?: number; allow404?: boolean };
 export async function get<T>(
   path: string,
   schema: ZodType<T>,
-  { revalidate = 60, allow404 = false }: GetOptions = {},
+  { revalidate = 60, allow404 = false, timeoutMs = 8000 }: GetOptions = {},
 ): Promise<T | null> {
   const url = `${baseUrl()}${path}`;
 
@@ -92,7 +106,7 @@ export async function get<T>(
     // function to its own execution limit and returns the platform's 504
     // instead of this app's error panel. Bound it ourselves so the failure is
     // ours to explain.
-    res = await fetch(url, { next: { revalidate }, signal: AbortSignal.timeout(8000) });
+    res = await fetch(url, { next: { revalidate }, signal: AbortSignal.timeout(timeoutMs) });
   } catch (e) {
     if (e instanceof Error && e.name === "TimeoutError") {
       throw new UpstreamError(`the ${BRAND.name} API at ${url} did not answer in time`);
