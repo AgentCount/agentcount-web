@@ -210,8 +210,8 @@ describe("schemas accept what the API actually returns", () => {
 /**
  * `delta.json` is CAPTURED — the literal body of
  * `GET /api/runs/56129cc8…/delta` (BSC, the 2026-08 census run) against the
- * live API on 2026-08-14, the day the endpoint deployed. Refresh it per this
- * file's header.
+ * live API on 2026-08-18, after the rung-2 `error` exclusion (agentcount#60)
+ * recomputed every stored row. Refresh it per this file's header.
  *
  * `delta-method-changed.json` stays HAND-WRITTEN, for the same reason
  * `runs.json` does: it carries a shape the live API has no example of. Every
@@ -231,17 +231,21 @@ describe("a delta carries its own caveats", () => {
     expect(d.checker_before).toBe(d.checker_after);
   });
 
-  it("the declined volume the headline series exclude stays visible", () => {
+  it("the excluded volumes the headline series rely on stay visible", () => {
     const d = deltaSchema.parse(delta);
-    // The captured BSC pair: 12 real losses, 57,745 declined-either-way —
-    // the same order-of-magnitude gap the 2026-08-06 rule exists for.
-    expect(d.stopped_resolving).toBe(12);
+    // The captured BSC pair after the 2026-08-18 recompute: 1 real loss,
+    // 57,745 declined-either-way, 19 probe errors of ours — the two
+    // order-of-magnitude gaps the 2026-08-06 and 2026-08-18 rules exist for.
+    expect(d.stopped_resolving).toBe(1);
     expect(d.rung2_declined).toBe(57745);
+    expect(d.rung2_errored).toBe(19);
     // The excluded transitions remain in flips, per METHODOLOGY §9.
-    const refused = d.flips.filter(
-      (f) => f.rung === 2 && (f.from === "refused" || f.to === "refused"),
+    const excluded = d.flips.filter(
+      (f) =>
+        f.rung === 2 &&
+        ["refused", "error"].some((s) => f.from === s || f.to === s),
     );
-    expect(refused.length).toBeGreaterThan(0);
+    expect(excluded.length).toBeGreaterThan(0);
   });
 
   it("a pair that spans a method change says so", () => {

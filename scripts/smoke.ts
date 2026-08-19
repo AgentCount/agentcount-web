@@ -269,6 +269,10 @@ async function checkLegacyRedirects() {
     "  ...with the refused-exclusion footnote",
   );
   check(
+    censusBody.includes("our failure is never the agent"),
+    "  ...and the error-exclusion footnote",
+  );
+  check(
     censusBody.includes("method changed"),
     "  ...and the method-changed marker for a pair that spans one",
   );

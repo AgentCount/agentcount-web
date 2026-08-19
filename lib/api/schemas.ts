@@ -282,6 +282,7 @@ export const deltaSchema = z.object({
   newly_resolving: z.number(),
   stopped_resolving: z.number(),
   rung2_declined: z.number(),
+  rung2_errored: z.number(),
   flips: z.array(flipSchema),
   checker_before: z.string(),
   checker_after: z.string(),

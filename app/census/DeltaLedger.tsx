@@ -4,9 +4,10 @@ import { chainDisplayName } from "@/lib/chains";
 /**
  * What changed since the previous sweep, one chain per row.
  *
- * The columns are the four delta series (METHODOLOGY §9), plus the volume
- * the two reachability series exclude. Two rules from the methodology are
- * enforced here rather than remembered:
+ * The columns are the four delta series (METHODOLOGY §9), plus the two
+ * volumes the reachability series exclude — the origin declining us, and our
+ * own probe failing. Two rules from the methodology are enforced here rather
+ * than remembered:
  *
  * * A chain whose run has no stored delta renders "first sweep — nothing to
  *   compare", never a row of zeroes: absence is not a measurement.
@@ -19,8 +20,9 @@ import { chainDisplayName } from "@/lib/chains";
  * this component formats and never derives. "No longer reachable" is the
  * plain-English rendering of `stopped_resolving` — check 2 (Reachable?)
  * moved from pass to not-pass — and stays honest because transitions where
- * the origin *declined* the probe are already excluded upstream and shown
- * in their own column.
+ * the origin *declined* the probe, or the probe itself *failed* (2026-08-18,
+ * after a night of checker-side timeouts read as 4,479 agents going dark),
+ * are already excluded upstream and shown in their own columns.
  */
 export function DeltaLedger({
   rows,
@@ -58,6 +60,9 @@ export function DeltaLedger({
             <th scope="col" className="label border-b border-edge px-3 py-2 text-right font-normal">
               Declined&thinsp;†
             </th>
+            <th scope="col" className="label border-b border-edge px-3 py-2 text-right font-normal">
+              Errored&thinsp;§
+            </th>
           </tr>
         </thead>
         <tbody>
@@ -86,9 +91,12 @@ export function DeltaLedger({
                   <td className="px-3 py-1.5 text-right font-mono text-xs tabular-nums text-dead">
                     {delta.rung2_declined.toLocaleString("en-US")}
                   </td>
+                  <td className="px-3 py-1.5 text-right font-mono text-xs tabular-nums text-dead">
+                    {delta.rung2_errored.toLocaleString("en-US")}
+                  </td>
                 </>
               ) : (
-                <td colSpan={5} className="px-3 py-1.5 font-mono text-xs text-dead">
+                <td colSpan={6} className="px-3 py-1.5 font-mono text-xs text-dead">
                   first sweep — nothing to compare
                 </td>
               )}
@@ -104,6 +112,12 @@ export function DeltaLedger({
           that said no. Excluded from both reachability columns by rule: being
           declined is not the agent having gone away, and getting through
           after being declined is not the agent having come back.
+        </p>
+        <p>
+          § Check 2 transitions where this census&rsquo;s own probe failed — a
+          timeout, a TLS or DNS failure. Excluded from both reachability
+          columns by the same rule: our failure is never the agent&rsquo;s,
+          and a checker-side outage must not read as agents going dark.
         </p>
         {methodChangedRows.length > 0 && (
           <p>
