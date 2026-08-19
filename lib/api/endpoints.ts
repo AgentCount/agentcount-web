@@ -168,7 +168,9 @@ export async function listAgents(params: ListAgentsParams = {}): Promise<AgentPa
   if (params.limit !== undefined) q.set("limit", String(params.limit));
   if (params.offset !== undefined) q.set("offset", String(params.offset));
   const qs = q.toString();
-  return (await get(`/api/agents${qs ? `?${qs}` : ""}`, agentPageSchema)) as AgentPage;
+  // Free-text search is the one call allowed to be slow — see GetOptions.
+  const opts = params.q ? { timeoutMs: 15_000 } : undefined;
+  return (await get(`/api/agents${qs ? `?${qs}` : ""}`, agentPageSchema, opts)) as AgentPage;
 }
 
 export async function getAgent(
@@ -203,6 +205,8 @@ export async function searchAgents(
   params.set("runs", runIds.join(","));
   return get(`/api/search?${params.toString()}`, searchResponseSchema, {
     allow404: true,
+    // Free-text search is the one call allowed to be slow — see GetOptions.
+    timeoutMs: 15_000,
   }) as Promise<SearchGroup[] | null>;
 }
 
