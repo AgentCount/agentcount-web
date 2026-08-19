@@ -9,6 +9,7 @@
   "newly_resolving": 12,
   "stopped_resolving": 10,
   "rung2_declined": 19962,
+  "rung2_errored": 0,
   "flips": [
     { "rung": 2, "from": "pass", "to": "fail", "agents": 10 },
     { "rung": 2, "from": "pass", "to": "refused", "agents": 19658 },

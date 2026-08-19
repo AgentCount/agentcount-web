@@ -6,9 +6,10 @@
     "agents_after": 263181,
     "newly_registered": 11399,
     "disappeared": 0,
-    "newly_resolving": 8,
-    "stopped_resolving": 12,
+    "newly_resolving": 0,
+    "stopped_resolving": 1,
     "rung2_declined": 57745,
+    "rung2_errored": 19,
     "flips": [
         {
             "agents": 8,
@@ -184,5 +185,5 @@
     "schema_before": 8,
     "schema_after": 8,
     "method_changed": false,
-    "computed_at": "2026-08-11T07:21:58.107174Z"
+    "computed_at": "2026-08-18T17:38:26.954765Z"
 }
