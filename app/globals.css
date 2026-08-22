@@ -23,7 +23,7 @@
        underline, not a hue. If you add a coloured call-to-action, the rule is
        broken and the six status colours stop being special.
      * Corners are square. Rounding is reserved for the rung register, where a
-       2px radius keeps the seven cells reading as one physical component.
+       3px radius keeps the seven cells reading as one physical component.
      * Structure is carried by hairline rules and whitespace. Cards with
        borders on all four sides were removed: a page of boxes reads as a
        dashboard, and this is a register.
