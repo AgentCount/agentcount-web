@@ -4,6 +4,7 @@ import { FindingTiles, type CensusFindings } from "./census/FindingTiles";
 import { AllRunsProvenance } from "@/components/AllRunsProvenance";
 import { InstrumentRow } from "@/components/InstrumentRow";
 import { Section } from "@/components/Section";
+import { TallyMark } from "@/components/TallyMark";
 import { TextLink } from "@/components/TextLink";
 import { aggregateFinding, canonicalRuns, totalAgents } from "@/lib/api/aggregate";
 import { getFindings, listRuns } from "@/lib/api/endpoints";
@@ -107,13 +108,40 @@ export default async function Home({
 
           Below `lg` the two stack, claim first: on a phone the argument is
           what a first-time reader needs, and the figure follows it. */}
-      <header className="border-b border-edge pb-8 lg:grid lg:grid-cols-[minmax(0,1fr)_minmax(18rem,24rem)] lg:gap-x-14">
+      <header className="relative overflow-hidden border-b border-edge pb-8 lg:grid lg:grid-cols-[minmax(0,1fr)_minmax(18rem,24rem)] lg:gap-x-14">
+        {/* The mark again, oversized and almost silent, behind the hero
+            reading — the count made into a watermark rather than repeated as
+            an icon. `-z-10` is load-bearing: an absolutely-positioned element
+            with no z-index still paints above ordinary in-flow content
+            regardless of DOM order, so without this the "silent" watermark
+            draws itself over the copy instead of behind it. Hidden below
+            `lg`: at the width where the hero itself stacks to one column,
+            340px of watermark has nowhere to sit that does not collide with
+            the reading. */}
+        <TallyMark
+          strokeWidth={2.6}
+          className="pointer-events-none absolute top-1/2 right-[-6%] hidden h-[340px] w-[340px] -translate-y-1/2 -z-10 text-text opacity-5 lg:block"
+        />
         <div>
           {/* The H1 is what the product IS; what it refuses to be — a score —
               sits in the deck, because refusing is a sentence, not a
-              headline. */}
-          <h1 className="numeral max-w-[18ch] text-[clamp(2rem,4.4vw,3.5rem)] text-text">
-            Independent measurement of the agent economy.
+              headline.
+
+              Set in mono rather than the shared `numeral` (condensed
+              display) utility every other heading on this site uses: this
+              is the one headline the design proposal in `globals.css`
+              singles out to read as part of the instrument rather than a
+              magazine title above it, which is also why "agent economy" is
+              the one other place — besides the tally mark and the focus
+              ring — the new accent is allowed to appear. Scoped to this
+              element on purpose, not promoted into `numeral` itself: that
+              utility backs 39 headings and figures across the rest of the
+              site, most of them never rendered in this review, and this
+              proposal does not assume that trade reads well without seeing
+              them. */}
+          <h1 className="max-w-[18ch] font-mono text-[clamp(2rem,4.4vw,3.5rem)] font-bold leading-[1.14] tracking-[-0.01em] text-text [font-variant-numeric:tabular-nums_slashed-zero]">
+            Independent measurement of the{" "}
+            <em className="text-accent not-italic">agent economy.</em>
           </h1>
 
           <p className="mt-7 max-w-[52ch] text-lg leading-relaxed text-muted">

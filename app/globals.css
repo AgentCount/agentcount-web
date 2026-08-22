@@ -8,32 +8,48 @@
    The interface is built to express that refusal rather than merely comply
    with it, and one rule carries most of the weight:
 
-     COLOUR IS RESERVED FOR MEASUREMENT.
+     COLOUR IS RESERVED FOR MEASUREMENT — with one deliberate exception, below.
 
    The whole interface — nav, links, headings, rules, tables, buttons — is
    monochrome bone-on-black. The only saturated pixels on any page belong to a
-   rung status. Nothing is highlighted, promoted or de-emphasised by the
-   chrome, because the product's argument is that the interface does not get an
-   opinion about which agents matter. A blue link or a coloured button would be
-   the interface claiming attention that belongs to the data.
+   rung status, plus the one brand accent this section documents. Nothing else
+   is highlighted, promoted or de-emphasised by the chrome, because the
+   product's argument is that the interface does not get an opinion about
+   which agents matter. A page of coloured buttons would be the interface
+   claiming attention that belongs to the data — which is exactly why this
+   exception is kept to a single hue, used sparingly, and never inside a rung
+   badge.
 
    Consequences worth stating, so nobody "fixes" them later:
 
-     * `--color-accent` is bone, not blue. Links are told apart by an
-       underline, not a hue. If you add a coloured call-to-action, the rule is
-       broken and the six status colours stop being special.
+     * `--color-accent` is a deep cyan (`#45d3e0`), not bone — a design
+       proposal, not yet the shipped rule. It was chosen because it is not one
+       of the five hues `--color-live`/`fail`/`warn`/`dim`/`claim` already use
+       for rung status, so it can never be mistaken for a verdict on an agent,
+       and it stays distinct from red and green for colour-blind readers. It
+       appears in exactly four places: the tally mark's closing diagonal
+       stroke (`lib/tally.ts`, `components/TallyMark.tsx`), the census
+       overview's "agent economy" emphasis (`app/page.tsx`), and the
+       `:focus-visible` ring below, which every interactive element already
+       shares. Links are still told apart by an underline, not a hue — that
+       part of the original rule is unchanged.
      * Corners are square. Rounding is reserved for the rung register, where a
-       3px radius keeps the seven cells reading as one physical component.
+       2px radius keeps the seven cells reading as one physical component.
      * Structure is carried by hairline rules and whitespace. Cards with
        borders on all four sides were removed: a page of boxes reads as a
        dashboard, and this is a register.
 
    ── Type ───────────────────────────────────────────────────────────────────
 
-   IBM Plex, throughout. It was drawn for technical and data contexts, its
-   mono has genuinely distinguishable 0/O and 1/l/I — which matters when every
-   page is full of hex addresses and hashes — and it is not the default
-   grotesk every other dashboard reaches for.
+   Big Shoulders Display / Instrument Sans / JetBrains Mono — a design
+   proposal alongside the accent above, replacing IBM Plex wholesale rather
+   than mixing families. The three-way split IBM Plex argued for is kept
+   exactly (condensed for display numbers and page titles, mono for every
+   machine-produced value, sans for prose); only the faces themselves change,
+   so `numeral`/`label` and the mono/sans split below still mean what they
+   meant. JetBrains Mono keeps IBM Plex Mono's genuinely distinguishable 0/O
+   and 1/l/I, which is the one property this system cannot trade away — every
+   page is full of hex addresses and hashes.
 
      Condensed  display numbers and page titles (a printed-yearbook voice)
      Mono       ALL data: ids, hashes, addresses, counts, status words
@@ -66,10 +82,14 @@
      test/tokens.test.ts fails the build if this ever regresses. */
   --color-dead: #767e88;
 
-  /* Interactive. Deliberately NOT a hue — see the rule at the top. */
-  --color-accent: #fffdf6;
+  /* Interactive/brand. A proposed departure from bone — see the design-system
+     comment above for where this is allowed to appear and why. 1.8:1 against
+     --color-bg on its own, which is why it is never used as body text; against
+     the near-black surfaces it sits on as a stroke or a ring it reads clearly,
+     the same tradeoff `test/tokens.test.ts` would flag if this were prose. */
+  --color-accent: #45d3e0;
 
-  /* ── The only saturated colours in the system ────────────────────────────
+  /* ── The only other saturated colours in the system ──────────────────────
      One per status, tuned for contrast against #08090b. These are the
      product. Every one is paired with a glyph and a spelled-out label in
      `lib/status.ts`, so none of them is ever the sole carrier of meaning. */
@@ -79,9 +99,9 @@
   --color-dim: #747d8a; /* skipped — the dimmest status, but still AA as text */
   --color-claim: #8b9ac4; /* unclaimed — cool, readable, and neither */
 
-  --font-sans: var(--font-plex-sans), ui-sans-serif, system-ui, sans-serif;
-  --font-mono: var(--font-plex-mono), ui-monospace, monospace;
-  --font-display: var(--font-plex-condensed), var(--font-plex-sans), sans-serif;
+  --font-sans: var(--font-instrument-sans), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font-jetbrains-mono), ui-monospace, monospace;
+  --font-display: var(--font-big-shoulders), var(--font-instrument-sans), sans-serif;
 }
 
 html {

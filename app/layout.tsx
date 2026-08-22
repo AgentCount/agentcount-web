@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { IBM_Plex_Mono, IBM_Plex_Sans, IBM_Plex_Sans_Condensed } from "next/font/google";
+import { Big_Shoulders, Instrument_Sans, JetBrains_Mono } from "next/font/google";
 import Link from "next/link";
 import { NavSearch } from "@/components/NavSearch";
 import { OutboundLink } from "@/components/OutboundLink";
@@ -9,32 +9,39 @@ import { BRAND, NEWCOMER_SENTENCE } from "@/lib/brand";
 import "./globals.css";
 
 /**
- * IBM Plex, in three cuts. Loaded through `next/font`, which is part of Next —
- * no npm dependency is added by this, though it does mean a build fetches the
- * font files once and caches them.
+ * Big Shoulders Display / Instrument Sans / JetBrains Mono, in place of IBM
+ * Plex — see the design-system comment at the top of `globals.css` for why.
+ * Loaded through `next/font`, same as before: no npm dependency is added by
+ * this, though it does mean a build fetches the font files once and caches
+ * them.
  *
- * The three cuts are used semantically, not decoratively (see `globals.css`):
+ * The three cuts keep IBM Plex's own semantic split (see `globals.css`):
  * mono for anything the chain or the checker produced, condensed for display
- * numerals and titles, sans for prose.
+ * numerals and titles, sans for prose. Only the faces changed.
+ *
+ * JetBrains Mono also loads italic 700, which nothing needed before this
+ * change: it is what `app/page.tsx` sets on the hero's "agent economy"
+ * emphasis, the one other place the new accent appears.
  */
-const plexSans = IBM_Plex_Sans({
-  subsets: ["latin"],
-  weight: ["400", "500", "600"],
-  variable: "--font-plex-sans",
-  display: "swap",
-});
-
-const plexMono = IBM_Plex_Mono({
-  subsets: ["latin"],
-  weight: ["400", "500", "600"],
-  variable: "--font-plex-mono",
-  display: "swap",
-});
-
-const plexCondensed = IBM_Plex_Sans_Condensed({
+const shoulders = Big_Shoulders({
   subsets: ["latin"],
   weight: ["500", "600", "700"],
-  variable: "--font-plex-condensed",
+  variable: "--font-big-shoulders",
+  display: "swap",
+});
+
+const instrumentSans = Instrument_Sans({
+  subsets: ["latin"],
+  weight: ["400", "500", "600"],
+  variable: "--font-instrument-sans",
+  display: "swap",
+});
+
+const jetbrainsMono = JetBrains_Mono({
+  subsets: ["latin"],
+  weight: ["400", "500", "600", "700"],
+  style: ["normal", "italic"],
+  variable: "--font-jetbrains-mono",
   display: "swap",
 });
 
@@ -181,7 +188,7 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${plexSans.variable} ${plexMono.variable} ${plexCondensed.variable}`}
+      className={`${instrumentSans.variable} ${jetbrainsMono.variable} ${shoulders.variable}`}
     >
       <body className="min-h-screen">
         {/* The masthead is a register header, not a nav bar — and it is two

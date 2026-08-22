@@ -22,7 +22,8 @@
  *
  * ## What it writes
  *
- *   app/icon.svg                    SVG favicon (Next file convention)
+ *   app/icon.svg                    SVG favicon (Next file convention),
+ *                                    theme-aware — see `tallyFaviconSvg`
  *   app/favicon.ico                 16 + 32, PNG-encoded ICO
  *   app/apple-icon.png              180x180 touch icon
  *   public/icon-512.png             maskable icon for site.webmanifest
@@ -36,9 +37,12 @@ import { join } from "node:path";
 import { ImageResponse } from "next/og";
 import { brandFonts, COLOR, MixedStrip, OG_TAGLINE } from "../lib/og";
 import {
-  TALLY_STROKES,
+  TALLY_BARS,
+  TALLY_CUT_WIDTH,
+  TALLY_DIAGONAL,
   TALLY_STROKE_WIDTH,
   tallyDataUri,
+  tallyFaviconSvg,
   tallySvg,
 } from "../lib/tally";
 
@@ -107,15 +111,39 @@ function ico(images: { size: number; data: Buffer }[]): Buffer {
  * repo deliberately does not carry, and every serious embedding context
  * (README, docs site) has a monospace to fall back to. Bone-on-transparent
  * means this file is for dark surfaces; that is the brand's only surface.
+ *
+ * The mark half matches `lib/tally.ts`'s `tallySvg` exactly, by hand: bars in
+ * `COLOR.live` with the diagonal's own stroke masked out of them, the
+ * diagonal itself drawn on top in `COLOR.accent`. This file is a plain
+ * string, not one more consumer of `tallySvg` — its mark sits inside a
+ * 340×64 wordmark canvas rather than tallySvg's own square one, offset by
+ * `shift` to sit on the baseline the text wants — so the geometry is
+ * reproduced at the offset rather than composed from the square export.
+ *
+ * `font-family` names JetBrains Mono first, matching the swap in
+ * `app/layout.tsx`/`app/globals.css`, with the same fallback stack as
+ * before. This is a static SVG a browser renders with whatever monospace it
+ * actually has installed — it does not go through `next/og`/Satori like the
+ * OG cards and `Banner()` below do, so unlike those it needs no font file
+ * bundled to pick up the new name; system JetBrains Mono is used where
+ * present, and the stack falls back exactly as it always has where it isn't.
  */
 function wordmarkSvg(): string {
-  const lines = TALLY_STROKES.map(
-    ([x1, y1, x2, y2]) => `<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}"/>`,
+  const shift = 8;
+  const [dx1, dy1, dx2, dy2] = TALLY_DIAGONAL;
+  const bars = TALLY_BARS.map(
+    ([x1, y1, x2, y2]) => `<line x1="${x1}" y1="${y1 + shift}" x2="${x2}" y2="${y2 + shift}"/>`,
   ).join("");
+  const maskId = "wordmark-tally-cut";
   return (
     `<svg xmlns="http://www.w3.org/2000/svg" width="340" height="64" viewBox="0 0 340 64" fill="none">` +
-    `<g transform="translate(0 8)" stroke="${COLOR.live}" stroke-width="${TALLY_STROKE_WIDTH}" stroke-linecap="round">${lines}</g>` +
-    `<text x="70" y="43" fill="${COLOR.text}" font-family="'IBM Plex Mono', ui-monospace, 'SF Mono', Menlo, monospace" ` +
+    `<mask id="${maskId}" maskUnits="userSpaceOnUse" x="0" y="0" width="340" height="64">` +
+    `<rect x="0" y="0" width="340" height="64" fill="#fff"/>` +
+    `<line x1="${dx1}" y1="${dy1 + shift}" x2="${dx2}" y2="${dy2 + shift}" stroke="#000" stroke-width="${TALLY_CUT_WIDTH}" stroke-linecap="round"/>` +
+    `</mask>` +
+    `<g stroke="${COLOR.live}" stroke-width="${TALLY_STROKE_WIDTH}" stroke-linecap="round" mask="url(#${maskId})">${bars}</g>` +
+    `<line x1="${dx1}" y1="${dy1 + shift}" x2="${dx2}" y2="${dy2 + shift}" stroke="${COLOR.accent}" stroke-width="${TALLY_STROKE_WIDTH}" stroke-linecap="round"/>` +
+    `<text x="70" y="43" fill="${COLOR.text}" font-family="'JetBrains Mono', ui-monospace, 'SF Mono', Menlo, monospace" ` +
     `font-size="32" font-weight="600" letter-spacing="4">AGENTCOUNT</text></svg>`
   );
 }
@@ -176,7 +204,11 @@ async function main() {
 
   const out: [string, Buffer | string][] = [
     // The favicon set. Padding 3 at tab sizes: air costs legibility there.
-    ["app/icon.svg", tallySvg({ background: COLOR.bg, padding: 3 })],
+    // `app/icon.svg` is theme-aware (see `tallyFaviconSvg`'s doc); the ICO
+    // and PNG tiles below cannot be — a rasterised image cannot switch on
+    // `prefers-color-scheme` — so they stay the fixed dark-surface mark
+    // every browser that does not read the SVG favicon falls back to.
+    ["app/icon.svg", tallyFaviconSvg({ padding: 3 })],
     [
       "app/favicon.ico",
       ico([
