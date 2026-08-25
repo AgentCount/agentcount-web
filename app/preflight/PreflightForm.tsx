@@ -52,7 +52,14 @@ export function PreflightForm({ statuses }: { statuses: string[] }) {
               `globals.css`) return for keyboard focus, while the border
               tint — plain `:focus`, not `:focus-visible` — still answers
               a mouse click same as before; the two now stack instead of
-              one silently winning. */}
+              one silently winning.
+
+              The three identity fields below carry a full border rather
+              than the underline this form used before — same fix as the
+              directory's search box (`DirectoryControls.tsx`): a bottom
+              rule alone reads as plain text sitting on a line, not as
+              something to type into, until the moment a reader's cursor
+              already happens to be over it. */}
           <textarea
             name="document"
             rows={18}
@@ -77,7 +84,7 @@ export function PreflightForm({ statuses }: { statuses: string[] }) {
                 <input
                   name="agent_id"
                   inputMode="numeric"
-                  className="border-b border-line bg-transparent pb-1 font-mono text-xs text-text focus:border-edge"
+                  className="w-full border border-line bg-raised/30 px-2 py-1 font-mono text-xs text-text transition-colors hover:border-edge focus:border-edge focus:bg-raised/50"
                 />
               </label>
               <label className="flex flex-col gap-1">
@@ -86,7 +93,7 @@ export function PreflightForm({ statuses }: { statuses: string[] }) {
                   name="chain_id"
                   inputMode="numeric"
                   placeholder="8453"
-                  className="border-b border-line bg-transparent pb-1 font-mono text-xs text-text placeholder:text-dead focus:border-edge"
+                  className="w-full border border-line bg-raised/30 px-2 py-1 font-mono text-xs text-text placeholder:text-dead transition-colors hover:border-edge focus:border-edge focus:bg-raised/50"
                 />
               </label>
               <label className="flex flex-col gap-1">
@@ -94,7 +101,7 @@ export function PreflightForm({ statuses }: { statuses: string[] }) {
                 <input
                   name="registry"
                   placeholder="0x8004…"
-                  className="border-b border-line bg-transparent pb-1 font-mono text-xs text-text placeholder:text-dead focus:border-edge"
+                  className="w-full border border-line bg-raised/30 px-2 py-1 font-mono text-xs text-text placeholder:text-dead transition-colors hover:border-edge focus:border-edge focus:bg-raised/50"
                 />
               </label>
             </div>
