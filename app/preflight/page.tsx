@@ -30,7 +30,7 @@ export default async function PreflightPage() {
   return (
     <>
       <header className="border-b border-edge pb-6">
-        <h1 className="numeral max-w-[22ch] text-[clamp(1.75rem,3.4vw,2.75rem)] text-text">
+        <h1 className="headline max-w-[22ch] text-[clamp(1.75rem,3.4vw,2.75rem)] text-text">
           Check a registration file before you mint it
         </h1>
         <p className="mt-4 max-w-prose text-sm leading-relaxed text-muted">

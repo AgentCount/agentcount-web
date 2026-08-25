@@ -14,15 +14,20 @@
  *
  * ## Two colours, as of this design proposal
  *
- * The four bars still draw in the site's pass-green (`--color-live`) — that
- * part of the original rule is unchanged, and `TALLY_COLOR` still hand-copies
- * exactly that token, which is what keeps `test/tokens.test.ts` honest. What
- * changes is the fifth stroke, the diagonal that counts the bars off: it now
- * carries the new `--color-accent` (see `app/globals.css`'s design-system
+ * The four bars draw in bone (`--color-text`, `TALLY_TEXT`) — the site's
+ * own ink, not a status colour. Before this proposal they drew in the
+ * site's pass-green (`--color-live`, `TALLY_COLOR`): a brand mark quietly
+ * wearing a "pass" verdict it has no standing to claim. `TALLY_COLOR`
+ * stays defined and still hand-copies `--color-live` exactly, which is
+ * what keeps `test/tokens.test.ts` honest, but nothing in this module
+ * draws with it by default any more. What changes alongside the colour is
+ * the fifth stroke, the diagonal that counts the bars off: it now carries
+ * the new `--color-accent` (see `app/globals.css`'s design-system
  * comment), so the mark itself narrates what it draws — four counted, one
- * doing the counting. `TALLY_ACCENT` is that token's hand-copy, for the same
- * reason `TALLY_COLOR` is one: standalone SVG files and Satori resolve no CSS
- * variables. In React, prefer `<TallyMark>` so the real tokens are used.
+ * doing the counting. `TALLY_TEXT` and `TALLY_ACCENT` are hand-copies for
+ * the same reason `TALLY_COLOR` always was one: standalone SVG files and
+ * Satori resolve no CSS variables. In React, prefer `<TallyMark>` so the
+ * real tokens are used.
  *
  * The gap where the diagonal crosses the four bars is a real cut, not a
  * layering trick: `tallySvg` masks the bars everywhere the diagonal's own
@@ -69,6 +74,12 @@ export const TALLY_STROKES: readonly (readonly [number, number, number, number])
 export const TALLY_COLOR = "#3ddc84";
 export const TALLY_ACCENT = "#45d3e0";
 export const TALLY_BG = "#08090b";
+/**
+ * Hand-copy of `--color-text` ("bone") — used only by `tallyFaviconSvg`'s
+ * dark-mode bars, not by the on-page mark. See that function's doc for why
+ * the favicon deliberately does NOT reuse `TALLY_COLOR`.
+ */
+export const TALLY_TEXT = "#e8e4dc";
 
 /**
  * Wide enough to fully cover `TALLY_STROKE_WIDTH` at any padding this module
@@ -94,12 +105,21 @@ export const TALLY_CUT_WIDTH = TALLY_STROKE_WIDTH * 2;
  * the module doc. Pass `accentColor` equal to `color` to fall back to the
  * old single-colour mark; the mask still applies either way; it is cheap and
  * invisible when both colours match.
+ *
+ * `color` defaults to `TALLY_TEXT` (bone), not `TALLY_COLOR` (pass-green):
+ * every caller of this function — the favicons, the touch icon, the
+ * standalone logo files — draws the brand mark, not a status readout, and
+ * green there reads as a "pass" none of these files is entitled to claim.
+ * `TALLY_COLOR` stays defined and still tested against `--color-live`
+ * because it is what the mark drew in before this proposal and a caller
+ * that explicitly wants the old single-colour mark can still pass it in —
+ * nothing here defaults to it any more.
  */
 export function tallySvg({
   size,
   background,
   padding = 0,
-  color = TALLY_COLOR,
+  color = TALLY_TEXT,
   accentColor = TALLY_ACCENT,
 }: {
   /** Rendered width/height in px. Defaults to the viewBox size. */
@@ -160,14 +180,19 @@ export function tallyDataUri(options: Parameters<typeof tallySvg>[0] = {}): stri
  * light `--color-bg`), so the two are genuinely different questions and this
  * function answers only the first one.
  *
- * The bars swap from pass-green to near-black — `TALLY_BG`, reused as an
- * ink rather than a fill, because it is already the darkest token this
- * module hand-copies and a second near-black hex has no reason to exist.
- * Green-on-white reads as "still not quite right" rather than as intent, and
- * black is legible against either surface. The background swaps from
- * `TALLY_BG` to plain white — not the page's own bone (`#fffdf6`, the old
- * `--color-accent`): a tab icon sits in the browser's neutral chrome, not on
- * this site's stylised surface, and white is what that chrome actually is.
+ * The bars are `TALLY_TEXT` (bone) in dark chrome and `TALLY_BG` (near-black,
+ * reused as an ink rather than a fill) in light chrome — deliberately NOT
+ * `TALLY_COLOR`, the pass-green every other rendering of this mark uses. On
+ * the page, green is correct: the bars sit beside real rung verdicts, so
+ * reusing the status hue ties the mark to what it counts. A tab icon has no
+ * such neighbours — green there reads as an arbitrary colour choice, or
+ * worse, as a status this one favicon is quietly claiming for itself. Bone
+ * is what the rest of this site's chrome is drawn in, which is what a
+ * favicon is: chrome, not data. There is no background rect: the tile stays
+ * transparent in both modes, so the mark sits directly on whatever the
+ * browser's own tab chrome is — a painted square behind it reads as this
+ * site's surface bleeding into chrome that is not this site's to paint, and
+ * disagrees with every other browser tab sitting next to it.
  *
  * The diagonal stays `TALLY_ACCENT` in both modes, unconditionally — see
  * `app/globals.css`'s design-system comment: this is the one place the new
@@ -187,10 +212,9 @@ export function tallyFaviconSvg({ padding = 3 }: { padding?: number } = {}): str
     `<svg xmlns="http://www.w3.org/2000/svg" width="${box}" height="${box}" ` +
     `viewBox="${-padding} ${-padding} ${box} ${box}" fill="none">` +
     `<style>` +
-    `.tally-bg{fill:${TALLY_BG}}.tally-bars{stroke:${TALLY_COLOR}}` +
-    `@media (prefers-color-scheme:light){.tally-bg{fill:#ffffff}.tally-bars{stroke:${TALLY_BG}}}` +
+    `.tally-bars{stroke:${TALLY_TEXT}}` +
+    `@media (prefers-color-scheme:light){.tally-bars{stroke:${TALLY_BG}}}` +
     `</style>` +
-    `<rect class="tally-bg" x="${-padding}" y="${-padding}" width="${box}" height="${box}"/>` +
     `<mask id="${maskId}" maskUnits="userSpaceOnUse" x="${-padding}" y="${-padding}" width="${box}" height="${box}">` +
     `<rect x="${-padding}" y="${-padding}" width="${box}" height="${box}" fill="#fff"/>` +
     `<line x1="${dx1}" y1="${dy1}" x2="${dx2}" y2="${dy2}" stroke="#000" stroke-width="${TALLY_CUT_WIDTH}" stroke-linecap="round"/>` +

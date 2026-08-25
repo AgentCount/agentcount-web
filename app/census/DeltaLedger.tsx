@@ -66,8 +66,13 @@ export function DeltaLedger({
           </tr>
         </thead>
         <tbody>
+          {/* `hover:bg-raised` on the row — the same scan aid `AgentTable.tsx`
+              and the runs table on `/data` give their own rows: a reader
+              tracking one chain across seven numeric columns benefits from
+              "this is the row under your cursor" feedback even though
+              nothing here is a link. */}
           {rows.map(({ run, delta }) => (
-            <tr key={run.run_id} className="border-b border-line/70">
+            <tr key={run.run_id} className="border-b border-line/70 transition-colors hover:bg-raised">
               <td className="px-3 py-1.5 font-mono text-xs text-muted">
                 {chainDisplayName(run.chain)}
                 {delta?.method_changed && (

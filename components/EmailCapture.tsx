@@ -92,6 +92,15 @@ export function EmailCapture({
           aria-hidden="true"
           className="hidden"
         />
+        {/* `focus:border-muted` only, no `focus:outline-none`: this
+            input used to suppress the site's accessible focus ring and
+            replace it with a border barely a shade lighter — a keyboard
+            user tabbing here got almost nothing. Dropping the
+            suppression lets the global `:focus-visible` ring (see
+            `globals.css`) return for keyboard focus, while the border
+            tint — plain `:focus`, not `:focus-visible` — still answers
+            a mouse click same as before; the two now stack instead of
+            one silently winning. */}
         <input
           id="newsletter-email"
           type="email"
@@ -99,11 +108,11 @@ export function EmailCapture({
           required
           autoComplete="email"
           placeholder="you@example.com"
-          className="min-w-0 flex-1 border border-edge bg-panel px-4 py-2.5 font-mono text-sm text-text placeholder:text-dead focus:border-muted focus:outline-none"
+          className="min-w-0 flex-1 border border-edge bg-panel px-4 py-2.5 font-mono text-sm text-text placeholder:text-dead focus:border-muted"
         />
         <button
           type="submit"
-          className="border border-edge px-5 py-2.5 font-mono text-xs uppercase tracking-[0.1em] text-muted transition-colors hover:border-muted hover:text-text"
+          className="border border-edge px-5 py-2.5 font-mono text-xs uppercase tracking-[0.1em] text-muted transition hover:border-muted hover:text-text active:scale-[0.97]"
         >
           Subscribe
         </button>
@@ -119,7 +128,7 @@ export function EmailCapture({
         census reports. Nothing is sent yet — there is no sending side built,
         so there is no confirmation email to expect, and you will be asked to
         confirm before the first report goes anywhere. Email{" "}
-        <TextLink href={`mailto:${BRAND.contactEmail}`} tone="quiet">
+        <TextLink href={`mailto:${BRAND.contactEmail}`} tone="inherit">
           {BRAND.contactEmail}
         </TextLink>{" "}
         at any point and it is deleted.

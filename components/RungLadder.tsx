@@ -62,7 +62,7 @@ export function RungLadder({
           >
             <span
               aria-hidden="true"
-              className={`numeral text-3xl ${r ? "text-dead" : "text-line"}`}
+              className={`headline text-3xl ${r ? "text-dead" : "text-line"}`}
             >
               {n}
             </span>

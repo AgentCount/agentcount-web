@@ -16,8 +16,12 @@ import {
  * are different claims cannot learn it from a colour.
  *
  * Set as a single ruled strip rather than a bordered panel: it is a key, and a
- * key should sit quietly under the thing it explains rather than compete with
- * it for weight.
+ * key should sit quietly beside the thing it explains rather than compete
+ * with it for weight. It renders directly above the table on `/directory`
+ * and `/working` — moved up from below the pagination, where a reader had
+ * already scanned every glyph on the page once before learning what any of
+ * them meant. The rule above it still separates it from whatever precedes
+ * it (the filter form), which is all `border-t` ever meant here.
  *
  * The status words come from the run's own vocabulary, not a literal list, so
  * this legend cannot describe a status the API no longer produces or omit one

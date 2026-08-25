@@ -1,3 +1,4 @@
+import { MiniPanel } from "@/components/MiniPanel";
 import { Section } from "@/components/Section";
 import probe from "@/content/coverage-probe.json";
 import { chainDisplayName } from "@/lib/chains";
@@ -77,30 +78,50 @@ export default async function CoveragePage() {
 
   return (
     <>
-      <header className="border-b border-edge pb-6">
-        <h1 className="numeral text-[clamp(1.75rem,3.2vw,2.5rem)] text-text">
-          Coverage
-        </h1>
-        <p className="mt-4 max-w-prose text-sm leading-relaxed text-muted">
-          The canonical Identity Registry is deployed on more chains than this
-          census sweeps. This page lists every deployment the probe could find,
-          how many agents each held on {probedDate}, and which of them the
-          census covers. The swept set is derived from the published runs, so a
-          newly published chain flips its own row.
-        </p>
-        <p className="mt-4 max-w-prose text-sm leading-relaxed text-muted">
-          As of {probedDate}, the swept chains held{" "}
-          <span className="font-mono text-text">{num(sweptTotal)}</span> of{" "}
-          <span className="font-mono text-text">{num(probedTotal)}</span>{" "}
-          probed registrations —{" "}
-          <span className="text-text">
-            {coverage === null ? "—" : `${coverage.toFixed(1)}%`}
-          </span>
-          . The census&rsquo;s own headline counts are read at pinned blocks
-          and therefore differ slightly from the probe&rsquo;s live counts;
-          this figure compares the probe with itself, on one date, so the
-          division is honest.
-        </p>
+      {/* Two-column page-head, the same split `MiniPanel`'s own doc
+          describes at its other three call sites: intro left, the one
+          figure a reader came for right. The figure here is the coverage
+          percentage the two paragraphs already state in prose — read a
+          second time from a box rather than a second hand-rolled number
+          that could drift from it, the same reasoning the homepage panel's
+          own `StatusTag` comment gives for its LIVE tag. */}
+      <header className="border-b border-edge pb-6 lg:grid lg:grid-cols-[minmax(0,1fr)_minmax(16rem,20rem)] lg:items-start lg:gap-x-12">
+        <div>
+          <h1 className="headline text-[clamp(1.75rem,3.2vw,2.5rem)] text-text">
+            Coverage
+          </h1>
+          <p className="mt-4 max-w-prose text-sm leading-relaxed text-muted">
+            The canonical Identity Registry is deployed on more chains than this
+            census sweeps. This page lists every deployment the probe could find,
+            how many agents each held on {probedDate}, and which of them the
+            census covers. The swept set is derived from the published runs, so a
+            newly published chain flips its own row.
+          </p>
+          <p className="mt-4 max-w-prose text-sm leading-relaxed text-muted">
+            As of {probedDate}, the swept chains held{" "}
+            <span className="font-mono text-text">{num(sweptTotal)}</span> of{" "}
+            <span className="font-mono text-text">{num(probedTotal)}</span>{" "}
+            probed registrations —{" "}
+            <span className="text-text">
+              {coverage === null ? "—" : `${coverage.toFixed(1)}%`}
+            </span>
+            . The census&rsquo;s own headline counts are read at pinned blocks
+            and therefore differ slightly from the probe&rsquo;s live counts;
+            this figure compares the probe with itself, on one date, so the
+            division is honest.
+          </p>
+        </div>
+        <MiniPanel
+          className="mt-6 lg:mt-0"
+          label="Swept share"
+          count={coverage === null ? "—" : `${coverage.toFixed(1)}%`}
+          foot={
+            <>
+              <span>{num(sweptTotal)} of {num(probedTotal)} agents</span>
+              <span>probed {probedDate}</span>
+            </>
+          }
+        />
       </header>
 
       <Section
@@ -129,8 +150,11 @@ export default async function CoveragePage() {
             </tr>
           </thead>
           <tbody>
+            {/* `hover:bg-raised` row scan aid — same pattern as
+                `AgentTable.tsx` and the tables on `/data` and
+                `/methodology`. */}
             {data.chains.map((c) => (
-              <tr key={c.slug} className="border-b border-line/60">
+              <tr key={c.slug} className="border-b border-line/60 transition-colors hover:bg-raised">
                 <td className="py-1.5 pr-4 text-muted">
                   {chainDisplayName(c.slug) === c.slug
                     ? c.name

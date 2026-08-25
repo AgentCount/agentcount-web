@@ -7,14 +7,18 @@ import {
 } from "@/lib/tally";
 
 /**
- * The mark, inline. The four bars draw in `currentColor`, unchanged from
- * before this proposal — the caller still applies `text-live` or whatever
- * token fits, exactly as it always has. The fifth stroke, the diagonal that
- * counts the bars off, now draws in `var(--color-accent)` directly rather
- * than `currentColor`: see the design-system comment in `app/globals.css`
- * and the module doc in `lib/tally.ts` for why the mark carries two colours
- * as of this proposal instead of one. Always decorative — the wordmark text
- * it accompanies is the accessible name — hence `aria-hidden` unconditionally.
+ * The mark, inline. The four bars still draw in `currentColor`, as they
+ * always have — this component still leaves the colour to whatever the
+ * caller sets. What changed with this proposal is which colour every
+ * caller actually passes: `text-live` (pass-green, a status hue) became
+ * `text-text` (bone, this site's own ink) at every call site, because a
+ * brand mark drawn in a status colour reads as a verdict it has no
+ * standing to give — see `lib/tally.ts`'s module doc. The fifth stroke,
+ * the diagonal that counts the bars off, draws in `var(--color-accent)`
+ * directly rather than `currentColor`: see the design-system comment in
+ * `app/globals.css` for why the mark carries two colours as of this
+ * proposal instead of one. Always decorative — the wordmark text it
+ * accompanies is the accessible name — hence `aria-hidden` unconditionally.
  *
  * ## The crossing gap is a real cut
  *

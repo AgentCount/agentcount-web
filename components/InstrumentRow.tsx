@@ -7,10 +7,13 @@ import { TextLink } from "@/components/TextLink";
  * instrument has published figures — a mono facts line in the same grammar
  * as a finding tile's denominator line.
  *
- * The homepage's Instruments section is a list of these. Today it has one
- * entry; a new instrument becomes a new row here the day it ships, and not
- * one day before — nothing unshipped is listed, linked or teased. The row
- * asserts existence, never quality: no colour, no glyph, no box.
+ * Not currently rendered: the homepage's Instruments section describes its
+ * one instrument in a plain paragraph instead, since a list of one is list
+ * chrome around a single row. This component is what that section switches
+ * to the day a second instrument ships — a new instrument becomes a new row
+ * here, and not one day before: nothing unshipped is listed, linked or
+ * teased. The row asserts existence, never quality: no colour, no glyph, no
+ * box.
  */
 export function InstrumentRow({
   index,

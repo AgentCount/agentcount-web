@@ -64,7 +64,7 @@ export function RateBar({ rung, total }: { rung: RungRate; total: number }) {
           decisions. */}
       <div className="flex items-baseline gap-2.5 lg:block">
         <div className="flex items-baseline gap-2">
-          <span className="numeral text-xl text-dead">{rung.rung}</span>
+          <span className="headline text-xl text-dead">{rung.rung}</span>
           <h3 className="font-mono text-sm uppercase tracking-[0.1em] text-text">
             {questionFor(rung.rung, rung.name)}
           </h3>
@@ -144,7 +144,7 @@ export function MissingRateBar({ rungNumber }: { rungNumber: number }) {
     <div className="grid grid-cols-1 gap-x-8 gap-y-2 lg:grid-cols-[15rem_1fr]">
       <div className="flex items-baseline gap-2.5 lg:block">
         <div className="flex items-baseline gap-2">
-          <span className="numeral text-xl text-dead">{rungNumber}</span>
+          <span className="headline text-xl text-dead">{rungNumber}</span>
           <h3 className="font-mono text-sm uppercase tracking-[0.1em] text-dead">
             {questionFor(rungNumber)}
           </h3>

@@ -113,8 +113,10 @@ function ico(images: { size: number; data: Buffer }[]): Buffer {
  * means this file is for dark surfaces; that is the brand's only surface.
  *
  * The mark half matches `lib/tally.ts`'s `tallySvg` exactly, by hand: bars in
- * `COLOR.live` with the diagonal's own stroke masked out of them, the
- * diagonal itself drawn on top in `COLOR.accent`. This file is a plain
+ * `COLOR.text` (bone — not `COLOR.live`; see that module's doc for why the
+ * brand mark stopped drawing in the status palette) with the diagonal's own
+ * stroke masked out of them, the diagonal itself drawn on top in
+ * `COLOR.accent`. This file is a plain
  * string, not one more consumer of `tallySvg` — its mark sits inside a
  * 340×64 wordmark canvas rather than tallySvg's own square one, offset by
  * `shift` to sit on the baseline the text wants — so the geometry is
@@ -141,7 +143,7 @@ function wordmarkSvg(): string {
     `<rect x="0" y="0" width="340" height="64" fill="#fff"/>` +
     `<line x1="${dx1}" y1="${dy1 + shift}" x2="${dx2}" y2="${dy2 + shift}" stroke="#000" stroke-width="${TALLY_CUT_WIDTH}" stroke-linecap="round"/>` +
     `</mask>` +
-    `<g stroke="${COLOR.live}" stroke-width="${TALLY_STROKE_WIDTH}" stroke-linecap="round" mask="url(#${maskId})">${bars}</g>` +
+    `<g stroke="${COLOR.text}" stroke-width="${TALLY_STROKE_WIDTH}" stroke-linecap="round" mask="url(#${maskId})">${bars}</g>` +
     `<line x1="${dx1}" y1="${dy1 + shift}" x2="${dx2}" y2="${dy2 + shift}" stroke="${COLOR.accent}" stroke-width="${TALLY_STROKE_WIDTH}" stroke-linecap="round"/>` +
     `<text x="70" y="43" fill="${COLOR.text}" font-family="'JetBrains Mono', ui-monospace, 'SF Mono', Menlo, monospace" ` +
     `font-size="32" font-weight="600" letter-spacing="4">AGENTCOUNT</text></svg>`

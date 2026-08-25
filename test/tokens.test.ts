@@ -67,6 +67,7 @@ describe("the palette's hand-copies match @theme", () => {
     expect(tally).toContain(`export const TALLY_COLOR = "${theme.live}"`);
     expect(tally).toContain(`export const TALLY_ACCENT = "${theme.accent}"`);
     expect(tally).toContain(`export const TALLY_BG = "${theme.bg}"`);
+    expect(tally).toContain(`export const TALLY_TEXT = "${theme.text}"`);
   });
 });
 

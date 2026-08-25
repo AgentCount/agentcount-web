@@ -2,6 +2,7 @@ import { AgentTable } from "@/components/AgentTable";
 import { ChainSwitcher } from "@/components/ChainSwitcher";
 import { chainDisplayName } from "@/lib/chains";
 import { DirectoryControls } from "@/components/DirectoryControls";
+import { MiniPanel } from "@/components/MiniPanel";
 import { Pagination } from "@/components/Pagination";
 import { StatusLegend } from "@/components/StatusLegend";
 import { TextLink } from "@/components/TextLink";
@@ -54,8 +55,12 @@ export async function AgentDirectory({
   footer?: React.ReactNode;
 }) {
   const page = pageFromParam(searchParams.page);
-  const run = await resolveRunForRequest(searchParams);
+  // Fetched once, then threaded into `resolveRunForRequest` below — it used
+  // to fetch `/api/runs` a second time internally to resolve the very same
+  // request's run. See `resolveRun`'s own doc for why that was two round
+  // trips to one endpoint rather than one.
   const allRuns = await listRuns();
+  const run = await resolveRunForRequest(searchParams, allRuns);
 
   // The rung and status vocabulary come from this run's own rates, never typed
   // here: a filter can then never offer a value the API would reject, and a
@@ -89,38 +94,66 @@ export async function AgentDirectory({
 
   return (
     <>
-      <header className="border-b border-edge pb-5">
-        <div className="mb-6">
-          <ChainSwitcher
-            chains={chainsWithRuns(allRuns)}
-            current={run.chain}
-            basePath={basePath}
-          />
-        </div>
-        <h1 className="numeral max-w-[24ch] text-[clamp(1.75rem,3.2vw,2.5rem)] text-text">
-          {title}
-        </h1>
-        <div className="mt-4 max-w-prose text-sm leading-relaxed text-muted">{intro}</div>
-        <p className="mt-4 flex flex-wrap items-baseline gap-x-5 gap-y-1 font-mono text-xs text-dead">
-          <span>
-            run <span className="text-muted">{run.run_id.slice(0, 8)}</span>
-          </span>
-          <span className="text-line">|</span>
-          <span className="text-muted">{run.chain}</span>
-          <span className="text-line">|</span>
-          <span>
-            block{" "}
-            <span className="text-muted">
-              {run.pinned_block !== null
-                ? run.pinned_block.toLocaleString("en-US")
-                : "—"}
+      {/* Two-column page-head: intro left, a stat box right — the same
+          split the homepage hero uses for its own header/panel pair, at
+          companion-page scale, so the population of the run being listed is
+          readable before any of the filtering below is touched. Single
+          column under `lg`, where two would leave neither half a usable
+          measure. See `MiniPanel.tsx`. */}
+      <header className="border-b border-edge pb-5 lg:grid lg:grid-cols-[minmax(0,1fr)_minmax(16rem,20rem)] lg:items-start lg:gap-x-12">
+        <div>
+          <div className="mb-6">
+            <ChainSwitcher
+              chains={chainsWithRuns(allRuns)}
+              current={run.chain}
+              basePath={basePath}
+            />
+          </div>
+          <h1 className="headline max-w-[24ch] text-[clamp(1.75rem,3.2vw,2.5rem)] text-text">
+            {title}
+          </h1>
+          <div className="mt-4 max-w-prose text-sm leading-relaxed text-muted">{intro}</div>
+          <p className="mt-4 flex flex-wrap items-baseline gap-x-5 gap-y-1 font-mono text-xs text-dead">
+            <span>
+              run <span className="text-muted">{run.run_id.slice(0, 8)}</span>
             </span>
-          </span>
-          <span className="text-line">|</span>
-          <TextLink href={`/?chain=${encodeURIComponent(run.chain)}`} tone="inherit">
-            provenance
-          </TextLink>
-        </p>
+            <span className="text-line">|</span>
+            <span className="text-muted">{run.chain}</span>
+            <span className="text-line">|</span>
+            <span>
+              block{" "}
+              <span className="text-muted">
+                {run.pinned_block !== null
+                  ? run.pinned_block.toLocaleString("en-US")
+                  : "—"}
+              </span>
+            </span>
+            <span className="text-line">|</span>
+            <TextLink href={`/?chain=${encodeURIComponent(run.chain)}`} tone="inherit">
+              provenance
+            </TextLink>
+          </p>
+        </div>
+        <MiniPanel
+          className="mt-6 lg:mt-0"
+          label="Agents on this run"
+          count={rates.agent_count}
+          foot={
+            <>
+              <span>
+                chain <span className="text-muted">{run.chain}</span>
+              </span>
+              <span>
+                block{" "}
+                <span className="text-muted">
+                  {run.pinned_block !== null
+                    ? run.pinned_block.toLocaleString("en-US")
+                    : "—"}
+                </span>
+              </span>
+            </>
+          }
+        />
       </header>
 
       {!lockedFacets && (
@@ -227,7 +260,15 @@ export async function AgentDirectory({
         </div>
       ) : (
         <>
-          <div className="mt-8">
+          {/* The key now sits directly above the table it explains, not
+              after the pagination below it — a reader used to scan every
+              glyph on all 50 rows once before finding out what any of them
+              meant. It still reads the run's own status vocabulary, so it
+              can never describe a status this run did not produce. */}
+          <div className="mt-8 max-w-5xl">
+            <StatusLegend statuses={validStatuses} />
+          </div>
+          <div className="mt-5">
             <AgentTable agents={agents.items} />
           </div>
           <div className="mt-5">
@@ -237,9 +278,6 @@ export async function AgentDirectory({
               params={linkParams}
               basePath={basePath}
             />
-          </div>
-          <div className="mt-8 max-w-5xl">
-            <StatusLegend statuses={validStatuses} />
           </div>
         </>
       )}

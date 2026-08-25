@@ -126,6 +126,19 @@ export function ReportBody({
               </table>
             </div>
           ),
+          // `hover:bg-raised` row scan aid — same pattern as
+          // `AgentTable.tsx` and every other data table site-wide, extended
+          // here to whatever tables a report's markdown body happens to
+          // contain, since react-markdown gives `tr` no styling of its own
+          // to inherit. Scoped to `tbody`'s direct rows (`[&>tr]`) rather
+          // than overriding `tr` itself, so the header row — which every
+          // other table on the site also excludes from the hover — is not
+          // included.
+          tbody: ({ children }) => (
+            <tbody className="[&>tr]:transition-colors [&>tr:hover]:bg-raised">
+              {children}
+            </tbody>
+          ),
           th: ({ children, style }) => (
             <th
               scope="col"

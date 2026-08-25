@@ -67,7 +67,7 @@ export function SpotCheck({ chain, agentId }: { chain: string; agentId: number }
         <button
           type="submit"
           disabled={pending}
-          className="border border-edge px-5 py-2 font-mono text-xs uppercase tracking-[0.1em] text-text transition-colors hover:bg-raised disabled:text-dead"
+          className="border border-edge px-5 py-2 font-mono text-xs uppercase tracking-[0.1em] text-text transition hover:bg-raised active:scale-[0.97] disabled:text-dead disabled:active:scale-100"
         >
           {pending ? "Checking…" : "Check this agent now"}
         </button>
@@ -83,10 +83,24 @@ export function SpotCheck({ chain, agentId }: { chain: string; agentId: number }
           see the panel would be given no signal at all that it landed.
           `polite` — this is a reply to something they asked for. */}
       <div className={state.kind === "idle" ? "" : "mt-6"} aria-live="polite">
-        {state.kind === "checked" ? (
-          <SpotCheckPanel result={state.result} />
-        ) : state.kind === "idle" ? null : (
-          <Refusal state={state} />
+        {/* `motion-safe:animate-fade-in` (see its doc in `globals.css`):
+            this answer just landed after the reader pressed the button
+            above, so it gets the one entrance animation on the site
+            instead of snapping into place. `key`, because a CSS
+            `animation` fires on mount, not on update — without it, a
+            second press would reuse this same wrapper and the entrance
+            would only ever have played once. Keyed on the result itself,
+            not on this wrapper alone, so a genuinely new check always
+            gets a fresh element. Wrapping rather than a prop on
+            `SpotCheckPanel`/`Refusal`: neither needs to know this exists. */}
+        {state.kind === "idle" ? null : (
+          <div key={JSON.stringify(state)} className="motion-safe:animate-fade-in">
+            {state.kind === "checked" ? (
+              <SpotCheckPanel result={state.result} />
+            ) : (
+              <Refusal state={state} />
+            )}
+          </div>
         )}
       </div>
     </Section>

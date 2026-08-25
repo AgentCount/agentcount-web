@@ -103,7 +103,7 @@ export function FindingTiles({
           pipeline writes one into a pinned run. */}
       <NoteTile
         index={4}
-        lead="not yet measured"
+        lead="—"
         source={`${LINKAGE.census.agents.toLocaleString("en-US")} agents · outside the seven checks`}
       >
         Whether money reaches a registered agent is read from token transfer
