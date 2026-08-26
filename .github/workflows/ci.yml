@@ -15,9 +15,16 @@ jobs:
       # This project uses pnpm — `pnpm-lock.yaml` is the committed lockfile.
       # pnpm must be installed BEFORE setup-node, because `cache: pnpm` asks
       # pnpm where its store is and fails if the binary is not on PATH yet.
+      #
+      # NO `version:` here on purpose. The version lives in package.json's
+      # `packageManager` field — one source of truth, pinned to an exact
+      # release with its tarball hash. Naming it in both places makes
+      # pnpm/action-setup refuse to guess ("Multiple versions of pnpm
+      # specified"), and naming it only here meant CI silently ran a
+      # different pnpm than anybody developing: `version: 11` resolves to
+      # the newest 11.x, which was 11.24.0 while this repo was built on
+      # 11.22.0.
       - uses: pnpm/action-setup@0977fd99725f1db4007ccb2928dbb4e90d06cc86 # v6.0.10
-        with:
-          version: 11
 
       - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
         with:
