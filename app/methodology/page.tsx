@@ -1,3 +1,4 @@
+import { MiniPanel } from "@/components/MiniPanel";
 import { RoleGlossary } from "@/components/RoleGlossary";
 import { getMethodology, getRates, listRuns, statusVocabulary } from "@/lib/api/endpoints";
 import { isCompletedRun } from "@/lib/api/schemas";
@@ -51,7 +52,32 @@ export default async function MethodologyPage() {
 
   return (
     <>
-      <h1 className="numeral text-[clamp(1.75rem,3.2vw,2.5rem)] text-text">What we measure</h1>
+      {/* Two-column page-head, the same split `MiniPanel`'s own doc
+          describes at its other call sites: intro left, the one figure a
+          reader came for right — here, how many checks this page is about
+          to define, next to the versions that pin what "checked" meant when
+          this run was swept. Single column under `lg`. See `MiniPanel.tsx`. */}
+      <header className="border-b border-edge pb-6 lg:grid lg:grid-cols-[minmax(0,1fr)_minmax(16rem,20rem)] lg:items-start lg:gap-x-12">
+        <div>
+          <h1 className="headline text-[clamp(1.75rem,3.2vw,2.5rem)] text-text">What we measure</h1>
+          <p className="mt-4 max-w-prose text-sm leading-relaxed text-muted">
+            What each of the seven checks asks, in the same vocabulary the
+            API, the checker and this page&rsquo;s own changelog use — so a
+            claim never has two definitions to drift apart.
+          </p>
+        </div>
+        <MiniPanel
+          className="mt-6 lg:mt-0"
+          label="Checks this census runs"
+          count={CHECKS.length}
+          foot={
+            <>
+              <span>checker {m.checker_version}</span>
+              <span>schema v{m.schema_version}</span>
+            </>
+          }
+        />
+      </header>
 
       {/* Why the census exists, at the anchor the homepage links to. The
           homepage carries three sentences of this; the rest lives here,
@@ -124,8 +150,8 @@ export default async function MethodologyPage() {
         <h2 className="label">Independence</h2>
         <ul className="mt-3 list-disc space-y-2 pl-5 text-sm leading-relaxed text-muted">
           <li>
-            <span className="text-text">Nobody in the census pays us.</span> No
-            payment is accepted from any agent operator, platform, registry or
+            <span className="text-text">Nobody in the census pays us.</span>{" "}
+            No payment is accepted from any agent operator, platform, registry or
             chain that appears in these results. Every agent here was checked
             without its owner&rsquo;s knowledge, at a block pinned in advance.
           </li>
@@ -203,8 +229,12 @@ export default async function MethodologyPage() {
               </tr>
             </thead>
             <tbody>
+              {/* `hover:bg-raised` row scan aid — same pattern as
+                  `AgentTable.tsx` and the tables on `/data` and `/coverage`:
+                  a four-column reference table benefits from "this is the
+                  row under your cursor" as much as any other. */}
               {CHECKS.map((c) => (
-                <tr key={c.number}>
+                <tr key={c.number} className="transition-colors hover:bg-raised">
                   <td className="border-b border-line py-2 pr-4 font-mono text-xs text-muted">
                     {c.number}
                   </td>
@@ -267,8 +297,8 @@ export default async function MethodologyPage() {
             <dt className="font-mono text-xs uppercase tracking-[0.1em] text-muted">6 · live</dt>
             <dd className="mt-2 max-w-prose text-sm leading-relaxed text-muted sm:mt-0">
               Whether the endpoints the card declares in{" "}
-              <code className="font-mono text-text">services[]</code> actually
-              respond. Not yet implemented — every agent currently shows no
+              <code className="font-mono text-text">services[]</code>{" "}
+              actually respond. Not yet implemented — every agent currently shows no
               row for this check, rendered on this site as &ldquo;not
               checked&rdquo;, never as a guessed status.
             </dd>
@@ -350,7 +380,7 @@ export default async function MethodologyPage() {
         </p>
         <table className="mt-3 w-full border-collapse text-left text-sm">
           <thead>
-            <tr >
+            <tr>
               <th scope="col" className="label border-b border-edge px-3 py-2 font-normal">
                 Field
               </th>
@@ -360,8 +390,10 @@ export default async function MethodologyPage() {
             </tr>
           </thead>
           <tbody>
+            {/* Same `hover:bg-raised` row scan aid as the check-naming table
+                above and the other reference tables site-wide. */}
             {m.rung4_must_fields.map((f) => (
-              <tr key={f.field}>
+              <tr key={f.field} className="transition-colors hover:bg-raised">
                 <td className="border-b border-line px-3 py-2 font-mono text-xs text-text">
                   {f.field}
                 </td>

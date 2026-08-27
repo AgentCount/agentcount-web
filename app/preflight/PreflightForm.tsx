@@ -43,13 +43,30 @@ export function PreflightForm({ statuses }: { statuses: string[] }) {
             </>
           }
         >
+          {/* `focus:border-edge` only, no `focus:outline-none`, here and
+              on the three identity fields below: all four used to
+              suppress the site's accessible focus ring and replace it
+              with a border barely a shade lighter — a keyboard user
+              tabbing through this form got almost nothing. Dropping the
+              suppression lets the global `:focus-visible` ring (see
+              `globals.css`) return for keyboard focus, while the border
+              tint — plain `:focus`, not `:focus-visible` — still answers
+              a mouse click same as before; the two now stack instead of
+              one silently winning.
+
+              The three identity fields below carry a full border rather
+              than the underline this form used before — same fix as the
+              directory's search box (`DirectoryControls.tsx`): a bottom
+              rule alone reads as plain text sitting on a line, not as
+              something to type into, until the moment a reader's cursor
+              already happens to be over it. */}
           <textarea
             name="document"
             rows={18}
             spellCheck={false}
             defaultValue={state.kind === "checked" ? state.document : ""}
             placeholder={'{\n  "type": "https://eips.ethereum.org/EIPS/eip-8004#registration-v1",\n  "name": "…",\n  "registrations": [{ "agentId": 1, "agentRegistry": "eip155:8453:0x…" }]\n}'}
-            className="w-full resize-y border border-line bg-panel px-3 py-2 font-mono text-xs leading-relaxed text-text placeholder:text-dead focus:border-edge focus:outline-none"
+            className="w-full resize-y border border-line bg-panel px-3 py-2 font-mono text-xs leading-relaxed text-text placeholder:text-dead focus:border-edge"
           />
 
           <fieldset className="mt-5 border-t border-line pt-4">
@@ -67,7 +84,7 @@ export function PreflightForm({ statuses }: { statuses: string[] }) {
                 <input
                   name="agent_id"
                   inputMode="numeric"
-                  className="border-b border-line bg-transparent pb-1 font-mono text-xs text-text focus:border-edge focus:outline-none"
+                  className="w-full border border-line bg-raised/30 px-2 py-1 font-mono text-xs text-text transition-colors hover:border-edge focus:border-edge focus:bg-raised/50"
                 />
               </label>
               <label className="flex flex-col gap-1">
@@ -76,7 +93,7 @@ export function PreflightForm({ statuses }: { statuses: string[] }) {
                   name="chain_id"
                   inputMode="numeric"
                   placeholder="8453"
-                  className="border-b border-line bg-transparent pb-1 font-mono text-xs text-text placeholder:text-dead focus:border-edge focus:outline-none"
+                  className="w-full border border-line bg-raised/30 px-2 py-1 font-mono text-xs text-text placeholder:text-dead transition-colors hover:border-edge focus:border-edge focus:bg-raised/50"
                 />
               </label>
               <label className="flex flex-col gap-1">
@@ -84,7 +101,7 @@ export function PreflightForm({ statuses }: { statuses: string[] }) {
                 <input
                   name="registry"
                   placeholder="0x8004…"
-                  className="border-b border-line bg-transparent pb-1 font-mono text-xs text-text placeholder:text-dead focus:border-edge focus:outline-none"
+                  className="w-full border border-line bg-raised/30 px-2 py-1 font-mono text-xs text-text placeholder:text-dead transition-colors hover:border-edge focus:border-edge focus:bg-raised/50"
                 />
               </label>
             </div>
@@ -94,7 +111,7 @@ export function PreflightForm({ statuses }: { statuses: string[] }) {
             <button
               type="submit"
               disabled={pending}
-              className="border border-edge px-5 py-2 font-mono text-xs uppercase tracking-[0.1em] text-text transition-colors hover:bg-raised disabled:text-dead"
+              className="border border-edge px-5 py-2 font-mono text-xs uppercase tracking-[0.1em] text-text transition hover:bg-raised active:scale-[0.97] disabled:text-dead disabled:active:scale-100"
             >
               {pending ? "Checking…" : "Check document"}
             </button>
@@ -109,6 +126,19 @@ export function PreflightForm({ statuses }: { statuses: string[] }) {
         {state.kind === "checked" ? (
           <Section
             title="What the checker says"
+            // `motion-safe:animate-fade-in`: see the animation's own doc
+            // in `globals.css` — this result just landed after the reader
+            // pressed the button below, so it gets the one entrance
+            // animation on the site instead of snapping into place.
+            //
+            // `key`, because a CSS `animation` fires on mount, not on
+            // update: without it, checking a second document would
+            // reuse this same `Section` and the animation would only
+            // ever have played for the first one. Keying on the result
+            // itself forces a fresh element — and with it, a fresh
+            // entrance — for every completed check.
+            key={JSON.stringify(state)}
+            className="motion-safe:animate-fade-in"
             // Not "N of 7": even about answerability, a numerator-over-seven
             // reads as the tally this product refuses, and screenshots do not
             // carry the distinction.
@@ -125,7 +155,12 @@ export function PreflightForm({ statuses }: { statuses: string[] }) {
               </>
             }
           >
-            <div className="flex flex-wrap items-center gap-4">
+            {/* `min-w-0` — same fix as the agent page header (see
+                `RungStrip.tsx` and that page's own comment): without it this
+                flex item won't shrink below the strip's intrinsic width, and
+                the whole page scrolls sideways on a phone instead of just
+                the strip. */}
+            <div className="flex min-w-0 flex-wrap items-center gap-4">
               <RungStrip rungs={state.result.rungs} size="md" />
             </div>
 

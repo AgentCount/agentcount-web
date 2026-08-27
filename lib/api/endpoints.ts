@@ -43,9 +43,20 @@ export async function listRuns(): Promise<Run[]> {
  * A page calls this once and threads the resulting `run_id` through every
  * other fetch it makes, so a paginated listing or a stats page reads
  * consistently even if another run finishes while the reader is on the page.
+ *
+ * `knownRuns` is for a page that has already fetched the full list for its
+ * own purposes (a chain switcher, a census scope line) and would otherwise
+ * fetch `/api/runs` a second time to resolve the same request's run — two
+ * round trips to the same endpoint, and two snapshots that could disagree if
+ * a sweep finishes between them. Passing the list already in hand makes this
+ * synchronous in practice and guarantees both reads come from one snapshot.
  */
-export async function resolveRun(preferRunId?: string, chain?: string): Promise<Run> {
-  const runs = await listRuns();
+export async function resolveRun(
+  preferRunId?: string,
+  chain?: string,
+  knownRuns?: Run[],
+): Promise<Run> {
+  const runs = knownRuns ?? (await listRuns());
   if (preferRunId) {
     const match = runs.find((r) => r.run_id === preferRunId);
     if (match) return match;
@@ -75,11 +86,11 @@ export async function resolveRun(preferRunId?: string, chain?: string): Promise<
  * and not another is how a chain switcher quietly stops working on half the
  * site.
  */
-export async function resolveRunForRequest(params: {
-  run?: string;
-  chain?: string;
-}): Promise<Run> {
-  return resolveRun(params.run, params.chain ?? CENSUS.defaultChain);
+export async function resolveRunForRequest(
+  params: { run?: string; chain?: string },
+  knownRuns?: Run[],
+): Promise<Run> {
+  return resolveRun(params.run, params.chain ?? CENSUS.defaultChain, knownRuns);
 }
 
 /**

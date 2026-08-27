@@ -42,7 +42,7 @@ pnpm dev                # http://localhost:3000
 | `lib/api/` | Zod schemas, the fetch client, and one function per endpoint. |
 | `lib/paging.ts` | Page-number ↔ offset maths. |
 | `lib/status.ts` | Status → colour, glyph, and spelled-out label. The status *word* is never chosen here — only how it is drawn. |
-| `app/` | Routes. Every page is a Server Component. The three client files — `app/error.tsx` (required by Next for error boundaries), `app/preflight/PreflightForm.tsx` and `app/agent/[chain]/[id]/SpotCheck.tsx` (both a `useActionState` form over a server action) — are not pages. `loading.tsx` sits on segments that only ever answer 200 — a loading file makes its segment stream, and a streamed response cannot still become a 404. |
+| `app/` | Routes. Every page is a Server Component. Three of this app's six client components live here and are not pages — `app/error.tsx` (required by Next for error boundaries), `app/preflight/PreflightForm.tsx` and `app/agent/[chain]/[id]/SpotCheck.tsx` (both a `useActionState` form over a server action). The other three (`CountUp.tsx`, `NavLink.tsx`, `PageTransition.tsx`) live under `components/`, each isolated to the one client-only browser API it needs rather than promoting anything above it to client-rendered; `NavSearch.tsx`'s own doc comment carries the running count and the case for keeping it low. `loading.tsx` sits on segments that only ever answer 200 — a loading file makes its segment stream, and a streamed response cannot still become a 404. |
 | `components/` | Presentational pieces only. |
 | `scripts/check-api.ts` | Validates every endpoint against a live API. |
 

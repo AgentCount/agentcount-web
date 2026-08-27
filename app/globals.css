@@ -8,39 +8,87 @@
    The interface is built to express that refusal rather than merely comply
    with it, and one rule carries most of the weight:
 
-     COLOUR IS RESERVED FOR MEASUREMENT.
+     COLOUR IS RESERVED FOR MEASUREMENT — with one deliberate exception, below.
 
    The whole interface — nav, links, headings, rules, tables, buttons — is
    monochrome bone-on-black. The only saturated pixels on any page belong to a
-   rung status. Nothing is highlighted, promoted or de-emphasised by the
-   chrome, because the product's argument is that the interface does not get an
-   opinion about which agents matter. A blue link or a coloured button would be
-   the interface claiming attention that belongs to the data.
+   rung status, plus the one brand accent this section documents. Nothing else
+   is highlighted, promoted or de-emphasised by the chrome, because the
+   product's argument is that the interface does not get an opinion about
+   which agents matter. A page of coloured buttons would be the interface
+   claiming attention that belongs to the data — which is exactly why this
+   exception is kept to a single hue, used sparingly, and never inside a rung
+   badge.
 
    Consequences worth stating, so nobody "fixes" them later:
 
-     * `--color-accent` is bone, not blue. Links are told apart by an
-       underline, not a hue. If you add a coloured call-to-action, the rule is
-       broken and the six status colours stop being special.
+     * `--color-accent` is a deep cyan (`#45d3e0`), not bone — a design
+       proposal, not yet the shipped rule. It was chosen because it is not one
+       of the five hues `--color-live`/`fail`/`warn`/`dim`/`claim` already use
+       for rung status, so it can never be mistaken for a verdict on an agent,
+       and it stays distinct from red and green for colour-blind readers. It
+       appears in exactly seven places: the tally mark's closing diagonal
+       stroke (`lib/tally.ts`, `components/TallyMark.tsx`), the census
+       overview's "agent economy" emphasis (`app/page.tsx`), the masthead's
+       active-nav indicator (`components/NavLink.tsx`, styled below), the
+       chain switcher's active chain (`components/ChainSwitcher.tsx`), the
+       hero's primary CTA (`components/CtaLink.tsx` — see that component's
+       own doc for why it is a separate small component rather than a new
+       `TextLink` tone), the masthead search box's hover/focus borders and
+       the button's hover text (`components/NavSearch.tsx` — the one
+       `<button>` in the masthead that is not an `<a>`, so the "links get
+       an underline, not a hue" rule above does not cover it; it needed
+       its own hover signal, and cyan is what this site already spends on
+       "the thing to press" everywhere else — and its focus state now
+       matches, both controls' own border turning the same cyan instead of
+       drawing the shared ring below on top of it, see the
+       `#nav-q:focus-visible, #nav-find:focus-visible` rule), and the
+       `:focus-visible` ring below, which every OTHER interactive element
+       still shares. Links are still told apart by an underline, not a hue
+       everywhere else — `CtaLink` is the one deliberate exception to that
+       too, alongside the colour it carries.
      * Corners are square. Rounding is reserved for the rung register, where a
        2px radius keeps the seven cells reading as one physical component.
      * Structure is carried by hairline rules and whitespace. Cards with
        borders on all four sides were removed: a page of boxes reads as a
-       dashboard, and this is a register.
+       dashboard, and this is a register — with one exception now, kept as
+       narrowly scoped as the accent itself: the census hero's population
+       panel. See the `panel` utility below and its one call site in
+       `app/page.tsx` for why that one instrument reading gets a glass front
+       nowhere else on the site does.
 
    ── Type ───────────────────────────────────────────────────────────────────
 
-   IBM Plex, throughout. It was drawn for technical and data contexts, its
-   mono has genuinely distinguishable 0/O and 1/l/I — which matters when every
-   page is full of hex addresses and hashes — and it is not the default
-   grotesk every other dashboard reaches for.
+   Big Shoulders Display / Instrument Sans / JetBrains Mono — a design
+   proposal alongside the accent above, replacing IBM Plex wholesale rather
+   than mixing families. JetBrains Mono keeps IBM Plex Mono's genuinely
+   distinguishable 0/O and 1/l/I, which is the one property this system
+   cannot trade away — every page is full of hex addresses and hashes.
 
-     Condensed  display numbers and page titles (a printed-yearbook voice)
-     Mono       ALL data: ids, hashes, addresses, counts, status words
+     Mono       ALL data: ids, hashes, addresses, counts, status words,
+                page titles, and every standalone figure — `headline`
+     Condensed  `ReportBody`'s own section headings only — `numeral`
      Sans       prose only
 
-   The mono/sans split is semantic, not decorative: if it came from the chain
-   or the checker, it is set in mono. Prose is the only thing a human wrote.
+   Page titles moved to `headline` first — every `<h1>` on the site, and the
+   two `<h2>`s standing in for one, on the reports index and each report's
+   own permalink title. `app/page.tsx`'s hero made that call first, for a
+   single headline; `headline` is that same call promoted into its own
+   utility once every other page had actually been looked at rendered, not
+   assumed to read the same way sight unseen. A second pass then moved every
+   standalone figure the same way — the hero's population count,
+   `MiniPanel`'s count, a finding's percentage, a rung's own index: anywhere
+   a number is the thing a reader is meant to read as a value now sets the
+   same mono face as every id and hash beside it, rather than a second,
+   condensed voice reserved for numbers alone. `numeral` is not retired —
+   `ReportBody`'s own `<h2>`/`<h3>` still set it, on purpose: a report's
+   internal section headings are the one place this site still wants the
+   printed-yearbook condensed voice, independent of whether the heading
+   happens to contain a digit.
+
+   The mono/sans split below `headline` is semantic, not decorative: if it
+   came from the chain or the checker, it is set in mono. Prose is the only
+   thing a human wrote.
    ═══════════════════════════════════════════════════════════════════════════ */
 
 @theme {
@@ -66,10 +114,23 @@
      test/tokens.test.ts fails the build if this ever regresses. */
   --color-dead: #767e88;
 
-  /* Interactive. Deliberately NOT a hue — see the rule at the top. */
-  --color-accent: #fffdf6;
+  /* Interactive/brand. A proposed departure from bone — see the design-system
+     comment above for where this is allowed to appear and why.
 
-  /* ── The only saturated colours in the system ────────────────────────────
+     MEASURED, because an earlier draft of this comment claimed "1.8:1 against
+     --color-bg" and that is the ratio against WHITE, not against this page:
+     against --color-bg (#08090b) it is 11.05:1, comfortably AAA. The
+     constraint that does bind is a different one, and it is not contrast with
+     the background at all — it is that this hue sits at almost exactly the
+     luminance of two STATUS colours: 1.01:1 against --color-live (pass) and
+     1.06:1 against --color-warn (error). Hue is therefore the only thing
+     separating brand from measurement, so in greyscale, in print, or for a
+     reader with tritanopia they are the same tone. Anywhere the accent fills
+     a proportion bar it is doing the job this file reserves for the status
+     hues; see the design-system comment's list. */
+  --color-accent: #45d3e0;
+
+  /* ── The only other saturated colours in the system ──────────────────────
      One per status, tuned for contrast against #08090b. These are the
      product. Every one is paired with a glyph and a spelled-out label in
      `lib/status.ts`, so none of them is ever the sole carrier of meaning. */
@@ -79,9 +140,75 @@
   --color-dim: #747d8a; /* skipped — the dimmest status, but still AA as text */
   --color-claim: #8b9ac4; /* unclaimed — cool, readable, and neither */
 
-  --font-sans: var(--font-plex-sans), ui-sans-serif, system-ui, sans-serif;
-  --font-mono: var(--font-plex-mono), ui-monospace, monospace;
-  --font-display: var(--font-plex-condensed), var(--font-plex-sans), sans-serif;
+  --font-sans: var(--font-instrument-sans), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font-jetbrains-mono), ui-monospace, monospace;
+  --font-display: var(--font-big-shoulders), var(--font-instrument-sans), sans-serif;
+
+  /* Every `transition`/`transition-colors` on the site reads its duration
+     from here rather than each call site picking its own — one number for
+     "how fast does this instrument respond to a touch", changed once if it
+     is ever wrong, instead of forty. 200ms over Tailwind's 150ms default:
+     long enough to read as a response rather than a snap, short enough that
+     a reader moving the pointer across several links in a row never feels
+     the site lagging behind the cursor. */
+  --default-transition-duration: 200ms;
+
+  /* One entrance animation, for the one shape of content on the site that
+     genuinely appears out of nowhere: a preflight or spot-check result,
+     landing after an async wait the reader just triggered rather than
+     with the rest of the page. Materialising with no transition at all
+     reads as the page glitching, not as an answer arriving. Everywhere
+     else on the site renders with its page load, so nothing else needs
+     this — see `motion-safe:animate-fade-in` at its two call sites,
+     `PreflightForm.tsx` and `SpotCheck.tsx`. `motion-safe:` is Tailwind's
+     own `prefers-reduced-motion` gate, not a hand-rolled media query. */
+  --animate-fade-in: fade-in 400ms ease-out;
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ── The page gutter, as one number ───────────────────────────────────────
+   How far the masthead, `<main>` and the footer hold off the viewport edge.
+   It lives here, as a custom property, rather than as a Tailwind padding
+   ramp repeated at four call sites in `app/layout.tsx`, because a second
+   thing now depends on its exact value: `full-bleed` below cancels it, and
+   a separator that cancels 6rem while the page pads 5rem is a rule that
+   pokes out past the content on one side of the design and stops short on
+   the other. One declaration, two readers, no drift.
+
+   The breakpoints are Tailwind's own `sm`/`lg`/`xl`, and the ramp is
+   deliberate rather than one fixed number: this site held its content 28px
+   off the edge at every width before the change, which reads as breathing
+   room on a phone and as content pressed against the glass on a desktop.
+   6rem from `xl` up holds a 1440px window roughly a hundred pixels clear on
+   each side, which is what makes the page read as a register with margins
+   rather than as a browser window filled to the frame. */
+:root {
+  --page-gutter: 1.25rem;
+}
+@media (min-width: 40rem) {
+  :root {
+    --page-gutter: 1.75rem;
+  }
+}
+@media (min-width: 64rem) {
+  :root {
+    --page-gutter: 3rem;
+  }
+}
+@media (min-width: 80rem) {
+  :root {
+    --page-gutter: 6rem;
+  }
 }
 
 html {
@@ -118,6 +245,39 @@ p {
   outline-offset: 2px;
 }
 
+/* The masthead search box's two controls answer focus differently from
+   every other element on the site: not a ring at all, however tight the
+   offset, but their own existing 1px border turning from `border-line`
+   to `border-accent` — see the `focus-visible:border-accent` on each in
+   `NavSearch.tsx`. Two concentric rectangles, even nearly touching, still
+   read as a border AND a ring; one line changing colour reads as the one
+   state it is. That utility cannot remove the shared ring by itself
+   (`:focus-visible` above is deliberately unlayered so it always beats a
+   layered utility), so this rule switches it off for exactly these two
+   ids, unlayered to match — leaving the border-colour change, which
+   needed no such override, as the only focus signal on either control.
+   Still as visible to a keyboard user as the ring it replaces: an accent
+   cyan line is not a browser default vanishing against near-black,
+   which is the actual property the shared rule's own comment asks for,
+   not literally an `outline`. */
+#nav-q:focus-visible,
+#nav-find:focus-visible {
+  outline: none;
+}
+
+/* ...EXCEPT where the border cannot carry it. In forced-colors mode (Windows
+   High Contrast) the system repaints author border colours, so `border-line`
+   at rest and `border-accent` on focus collapse to the same system colour and
+   keyboard focus disappears entirely — on the one control present on every
+   page. An outline survives that repaint, which is why the shared rule uses
+   one; here it is simply given back. */
+@media (forced-colors: active) {
+  #nav-q:focus-visible,
+  #nav-find:focus-visible {
+    outline: revert;
+  }
+}
+
 /* ── Utilities the design leans on repeatedly ────────────────────────────── */
 
 /* The micro-label: 10px, uppercase, widely tracked. Every section is titled
@@ -145,12 +305,97 @@ p {
   background: var(--color-line);
 }
 
-/* Display numerals: condensed, tight, and optically aligned by trimming the
-   left side-bearing so a big number sits flush to the rule above it. */
+/* Condensed, tight, and optically aligned by trimming the left
+   side-bearing so a big line sits flush to the rule above it — now scoped
+   to `ReportBody`'s own `<h2>`/`<h3>`; see the Type section above for why
+   every number and every page title moved to `headline` and left this the
+   report body's own voice. */
 @utility numeral {
   font-family: var(--font-display);
   font-weight: 600;
   letter-spacing: -0.02em;
   line-height: 0.9;
   font-variant-numeric: tabular-nums slashed-zero;
+}
+
+/* Page titles and every standalone figure, as of this design proposal —
+   see the Type section above. Mono rather than condensed, and a full 1.14
+   line-height rather than `numeral`'s tight 0.9: that ratio was tuned for a
+   title, which wraps to two or three lines far more often than a number
+   does — a figure sitting alone by itself doesn't need the room 0.9 was
+   saving. `tabular-nums slashed-zero` is what makes this face fit a number
+   in the first place: ids, hashes, and now every display figure line up
+   digit to digit under it. */
+@utility headline {
+  font-family: var(--font-mono);
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  line-height: 1.14;
+  font-variant-numeric: tabular-nums slashed-zero;
+}
+
+/* ── The one bordered panel ───────────────────────────────────────────────
+   A second departure from "cards never get a border on all four sides"
+   (see the design-system comment above), kept as narrowly scoped as the
+   first one — the brand accent — was: the census hero's population panel.
+   It exists because that panel is the one place a reader is meant to read
+   the chrome itself as an instrument reading, with its own glass front,
+   rather than as more register rows — the findings tiles sitting directly
+   beneath it keep the hairline-only language unchanged, and so does every
+   other page. Scoped to one call site (`app/page.tsx`): the companion
+   pages take the smaller `mini-panel` below instead, so the full-size
+   glass front stays the hero's alone and the exception does not spread by
+   being convenient. */
+@utility panel {
+  /* --color-panel at 70% — a hand copy, not `color-mix()`: a custom
+     property can't be threaded through Tailwind's `/NN` opacity shorthand,
+     and writing the equivalent rgb() out where --color-panel is itself
+     defined would be a second copy of that hex rather than the first. */
+  background: rgba(16, 19, 23, 0.7);
+  border: 1px solid var(--color-edge);
+  padding: 1.625rem 1.625rem 1.375rem;
+}
+
+/* `panel`, scaled down for a header that shares its row with page-intro
+   prose rather than owning a hero. Same one exception `panel` already is to
+   "cards never get a border on all four sides"; this is not a second one —
+   the background and the border are `panel`'s to the pixel, and only the
+   padding is smaller, because a box standing beside a paragraph cannot
+   carry a hero's internal margins without dwarfing the prose it sits next
+   to. See `components/MiniPanel.tsx` for the three call sites. */
+@utility mini-panel {
+  background: rgba(16, 19, 23, 0.7);
+  border: 1px solid var(--color-edge);
+  padding: 1.25rem 1.375rem 1.125rem;
+}
+
+/* An element that cancels the page gutter and runs to the edges of the
+   column its page sits in — a separator drawn between chapters at full
+   width rather than stopping where the text stops, so the break reads as
+   the page turning rather than as one more hairline inside the column, of
+   which every page already has many. Only the gutter is cancelled, not
+   `<main>`'s 1800px cap: past that width the rule ends with the content,
+   which is the right answer on an ultrawide monitor, where a hairline
+   crossing three feet of empty black would read as a mistake rather than
+   as punctuation.
+
+   `border-top` rather than a `<hr>`'s default border-block, so the rule
+   sits at the top of the box and vertical rhythm can be set with plain
+   margins by whoever places it. */
+@utility full-bleed-rule {
+  margin-inline: calc(-1 * var(--page-gutter));
+  border: 0;
+  border-top: 1px solid var(--color-line);
+}
+
+/* Masthead nav active state, keyed off the `aria-current` attribute
+   `components/NavLink.tsx` sets — so the same fact a sighted reader gets
+   from the accent is the one a screen reader announces, rather than two
+   parallel signals that can disagree. An attribute selector rather than a
+   `text-accent` class on the link itself, so this rule wins over the
+   `label` utility's own colour on specificity alone, with no dependency on
+   which of the two Tailwind happens to emit last. */
+nav[aria-label="Main"] a[aria-current="page"] {
+  color: var(--color-accent);
+  border-bottom-color: var(--color-accent);
 }

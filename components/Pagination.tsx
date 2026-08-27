@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { buildQuery, pageCount } from "@/lib/paging";
+import { withArrowNudge } from "@/components/ArrowNudge";
 
 /**
  * 60,097 agents are never one DOM dump: the API pages by offset and this walks
@@ -8,6 +9,10 @@ import { buildQuery, pageCount } from "@/lib/paging";
  *
  * `basePath` exists because the directory is no longer at `/` — the homepage
  * is. Both `/directory` and `/working` page through this same component.
+ *
+ * The two live arrows nudge on hover via `withArrowNudge` (`ArrowNudge.tsx`)
+ * — the disabled `<span>` ends do not, since there is nowhere for them to
+ * point a reader.
  */
 export function Pagination({
   page,
@@ -34,9 +39,9 @@ export function Pagination({
         <Link
           href={href(page - 1)}
           rel="prev"
-          className={`${step} text-muted transition-colors hover:text-text`}
+          className={`${step} group text-muted transition-colors hover:text-text`}
         >
-          ← Prev
+          {withArrowNudge("← Prev")}
         </Link>
       ) : (
         <span className={`${step} text-dead`}>← Prev</span>
@@ -52,9 +57,9 @@ export function Pagination({
         <Link
           href={href(page + 1)}
           rel="next"
-          className={`${step} text-muted transition-colors hover:text-text`}
+          className={`${step} group text-muted transition-colors hover:text-text`}
         >
-          Next →
+          {withArrowNudge("Next →")}
         </Link>
       ) : (
         <span className={`${step} text-dead`}>Next →</span>

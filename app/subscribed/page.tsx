@@ -83,7 +83,7 @@ export default async function SubscribedPage({
   return (
     <div className="mx-auto max-w-prose py-16">
       <span className="label">{ok ? "Subscribed" : "Not subscribed"}</span>
-      <h1 className="numeral mt-3 text-[clamp(1.75rem,3.4vw,2.5rem)] text-text">
+      <h1 className="headline mt-3 text-[clamp(1.75rem,3.4vw,2.5rem)] text-text">
         {s.heading}
       </h1>
       <p className="mt-5 text-[0.9375rem] leading-relaxed text-muted">{s.body}</p>
@@ -103,8 +103,8 @@ export default async function SubscribedPage({
       </p>
 
       <p className="mt-10 flex flex-wrap gap-x-8 gap-y-2 font-mono text-xs uppercase tracking-[0.1em]">
-        <TextLink href="/">Back to the findings →</TextLink>
-        <TextLink href="/reports">The reports →</TextLink>
+        <TextLink href="/" tone="bright">Back to the findings →</TextLink>
+        <TextLink href="/reports" tone="bright">The reports →</TextLink>
       </p>
     </div>
   );

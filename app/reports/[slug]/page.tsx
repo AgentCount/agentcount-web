@@ -73,7 +73,7 @@ export default async function ReportPage({ params }: { params: Promise<Params> }
           <span className="text-line">|</span>
           <span>no score, no ranking, no aggregate</span>
         </div>
-        <h1 className="numeral mt-3 max-w-[24ch] text-[clamp(2rem,4vw,3rem)] text-text">
+        <h1 className="headline mt-3 max-w-[24ch] text-[clamp(2rem,4vw,3rem)] text-text">
           {report.title}
         </h1>
         <p className="mt-5 max-w-prose text-sm leading-relaxed text-muted">
@@ -100,9 +100,9 @@ export default async function ReportPage({ params }: { params: Promise<Params> }
           repository.
         </p>
         <p className="mt-5 flex flex-wrap gap-x-8 gap-y-2 font-mono text-xs uppercase tracking-[0.1em]">
-          <TextLink href="/methodology">How each rung is measured →</TextLink>
-          <TextLink href="/methodology#independence">Who pays for this →</TextLink>
-          <TextLink href="/reports">All reports →</TextLink>
+          <TextLink href="/methodology" tone="bright">How each rung is measured →</TextLink>
+          <TextLink href="/methodology#independence" tone="bright">Who pays for this →</TextLink>
+          <TextLink href="/reports" tone="bright">All reports →</TextLink>
         </p>
       </footer>
     </article>

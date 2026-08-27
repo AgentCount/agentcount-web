@@ -192,7 +192,7 @@ export default async function AgentDetail({
         <div className="flex flex-wrap items-end justify-between gap-x-10 gap-y-6">
           <div className="min-w-0">
             <span className="label">Agent</span>
-            <h1 className="numeral mt-2 max-w-[20ch] break-words text-[clamp(2rem,4vw,3rem)] text-text">
+            <h1 className="headline mt-2 max-w-[20ch] break-words text-[clamp(2rem,4vw,3rem)] text-text">
               {agent.name ?? (
                 <span className="font-mono text-dead">Agent #{agent.agent_id}</span>
               )}
@@ -218,8 +218,13 @@ export default async function AgentDetail({
           </div>
 
           {/* The strip is the headline here — the one thing someone following
-              a shared link came to read. */}
-          <div>
+              a shared link came to read. `min-w-0` overrides this flex
+              item's default `min-width: auto`, which otherwise refuses to
+              shrink below the strip's own intrinsic width and forces the
+              whole header (and page) to scroll sideways on a phone; with it
+              set, the strip's own `overflow-x-auto` (see `RungStrip.tsx`)
+              scrolls instead, confined to its own frame. */}
+          <div className="min-w-0">
             <span className="label">Checks 1–7</span>
             <div className="mt-2">
               <RungStrip

@@ -36,7 +36,7 @@ export function UncheckedAgent({ agent }: { agent: TailAgent }) {
     <>
       <header className="border-b border-edge pb-6">
         <p className="label">Registered · not yet checked</p>
-        <h1 className="numeral mt-3 text-[clamp(1.75rem,3.2vw,2.5rem)] text-text">
+        <h1 className="headline mt-3 text-[clamp(1.75rem,3.2vw,2.5rem)] text-text">
           Agent #{agent.agent_id.toLocaleString("en-US")} on{" "}
           {chainDisplayName(agent.chain)}
         </h1>

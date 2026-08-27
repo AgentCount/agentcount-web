@@ -5,13 +5,35 @@ import { OutboundLink } from "./OutboundLink";
 import { RungStrip } from "./RungStrip";
 
 /**
+ * `0x1a2b…f029` — the shape every wallet and explorer already shows an
+ * address in, so a shortened one reads as familiar rather than as a cut this
+ * site invented. Only the VISIBLE text is shortened: the full address still
+ * reaches a reader in the `title` tooltip and, for owners with a recognised
+ * chain, in the explorer link's own `href` — so nothing here makes an address
+ * harder to check against anything, only faster to tell apart from its
+ * neighbours in the column above and below it.
+ */
+function shortAddress(address: string): string {
+  if (address.length <= 14) return address;
+  return `${address.slice(0, 6)}…${address.slice(-4)}`;
+}
+
+/**
  * The directory, set as a ledger.
  *
- * Rows are tight (28px), separated by hairlines rather than boxed, and the
- * numeric columns are right-aligned with tabular figures so ids and blocks
- * form clean vertical edges when you scan 50 of them. The header is a row of
- * micro-labels, not a heavier band — the data should be the darkest thing on
- * the page.
+ * Rows are tight (28px), separated by hairlines rather than boxed — the
+ * header is a row of micro-labels, not a heavier band, so the data stays the
+ * darkest thing on the page.
+ *
+ * ## Three columns, not four
+ *
+ * The id used to be its own right-aligned column. It is metadata about the
+ * row, not a second thing to track left-to-right beside the name and the
+ * owner, so it now sits inline after the name instead — dim, small, and
+ * omitted entirely when the name itself IS the id (the no-name fallback
+ * below already says "Agent #<id>", and repeating the id a second time next
+ * to itself would say nothing new). Fewer columns to sweep across is the
+ * same density argument the short address below makes.
  *
  * ## Identity
  *
@@ -36,16 +58,10 @@ export function AgentTable({ agents }: { agents: AgentSummary[] }) {
           <tr>
             {/* The name column absorbs the slack, so the rung register lands
                 flush against the right edge however wide the viewport is —
-                without it, a four-column table on a 1680px monitor leaves a
+                without it, a three-column table on a 1680px monitor leaves a
                 third of the page empty and the layout reads as unfinished. */}
             <th scope="col" className="label w-full border-b border-edge px-3 py-2 font-normal">
               Agent
-            </th>
-            <th
-              scope="col"
-              className="label whitespace-nowrap border-b border-edge px-3 py-2 text-right font-normal"
-            >
-              Id
             </th>
             <th
               scope="col"
@@ -57,7 +73,16 @@ export function AgentTable({ agents }: { agents: AgentSummary[] }) {
               scope="col"
               className="label whitespace-nowrap border-b border-edge px-3 py-2 font-normal"
             >
-              Checks 1–7
+              {/* One hop to the full vocabulary, for a reader who does not
+                  want to hover 350 individual cells to learn what each
+                  position means — the popover on every cell (see
+                  `RungStrip.tsx`) still covers the reader who does. */}
+              <Link
+                href="/methodology"
+                className="underline decoration-line underline-offset-4 transition-colors hover:text-muted hover:decoration-muted"
+              >
+                Checks 1–7
+              </Link>
             </th>
           </tr>
         </thead>
@@ -73,26 +98,27 @@ export function AgentTable({ agents }: { agents: AgentSummary[] }) {
                   className="text-sm text-text underline decoration-transparent underline-offset-4 transition-colors hover:decoration-edge"
                 >
                   {a.name ?? (
-                    <span className="font-mono text-[0.8125rem] text-dead">
+                    <span className="font-mono text-xs text-dead">
                       Agent #{a.agent_id}
                     </span>
                   )}
                 </Link>
+                {a.name && (
+                  <span className="ml-2 font-mono text-xs text-dead">
+                    #{a.agent_id}
+                  </span>
+                )}
               </td>
-              <td className="whitespace-nowrap px-3 py-1.5 text-right font-mono text-[0.8125rem] text-muted">
-                {a.agent_id}
-              </td>
-              {/* The full address, not a truncation: there is room for all 42
-                  characters once the name column takes the slack, and a
-                  half-address is not something a reader can check against
-                  anything. */}
-              <td className="whitespace-nowrap px-3 py-1.5 font-mono text-[0.8125rem] text-dead">
+              <td className="whitespace-nowrap px-3 py-1.5 font-mono text-xs text-dead">
                 {(() => {
                   const href = addressUrl(a.chain, a.owner);
+                  const short = shortAddress(a.owner);
                   return href ? (
-                    <OutboundLink href={href}>{a.owner}</OutboundLink>
+                    <OutboundLink href={href} title={a.owner}>
+                      {short}
+                    </OutboundLink>
                   ) : (
-                    a.owner
+                    <span title={a.owner}>{short}</span>
                   );
                 })()}
               </td>

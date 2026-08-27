@@ -42,6 +42,11 @@
 type StatusStyle = {
   /** Border + text, for outlined chips. */
   chip: string;
+  /** Border alone, at a lighter opacity than `chip`'s — a whisper of the
+   * status colour on a control that has not been chosen yet. See
+   * `statusBorderClass`'s own doc for where this is for and why it stops at
+   * the border. */
+  border: string;
   /** Text colour alone, for the rung register — its cells share one neutral
    * frame, so they colour the glyph rather than their own border. */
   ink: string;
@@ -59,6 +64,7 @@ const STATUS: Record<string, StatusStyle> = {
   pass: {
     ink: "text-live",
     chip: "border-live/45 text-live",
+    border: "border-live/25",
     fill: "bg-live",
     glyph: "✓",
     label: "passed",
@@ -66,6 +72,7 @@ const STATUS: Record<string, StatusStyle> = {
   fail: {
     ink: "text-fail",
     chip: "border-fail/45 text-fail",
+    border: "border-fail/25",
     fill: "bg-fail",
     glyph: "✗",
     label: "did not pass",
@@ -73,6 +80,7 @@ const STATUS: Record<string, StatusStyle> = {
   error: {
     ink: "text-warn",
     chip: "border-warn/45 text-warn",
+    border: "border-warn/25",
     fill: "bg-warn",
     glyph: "!",
     label: "the check could not complete",
@@ -80,6 +88,7 @@ const STATUS: Record<string, StatusStyle> = {
   skipped: {
     ink: "text-dim",
     chip: "border-dim/40 text-dim",
+    border: "border-dim/22",
     fill: "bg-dim",
     glyph: "–",
     label: "skipped — a check this one depends on did not pass",
@@ -87,6 +96,7 @@ const STATUS: Record<string, StatusStyle> = {
   unclaimed: {
     ink: "text-claim",
     chip: "border-claim/40 text-claim",
+    border: "border-claim/22",
     fill: "bg-claim",
     glyph: "○",
     label: "unclaimed — the document made no claim to check",
@@ -99,6 +109,7 @@ const STATUS: Record<string, StatusStyle> = {
   unprobeable: {
     ink: "text-claim",
     chip: "border-claim/40 text-claim",
+    border: "border-claim/22",
     fill: "bg-claim",
     glyph: "⌀",
     label: "unprobeable — no declared endpoint that a probe can reach",
@@ -108,6 +119,7 @@ const STATUS: Record<string, StatusStyle> = {
 const UNRECOGNISED: StatusStyle = {
   ink: "text-muted",
   chip: "border-line text-muted",
+  border: "border-line",
   fill: "bg-line",
   glyph: "•",
   label: "",
@@ -119,6 +131,22 @@ function styleFor(status: string): StatusStyle {
 
 export function statusClasses(status: string): string {
   return styleFor(status).chip;
+}
+
+/**
+ * Border alone, at rest — for a control a reader has not chosen yet but
+ * should still be able to read at a glance, like the unticked check filters
+ * on `/directory`. Those used to sit at pure `border-line` grey until
+ * clicked, which is honest (colour is reinforcement, never the carrier — see
+ * this file's own top comment) but meant the one piece of the page with the
+ * most information in it read as the flattest: fifty identical grey boxes
+ * until a reader committed to one. A quiet tint of the real status colour on
+ * the border — text and glyph both stay their normal reinforcement roles —
+ * gives that panel some life without moving colour any closer to being the
+ * carrier than it already is anywhere else on the site.
+ */
+export function statusBorderClass(status: string): string {
+  return styleFor(status).border;
 }
 
 /** Text colour only — for the rung register, whose cells share one frame. */

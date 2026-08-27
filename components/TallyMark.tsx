@@ -1,14 +1,34 @@
+import { useId } from "react";
 import {
-  TALLY_STROKES,
+  TALLY_BARS,
+  TALLY_DIAGONAL,
   TALLY_STROKE_WIDTH,
   TALLY_VIEW,
 } from "@/lib/tally";
 
 /**
- * The mark, inline, drawn in `currentColor` so the caller applies the real
- * `text-live` token rather than a hex copy of it. Always decorative — the
- * wordmark text it accompanies is the accessible name — hence `aria-hidden`
- * unconditionally.
+ * The mark, inline. The four bars still draw in `currentColor`, as they
+ * always have — this component still leaves the colour to whatever the
+ * caller sets. What changed with this proposal is which colour every
+ * caller actually passes: `text-live` (pass-green, a status hue) became
+ * `text-text` (bone, this site's own ink) at every call site, because a
+ * brand mark drawn in a status colour reads as a verdict it has no
+ * standing to give — see `lib/tally.ts`'s module doc. The fifth stroke,
+ * the diagonal that counts the bars off, draws in `var(--color-accent)`
+ * directly rather than `currentColor`: see the design-system comment in
+ * `app/globals.css` for why the mark carries two colours as of this
+ * proposal instead of one. Always decorative — the wordmark text it
+ * accompanies is the accessible name — hence `aria-hidden` unconditionally.
+ *
+ * ## The crossing gap is a real cut
+ *
+ * Where the diagonal crosses the four bars, an SVG `<mask>` paints the bars
+ * transparent along a channel the width of the diagonal's own stroke, so
+ * whatever sits behind the mark — page background, a hover fill, anything —
+ * shows through there rather than one stroke sitting on top of the other.
+ * `useId` keeps the mask's id unique per instance, since a page can now
+ * render this component more than once (the header wordmark, plus a hero
+ * watermark on `/`).
  *
  * ## Why `strokeWidth` is adjustable
  *
@@ -35,6 +55,13 @@ export function TallyMark({
   /** In viewBox units, out of 48. See the note above before changing. */
   strokeWidth?: number;
 }) {
+  const maskId = useId();
+  const [dx1, dy1, dx2, dy2] = TALLY_DIAGONAL;
+  // Wide enough to fully cover any strokeWidth this component is ever passed
+  // (double the largest — 6, at the header) while leaving the bars' own
+  // clear gaps alone away from the crossing.
+  const cutWidth = strokeWidth * 2;
+
   return (
     <svg
       viewBox={`0 0 ${TALLY_VIEW} ${TALLY_VIEW}`}
@@ -42,18 +69,32 @@ export function TallyMark({
       aria-hidden="true"
       className={className}
     >
-      {TALLY_STROKES.map(([x1, y1, x2, y2], i) => (
+      <mask id={maskId} maskUnits="userSpaceOnUse" x={0} y={0} width={TALLY_VIEW} height={TALLY_VIEW}>
+        <rect x={0} y={0} width={TALLY_VIEW} height={TALLY_VIEW} fill="#fff" />
         <line
-          key={i}
-          x1={x1}
-          y1={y1}
-          x2={x2}
-          y2={y2}
-          stroke="currentColor"
-          strokeWidth={strokeWidth}
+          x1={dx1}
+          y1={dy1}
+          x2={dx2}
+          y2={dy2}
+          stroke="#000"
+          strokeWidth={cutWidth}
           strokeLinecap="round"
         />
-      ))}
+      </mask>
+      <g stroke="currentColor" strokeWidth={strokeWidth} strokeLinecap="round" mask={`url(#${maskId})`}>
+        {TALLY_BARS.map(([x1, y1, x2, y2], i) => (
+          <line key={i} x1={x1} y1={y1} x2={x2} y2={y2} />
+        ))}
+      </g>
+      <line
+        x1={dx1}
+        y1={dy1}
+        x2={dx2}
+        y2={dy2}
+        stroke="var(--color-accent)"
+        strokeWidth={strokeWidth}
+        strokeLinecap="round"
+      />
     </svg>
   );
 }

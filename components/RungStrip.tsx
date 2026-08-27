@@ -36,7 +36,7 @@ import {
  * keyboard, and — the part that makes it work on a phone — a `tabindex` on the
  * cell, so a tap focuses it and shows the panel, and a tap elsewhere blurs it
  * and hides it again. That is the whole touch "toggle", with no state and no
- * client bundle in an app that ships three client components in total.
+ * client bundle in an app that ships six client components in total.
  *
  * ## Never summed
  *
@@ -52,8 +52,14 @@ export function RungStrip({
   evidenceFor,
 }: {
   rungs: { rung: number; name: string; status: string }[];
-  /** `md` shows the status word under each number — for the agent page header
-   * and anywhere the strip is the headline rather than one cell in a table. */
+  /** `md` stacks a bigger number over its glyph, no word — for the agent
+   * page header and anywhere the strip is the headline rather than one cell
+   * in a table. The word was always redundant with the glyph it sat beside
+   * (see `lib/status.ts`'s own "colour is reinforcement, glyph is the
+   * carrier" rule) and with the `StatusLegend` this size is always shown
+   * next to, so dropping it lets the number and glyph — the two things a
+   * reader actually scans for — read at headline size instead of splitting
+   * the cell three ways. */
   size?: "sm" | "md";
   /** One line of evidence per check, shown in the popover. Agent pages pass
    * this; a directory row has no evidence loaded and omits it. */
@@ -63,13 +69,24 @@ export function RungStrip({
 
   const cell =
     size === "md"
-      ? "h-14 w-[4.75rem] flex-col justify-center gap-0.5 text-base"
+      ? "h-20 w-20 flex-col justify-center gap-1.5"
       : "h-6 w-8 items-center justify-center gap-[3px] text-[11px]";
 
+  // The `sm` frame keeps its near-square corner for table density; `md`
+  // takes a visibly rounded one because it is standing alone as a headline
+  // rather than sitting inside a table's own hairlines.
+  const frame = size === "md" ? "rounded-lg" : "rounded-[3px]";
+
   return (
+    // `max-w-full overflow-x-auto` so seven cells at `md` size — wider than
+    // a phone screen no matter the exact px — scroll within their own frame
+    // on a narrow viewport instead of forcing the whole page to scroll
+    // sideways. Only takes effect once an ancestor lets this element shrink
+    // (see the `min-w-0` at both `md` call sites); a `sm` strip inside a
+    // table cell is already narrow enough that this never engages.
     <div
       role="list"
-      className="inline-flex overflow-hidden rounded-[3px] border border-edge bg-panel/70"
+      className={`inline-flex max-w-full overflow-x-auto overflow-y-hidden border border-edge bg-panel/70 ${frame}`}
     >
       {Array.from({ length: LADDER_SIZE }, (_, i) => i + 1).map((n) => {
         const r = byRung.get(n);
@@ -97,17 +114,11 @@ export function RungStrip({
           >
             {size === "md" ? (
               <>
-                <span aria-hidden="true" className="flex items-baseline gap-1">
-                  <span className="text-lg font-semibold leading-none">{n}</span>
-                  <span className="leading-none">
-                    {r ? statusGlyph(r.status) : NOT_CHECKED_GLYPH}
-                  </span>
+                <span aria-hidden="true" className="text-2xl font-semibold leading-none">
+                  {n}
                 </span>
-                <span
-                  aria-hidden="true"
-                  className="text-[9px] uppercase tracking-[0.08em] opacity-80"
-                >
-                  {r ? r.status : "n/c"}
+                <span aria-hidden="true" className="text-xl leading-none">
+                  {r ? statusGlyph(r.status) : NOT_CHECKED_GLYPH}
                 </span>
               </>
             ) : (

@@ -8,9 +8,10 @@ import { humaniseRungs } from "@/lib/checks";
  *
  * There are no charts, icons or images on the homepage — the brief for this
  * product is that the numbers are the design. So a finding is built from three
- * sizes and one hairline: an index number, a condensed numeral at display
- * size, the sentence, and the populations in mono underneath. The rule above
- * each tile is what groups them into a row without drawing four boxes.
+ * sizes and one hairline: an index number, the big figure in `headline` at
+ * display size, the sentence, and the populations in mono underneath. The
+ * rule above each tile is what groups them into a row without drawing four
+ * boxes.
  *
  * ## The number is never computed here
  *
@@ -79,10 +80,35 @@ export function FindingTile({
     <TileFrame
       index={index}
       numeral={
-        <div className="numeral text-[clamp(3.5rem,6vw,5.25rem)] text-text">
-          {finding.percent === null ? "—" : finding.percent.toFixed(1)}
-          <span className="ml-0.5 text-[0.45em] font-medium text-muted">%</span>
-        </div>
+        <>
+          <div className="headline text-[2.6rem] text-text">
+            {finding.percent === null ? "—" : finding.percent.toFixed(1)}
+            <span className="ml-0.5 text-[0.45em] font-medium text-muted">%</span>
+          </div>
+          {/* A single-hue proportion bar under the figure itself, where
+              length is the only carrier of the value and no hue is asked
+              to mean anything: the width IS the percentage printed above
+              it, not a second computation of it — see
+              `lib/api/aggregate.ts`'s module doc on why this app does not
+              derive its own rates. Omitted when there is no rate to draw:
+              a bar under "—" would imply a zero this tile isn't
+              claiming.
+
+              `group-hover:bg-text` on the fill rather than a second hue:
+              the bar still reads as one accent-coloured measurement at
+              rest, and going fully to `--color-text` on hover is the
+              pointer confirming attention on the same tile, not a second
+              value competing with the accent for meaning — `TileFrame`
+              already carries `group` for exactly this. */}
+          {finding.percent !== null && (
+            <div className="mt-3 h-[3px] bg-line">
+              <div
+                className="h-full bg-accent transition-colors group-hover:bg-text"
+                style={{ width: `${finding.percent}%` }}
+              />
+            </div>
+          )}
+        </>
       }
       footer={
         <>
@@ -106,9 +132,11 @@ export function FindingTile({
  * printed one anyway would be the only figure on this page not recomputable
  * from a run id.
  *
- * `lead` takes a short phrase in place of the numeral so the tile still reads
- * as a member of the row rather than as a rendering fault, and it is set in
- * `text-muted` because it is not a finding.
+ * `lead` takes the same em dash `FindingTile` already prints for a null
+ * rate, so the fourth tile reads as "no figure yet" in the one glyph the
+ * rest of the row already uses for that, rather than a second, wordier
+ * convention of its own — and it is set in `text-muted` because it is not
+ * a finding.
  */
 export function NoteTile({
   index,
@@ -117,7 +145,8 @@ export function NoteTile({
   children,
 }: {
   index: number;
-  /** A phrase, never a quantity — a tile with no number must not imply one. */
+  /** Usually the shared "no value" dash — a short phrase instead, only where
+   * one is genuinely clearer than the dash for that particular absence. */
   lead: string;
   source: string;
   children: React.ReactNode;
@@ -126,7 +155,7 @@ export function NoteTile({
     <TileFrame
       index={index}
       numeral={
-        <div className="numeral text-[clamp(1.5rem,2.4vw,2rem)] leading-tight text-muted">
+        <div className="headline text-[clamp(1.5rem,2.4vw,2rem)] leading-tight text-muted">
           {lead}
         </div>
       }
@@ -161,7 +190,7 @@ export function CountTile({
     <TileFrame
       index={index}
       numeral={
-        <div className="numeral text-[clamp(3.5rem,6vw,5.25rem)] text-text">
+        <div className="headline text-[2.6rem] text-text">
           {value.toLocaleString("en-US")}
         </div>
       }

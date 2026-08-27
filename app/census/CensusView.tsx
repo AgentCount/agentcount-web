@@ -76,7 +76,10 @@ export async function CensusView({ sp }: { sp: { run?: string; chain?: string } 
   // The run that the sample table, the rates and the status legend describe.
   // In all-chains mode there is no single run those could honestly be "of",
   // so they take the largest contributor and the page says which.
-  const run = perChain ? await resolveRunForRequest(sp) : censusRuns[0];
+  // `allRuns` is already in hand from the `Promise.all` above — passed
+  // through so this does not fetch `/api/runs` a second time to resolve the
+  // same request's run. See `resolveRun`'s own doc.
+  const run = perChain ? await resolveRunForRequest(sp, allRuns) : censusRuns[0];
   if (!run) {
     throw new Error("no completed run is available yet");
   }
@@ -182,7 +185,7 @@ export async function CensusView({ sp }: { sp: { run?: string; chain?: string } 
         </p>
         {perChain ? (
           <>
-            <h1 className="numeral max-w-[18ch] text-[clamp(2rem,4.2vw,3.25rem)] text-text">
+            <h1 className="headline max-w-[18ch] text-[clamp(2rem,4.2vw,3.25rem)] text-text">
               What we found when we checked every ERC-8004 agent on{" "}
               {chainDisplayName(run.chain)}
             </h1>
@@ -224,7 +227,7 @@ export async function CensusView({ sp }: { sp: { run?: string; chain?: string } 
 
                 Both halves still derive from the runs, so a fifth chain
                 moves them without an edit here. */}
-            <h1 className="numeral max-w-[18ch] text-[clamp(2rem,4.4vw,3.5rem)] text-text">
+            <h1 className="headline max-w-[18ch] text-[clamp(2rem,4.4vw,3.5rem)] text-text">
               We check every AI agent registered under{" "}
               <span className="whitespace-nowrap">ERC-8004</span>.
             </h1>
@@ -247,7 +250,7 @@ export async function CensusView({ sp }: { sp: { run?: string; chain?: string } 
               <span className="text-line">·</span>
               <TextLink href="/coverage">{scope}</TextLink>
               <span className="text-line">·</span>
-              <TextLink href="#provenance" tone="quiet">
+              <TextLink href="#provenance" tone="inherit">
                 provenance ↓
               </TextLink>
             </p>
@@ -311,6 +314,7 @@ export async function CensusView({ sp }: { sp: { run?: string; chain?: string } 
         <p className="mt-10">
           <TextLink
             href={`/reports/${report.slug}`}
+            tone="bright"
             className="font-mono text-xs uppercase tracking-[0.1em]"
           >
             Read the full report: {report.chains.length} chains, {report.agents}{" "}
@@ -409,10 +413,10 @@ export async function CensusView({ sp }: { sp: { run?: string; chain?: string } 
         <p className="mt-6 flex flex-wrap gap-x-8 gap-y-2 font-mono text-xs uppercase tracking-[0.1em]">
           {/* True again: /search covers every published chain at once, so
               the promise this label briefly could not make is back. */}
-          <TextLink href="/search">
+          <TextLink href="/search" tone="bright">
             Search all {population.toLocaleString("en-US")} agents →
           </TextLink>
-          <TextLink href={workingHref}>
+          <TextLink href={workingHref} tone="bright">
             Agents that passed every check →
           </TextLink>
         </p>
@@ -442,7 +446,7 @@ export async function CensusView({ sp }: { sp: { run?: string; chain?: string } 
         )}
         <RunProvenance run={run} />
         <p className="mt-6 flex flex-wrap gap-x-8 gap-y-2 font-mono text-xs uppercase tracking-[0.1em]">
-          <TextLink href="/methodology">
+          <TextLink href="/methodology" tone="bright">
             How each check is measured →
           </TextLink>
         </p>

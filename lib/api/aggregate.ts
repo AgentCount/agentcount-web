@@ -3,22 +3,34 @@
  *
  * ## The exception this module is
  *
- * `lib/api/schemas.ts` states the rule this app otherwise follows without
- * exception: percentages are computed by the API, because "a percentage
+ * `lib/api/schemas.ts` states the rule this app follows for the census's own
+ * headline conformance figures — `Finding.percent` — because "a percentage
  * derived in this app is a second implementation of the census's arithmetic,
  * free to drift from the published report. This app formats; it does not
  * divide."
  *
- * That rule stands everywhere except here, and the exception is deliberate
- * and bounded. The API has no all-chains endpoint: `/findings` is per run,
- * and a run sweeps one chain. The homepage's whole claim is about the
+ * That rule holds for every `Finding` on the site, and the exception here is
+ * deliberate and bounded. The API has no all-chains endpoint: `/findings` is
+ * per run, and a run sweeps one chain. The homepage's whole claim is about the
  * population, so the choice was between dividing in one audited place and
  * publishing a headline figure nobody can recompute — and an unrecomputable
  * number on this site would contradict the thing the site is for.
  *
- * So: division happens in `aggregateFinding` and nowhere else in the
- * application. If the API grows an all-chains findings endpoint, delete this
- * module and read that instead rather than keeping both.
+ * So: division of a `Finding`'s own numerator and denominator happens in
+ * `aggregateFinding` and nowhere else. If the API grows an all-chains
+ * findings endpoint, delete this module and read that instead rather than
+ * keeping both.
+ *
+ * This module is not the only place the app divides — it is the only place
+ * it divides a `Finding`, which is the number this rule exists to protect.
+ * Three other pages compute a ratio locally, each over data the API has no
+ * endpoint to pre-divide, and each documented at its own site: the coverage
+ * page's swept-share figure (`app/coverage/page.tsx`, comparing a probe
+ * dataset against itself), the linkage report's per-chain share of its own
+ * population (`app/reports/linkage/page.tsx`), and a rung's status
+ * breakdown within one run (`components/RateBar.tsx`). None of them
+ * re-derives a number the census itself publishes, which is what would put
+ * them in scope for this rule rather than beside it.
  *
  * ## Population-weighted, never a mean of chains
  *

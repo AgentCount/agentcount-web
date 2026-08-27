@@ -81,7 +81,7 @@ export function RunProvenance({ run }: { run: Run }) {
             <span className="text-line">|</span>
             <OutboundLink href={checksumUrl(archive)}>sha256</OutboundLink>
             <span className="text-line">|</span>
-            <TextLink href="/data" tone="quiet">
+            <TextLink href="/data" tone="inherit">
               all runs
             </TextLink>
           </p>

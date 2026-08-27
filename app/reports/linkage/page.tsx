@@ -37,7 +37,7 @@ export default function LinkagePage() {
   return (
     <>
       <header className="border-b border-edge pb-6">
-        <h1 className="numeral max-w-[22ch] text-[clamp(1.75rem,3.4vw,2.75rem)] text-text">
+        <h1 className="headline max-w-[22ch] text-[clamp(1.75rem,3.4vw,2.75rem)] text-text">
           Where registration meets payment
         </h1>
         <p className="mt-4 max-w-prose text-sm leading-relaxed text-muted">
@@ -83,8 +83,8 @@ export default function LinkagePage() {
           rate computed on the second is a rate about what people wrote down.
         </p>
         <p className="mt-4 max-w-prose text-sm leading-relaxed text-muted">
-          <span className="text-text">What a match would establish.</span> A
-          matching address confirms that a transfer occurred and who received
+          <span className="text-text">What a match would establish.</span>{" "}
+          A matching address confirms that a transfer occurred and who received
           it. It never confirms who initiated it or why: airdrops, refunds,
           mistakes and an operator&rsquo;s own capital returning from DeFi all
           look identical to it. And a seller with no match is not &ldquo;not an
@@ -160,8 +160,12 @@ export default function LinkagePage() {
               </tr>
             </thead>
             <tbody>
+              {/* `hover:bg-raised` row scan aid — same pattern as
+                  `AgentTable.tsx` and the other reference tables site-wide.
+                  Applied to the totals row too: it is still a data row a
+                  reader might be scanning to. */}
               {census.chains.map((c) => (
-                <tr key={c.chain}>
+                <tr key={c.chain} className="transition-colors hover:bg-raised">
                   <td className="border-b border-line px-3 py-2 font-mono text-muted">{c.chain}</td>
                   <td className="border-b border-line px-3 py-2 text-right font-mono text-text">
                     {num(c.agents)}
@@ -171,7 +175,7 @@ export default function LinkagePage() {
                   </td>
                 </tr>
               ))}
-              <tr>
+              <tr className="transition-colors hover:bg-raised">
                 <td className="border-b border-edge px-3 py-2 font-mono text-text">all four</td>
                 <td className="border-b border-edge px-3 py-2 text-right font-mono text-text">
                   {num(census.agents)}
@@ -183,7 +187,8 @@ export default function LinkagePage() {
         </div>
         <p className="mt-6 max-w-prose border-l-2 border-edge pl-5 text-sm leading-relaxed text-muted">
           <span className="text-text">Attestation does not stand in for
-          payment.</span> Celo attests at a rate an order of magnitude above
+          payment.</span>{" "}
+          Celo attests at a rate an order of magnitude above
           every other chain, and that rate is three addresses writing feedback
           for one platform&rsquo;s batch of agents. It was never a measure of
           commerce. No report on this site lets one of these measures stand in
@@ -201,9 +206,9 @@ export default function LinkagePage() {
           published here.
         </p>
         <p className="mt-6 flex flex-wrap gap-x-8 gap-y-2 font-mono text-xs uppercase tracking-[0.1em]">
-          <TextLink href="/data">Every run, with its archive →</TextLink>
-          <TextLink href="/coverage">What the census covers →</TextLink>
-          <TextLink href="/methodology">What each check measures →</TextLink>
+          <TextLink href="/data" tone="bright">Every run, with its archive →</TextLink>
+          <TextLink href="/coverage" tone="bright">What the census covers →</TextLink>
+          <TextLink href="/methodology" tone="bright">What each check measures →</TextLink>
         </p>
       </Section>
     </>

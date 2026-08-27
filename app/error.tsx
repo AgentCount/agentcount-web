@@ -27,7 +27,7 @@ export default function Error({
 }) {
   return (
     <div className="max-w-prose border-l-2 border-fail/40 pl-6">
-      <h1 className="numeral text-3xl text-text">This page could not be loaded</h1>
+      <h1 className="headline text-3xl text-text">This page could not be loaded</h1>
       <p className="mt-3 text-sm leading-relaxed text-muted">
         The site did not get an answer it could use from the {BRAND.name} API —
         either the API is down, or it answered in a shape this site does not
@@ -40,12 +40,13 @@ export default function Error({
         <button
           type="button"
           onClick={reset}
-          className="border border-edge px-4 py-1.5 font-mono text-xs uppercase tracking-[0.1em] text-text transition-colors hover:bg-raised"
+          className="border border-edge px-4 py-1.5 font-mono text-xs uppercase tracking-[0.1em] text-text transition hover:bg-raised active:scale-[0.97]"
         >
           Try again
         </button>
         <TextLink
           href="/"
+          tone="bright"
           className="self-center font-mono text-xs uppercase tracking-[0.1em]"
         >
           ← Back to the census

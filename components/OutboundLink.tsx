@@ -1,4 +1,5 @@
 import { UNTRUSTED_REL } from "@/lib/links";
+import { withArrowNudge } from "./ArrowNudge";
 
 /**
  * Every link that leaves this site goes through here, so the `rel` rules are
@@ -12,6 +13,9 @@ import { UNTRUSTED_REL } from "@/lib/links";
  *
  * Styled as a dotted underline rather than a colour, because colour on this
  * site means a rung status and nothing else.
+ *
+ * A trailing " →" in the label nudges on hover, via `withArrowNudge`
+ * (`ArrowNudge.tsx`) — the same shared device as `TextLink`/`CtaLink`.
  */
 export function OutboundLink({
   href,
@@ -32,9 +36,9 @@ export function OutboundLink({
       title={title}
       target="_blank"
       rel={untrusted ? UNTRUSTED_REL : "noopener noreferrer"}
-      className={`underline decoration-dotted decoration-edge underline-offset-[3px] transition-colors hover:text-text hover:decoration-muted ${className}`}
+      className={`group underline decoration-dotted decoration-edge underline-offset-[3px] transition-colors hover:text-text hover:decoration-muted ${className}`}
     >
-      {children}
+      {withArrowNudge(children)}
     </a>
   );
 }

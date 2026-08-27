@@ -73,6 +73,12 @@ export const COLOR = {
   text: "#e8e4dc",
   muted: "#99a0a9",
   dead: "#767e88",
+  // The design proposal's cyan (see `app/globals.css`) — added here only so
+  // `scripts/generate-brand.tsx`'s exported wordmark can draw its diagonal
+  // to match `lib/tally.ts`'s `TALLY_ACCENT` rather than a third hand-copy
+  // of the same hex. `test/tokens.test.ts` checks this key against
+  // `--color-accent` exactly like every other entry in this object.
+  accent: "#45d3e0",
   live: "#3ddc84",
   fail: "#ff5f56",
   warn: "#f2b035",

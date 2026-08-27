@@ -48,7 +48,7 @@ export default async function SearchPage({
   return (
     <>
       <header className="border-b border-edge pb-5">
-        <h1 className="numeral max-w-[24ch] text-[clamp(1.75rem,3.2vw,2.5rem)] text-text">
+        <h1 className="headline max-w-[24ch] text-[clamp(1.75rem,3.2vw,2.5rem)] text-text">
           Search
         </h1>
         <p className="mt-4 max-w-prose text-sm leading-relaxed text-muted">
@@ -60,17 +60,26 @@ export default async function SearchPage({
           <label htmlFor="search-q" className="sr-only">
             Search agents by name, description or owner address
           </label>
+          {/* `focus:border-edge` only, no `focus:outline-none`: this
+              input used to suppress the site's accessible focus ring
+              entirely and replace it with a border barely a shade
+              lighter — a keyboard user tabbing here got almost nothing.
+              Dropping the suppression lets the global `:focus-visible`
+              ring (see `globals.css`) return for keyboard focus, while
+              the border tint — plain `:focus`, not `:focus-visible` —
+              still answers a mouse click same as before; the two now
+              stack instead of one silently winning. */}
           <input
             id="search-q"
             type="search"
             name="q"
             defaultValue={q}
             placeholder="Search name, description or owner"
-            className="w-full border border-line bg-panel px-3 py-2 font-mono text-sm text-text placeholder:text-dead focus:border-edge focus:outline-none"
+            className="w-full border border-line bg-panel px-3 py-2 font-mono text-sm text-text placeholder:text-dead focus:border-edge"
           />
           <button
             type="submit"
-            className="-ml-px border border-line px-4 py-2 font-mono text-xs uppercase tracking-[0.08em] text-muted transition-colors hover:border-edge hover:text-text"
+            className="-ml-px border border-line px-4 py-2 font-mono text-xs uppercase tracking-[0.08em] text-muted transition hover:border-edge hover:text-text active:scale-[0.97]"
           >
             Find
           </button>
@@ -152,6 +161,7 @@ export default async function SearchPage({
                   <p className="mt-4">
                     <TextLink
                       href={`/directory?chain=${encodeURIComponent(g.chain)}&q=${encodeURIComponent(q)}`}
+                      tone="bright"
                       className="font-mono text-xs uppercase tracking-[0.1em]"
                     >
                       All {g.total.toLocaleString("en-US")} on{" "}
