@@ -115,10 +115,19 @@
   --color-dead: #767e88;
 
   /* Interactive/brand. A proposed departure from bone — see the design-system
-     comment above for where this is allowed to appear and why. 1.8:1 against
-     --color-bg on its own, which is why it is never used as body text; against
-     the near-black surfaces it sits on as a stroke or a ring it reads clearly,
-     the same tradeoff `test/tokens.test.ts` would flag if this were prose. */
+     comment above for where this is allowed to appear and why.
+
+     MEASURED, because an earlier draft of this comment claimed "1.8:1 against
+     --color-bg" and that is the ratio against WHITE, not against this page:
+     against --color-bg (#08090b) it is 11.05:1, comfortably AAA. The
+     constraint that does bind is a different one, and it is not contrast with
+     the background at all — it is that this hue sits at almost exactly the
+     luminance of two STATUS colours: 1.01:1 against --color-live (pass) and
+     1.06:1 against --color-warn (error). Hue is therefore the only thing
+     separating brand from measurement, so in greyscale, in print, or for a
+     reader with tritanopia they are the same tone. Anywhere the accent fills
+     a proportion bar it is doing the job this file reserves for the status
+     hues; see the design-system comment's list. */
   --color-accent: #45d3e0;
 
   /* ── The only other saturated colours in the system ──────────────────────
@@ -254,6 +263,19 @@ p {
 #nav-q:focus-visible,
 #nav-find:focus-visible {
   outline: none;
+}
+
+/* ...EXCEPT where the border cannot carry it. In forced-colors mode (Windows
+   High Contrast) the system repaints author border colours, so `border-line`
+   at rest and `border-accent` on focus collapse to the same system colour and
+   keyboard focus disappears entirely — on the one control present on every
+   page. An outline survives that repaint, which is why the shared rule uses
+   one; here it is simply given back. */
+@media (forced-colors: active) {
+  #nav-q:focus-visible,
+  #nav-find:focus-visible {
+    outline: revert;
+  }
 }
 
 /* ── Utilities the design leans on repeatedly ────────────────────────────── */

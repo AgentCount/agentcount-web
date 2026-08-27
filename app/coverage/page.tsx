@@ -1,6 +1,7 @@
 import { MiniPanel } from "@/components/MiniPanel";
 import { Section } from "@/components/Section";
 import probe from "@/content/coverage-probe.json";
+import { TextLink } from "@/components/TextLink";
 import { chainDisplayName } from "@/lib/chains";
 import { getPublishedRuns, sweptChains } from "@/lib/published-runs";
 
@@ -155,10 +156,25 @@ export default async function CoveragePage() {
                 `/methodology`. */}
             {data.chains.map((c) => (
               <tr key={c.slug} className="border-b border-line/60 transition-colors hover:bg-raised">
+                {/* A swept chain's name is a LINK, because this table is where
+                    the chain switcher sends readers once there are more chains
+                    than it shows as chips. Without it, every chain past the
+                    switcher's cap could only be reached by editing `?chain=`
+                    by hand — eleven chains published, five reachable. An
+                    unswept chain stays plain text: there is no census page to
+                    send anyone to yet. */}
                 <td className="py-1.5 pr-4 text-muted">
-                  {chainDisplayName(c.slug) === c.slug
-                    ? c.name
-                    : chainDisplayName(c.slug)}
+                  {swept.has(c.slug) ? (
+                    <TextLink href={`/directory?chain=${c.slug}`} tone="bright">
+                      {chainDisplayName(c.slug) === c.slug
+                        ? c.name
+                        : chainDisplayName(c.slug)}
+                    </TextLink>
+                  ) : chainDisplayName(c.slug) === c.slug ? (
+                    c.name
+                  ) : (
+                    chainDisplayName(c.slug)
+                  )}
                 </td>
                 {/* A chain id is an identifier, not a quantity: 8453, never
                     "8,453". The global tabular-nums still aligns the column. */}

@@ -36,7 +36,25 @@ export default async function DataPage() {
   // population-share bar (see `app/page.tsx`'s own comment): these three
   // figures are not a second implementation of a published claim, they're a
   // box summarising numbers the table right below already prints per row.
-  const totalSwept = runs.reduce((s, r) => s + (r.swept ?? 0), 0);
+  // ONE RUN PER CHAIN, not one per archive. Summing every published run
+  // counts the same agents once per sweep: the index holds 21 archives across
+  // 11 chains, so the naive sum reads 1,211,191 where the population is
+  // 439,681 — 2.75x, and contradicting the homepage on the same site. The
+  // archive count and byte total below ARE per-archive and stay that way.
+  const newestPerChain = new Map<string, (typeof runs)[number]>();
+  for (const r of runs) {
+    const held = newestPerChain.get(r.chain);
+    // `finished_at` is nullable on the type; a run without one cannot be the
+    // newest, and an unfinished run has nothing to contribute here anyway.
+    if (!r.finished_at) continue;
+    if (!held?.finished_at || r.finished_at > held.finished_at) {
+      newestPerChain.set(r.chain, r);
+    }
+  }
+  const totalSwept = [...newestPerChain.values()].reduce(
+    (s, r) => s + (r.swept ?? 0),
+    0,
+  );
   const totalBytes = runs.reduce((s, r) => s + r.archive_bytes, 0);
   const schemaVersions = runs.map((r) => r.schema_version);
   const minSchema = Math.min(...schemaVersions);
@@ -91,7 +109,7 @@ export default async function DataPage() {
         </div>
         <MiniPanel
           className="mt-6 lg:mt-0"
-          label={`Agents across ${runs.length} archives`}
+          label={`Agents across ${newestPerChain.size} chains`}
           count={totalSwept}
           foot={
             <>
