@@ -2,7 +2,7 @@ import { MiniPanel } from "@/components/MiniPanel";
 import { Section } from "@/components/Section";
 import probe from "@/content/coverage-probe.json";
 import { TextLink } from "@/components/TextLink";
-import { chainDisplayName } from "@/lib/chains";
+import { canonicalChainSlug, chainDisplayName } from "@/lib/chains";
 import { getPublishedRuns, sweptChains } from "@/lib/published-runs";
 
 export const metadata = {
@@ -55,14 +55,19 @@ export default async function CoveragePage() {
   const data = probe as Probe;
   // The live canonical list, so a newly published chain flips its own row
   // without waiting for this app to be redeployed.
-  const swept = new Set(sweptChains(await getPublishedRuns()));
+  // Canonicalised on BOTH sides: the probe says `optimism` where a run says
+  // `op`, and comparing the raw strings published Optimism as unswept while
+  // also dropping its agents from the coverage percentage below.
+  const swept = new Set(
+    sweptChains(await getPublishedRuns()).map(canonicalChainSlug),
+  );
 
   const counted = data.chains.filter(
     (c) => c.status === "ok" && c.agents !== null,
   );
   const probedTotal = counted.reduce((n, c) => n + (c.agents ?? 0), 0);
   const sweptTotal = counted
-    .filter((c) => swept.has(c.slug))
+    .filter((c) => swept.has(canonicalChainSlug(c.slug)))
     .reduce((n, c) => n + (c.agents ?? 0), 0);
   const coverage =
     probedTotal === 0 ? null : (sweptTotal / probedTotal) * 100;
@@ -72,7 +77,7 @@ export default async function CoveragePage() {
   const statusWord = (c: ProbedChain): string => {
     if (c.status === "rpc_unreachable") return "rpc unreachable";
     if (!c.deployed) return "not deployed";
-    if (swept.has(c.slug)) return "swept";
+    if (swept.has(canonicalChainSlug(c.slug))) return "swept";
     if (c.agents === 0) return "no agents";
     return "not swept";
   };
@@ -164,8 +169,11 @@ export default async function CoveragePage() {
                     unswept chain stays plain text: there is no census page to
                     send anyone to yet. */}
                 <td className="py-1.5 pr-4 text-muted">
-                  {swept.has(c.slug) ? (
-                    <TextLink href={`/directory?chain=${c.slug}`} tone="bright">
+                  {swept.has(canonicalChainSlug(c.slug)) ? (
+                    <TextLink
+                      href={`/directory?chain=${canonicalChainSlug(c.slug)}`}
+                      tone="bright"
+                    >
                       {chainDisplayName(c.slug) === c.slug
                         ? c.name
                         : chainDisplayName(c.slug)}
@@ -184,7 +192,7 @@ export default async function CoveragePage() {
                 </td>
                 <td
                   className={`py-1.5 ${
-                    swept.has(c.slug) ? "text-text" : "text-dead"
+                    swept.has(canonicalChainSlug(c.slug)) ? "text-text" : "text-dead"
                   }`}
                 >
                   {statusWord(c)}

@@ -30,6 +30,31 @@ const CHAIN_DISPLAY: Record<string, string> = {
   monad: "Monad",
 };
 
+/**
+ * One slug per chain, whichever spelling arrived.
+ *
+ * Two vocabularies meet on the coverage page: the census names Optimism
+ * `op` in its runs, and the deployment probe names it `optimism`. Both are
+ * correct in their own source, which is why `CHAIN_NAMES` above carries
+ * both — but a `Set` comparison between them silently fails, and the
+ * failure is invisible because the row simply reads "not swept".
+ *
+ * It read that way in production: Optimism, 533 agents, swept weekly since
+ * July, published on /coverage as a chain this census does not cover — and
+ * excluded from the coverage percentage that page exists to state.
+ *
+ * So slugs are canonicalised before they are compared. The census's own
+ * spelling wins, because that is what a run actually says and what
+ * `/directory?chain=` accepts.
+ */
+const SLUG_ALIASES: Record<string, string> = {
+  optimism: "op",
+};
+
+export function canonicalChainSlug(slug: string): string {
+  return SLUG_ALIASES[slug] ?? slug;
+}
+
 export function chainDisplayName(slug: string): string {
   return CHAIN_DISPLAY[slug] ?? slug;
 }
