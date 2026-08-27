@@ -55,6 +55,16 @@ jobs:
           path-to-signatures: 'signatures/version1/cla.json'
           path-to-document: 'https://github.com/AgentCount/agentcount/blob/main/CLA.md'
           branch: 'main'
-          allowlist: 'dependabot[bot]'
+          # Maintainers are not asked to sign an agreement WITH THE PROJECT
+          # they run — a CLA grants the project a licence, and the project
+          # cannot meaningfully grant one to itself. Bots have nothing to
+          # grant either. Everyone else signs.
+          #
+          # Practical reason this exists at all: a maintainer pushing a fix to
+          # an outside contributor's branch (which "allow edits by
+          # maintainers" invites) adds their own commits to that PR, and the
+          # bot then blocks the contributor's PR until the maintainer signs
+          # their own CLA. That happened on #46.
+          allowlist: 'dependabot[bot],NemboKid'
           remote-organization-name: 'AgentCount'
           remote-repository-name: 'cla-signatures'
