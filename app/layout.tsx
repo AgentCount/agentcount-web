@@ -4,6 +4,7 @@ import Link from "next/link";
 import { NavLink } from "@/components/NavLink";
 import { NavSearch } from "@/components/NavSearch";
 import { PageTransition } from "@/components/PageTransition";
+import { FaviconThemeSync } from "@/components/FaviconThemeSync";
 import { OutboundLink } from "@/components/OutboundLink";
 import { TallyMark } from "@/components/TallyMark";
 import { TextLink } from "@/components/TextLink";
@@ -226,6 +227,7 @@ export default function RootLayout({
       className={`${instrumentSans.variable} ${jetbrainsMono.variable} ${shoulders.variable}`}
     >
       <body className="min-h-screen">
+        <FaviconThemeSync />
         {/* The masthead is a register header, not a nav bar — and it is two
             deliberate rows, not one negotiated one. The old single row held
             seven items of five kinds, and between ~640px and ~1100px the
