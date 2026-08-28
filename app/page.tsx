@@ -4,6 +4,7 @@ import { FindingTiles, type CensusFindings } from "./census/FindingTiles";
 import { AllRunsProvenance } from "@/components/AllRunsProvenance";
 import { CountUp } from "@/components/CountUp";
 import { CtaLink } from "@/components/CtaLink";
+import { InstrumentRow } from "@/components/InstrumentRow";
 import { Section } from "@/components/Section";
 import { StatusTag } from "@/components/StatusTag";
 import { TallyMark } from "@/components/TallyMark";
@@ -14,6 +15,7 @@ import type { Findings } from "@/lib/api/schemas";
 import { BRAND } from "@/lib/brand";
 import { chainDisplayName } from "@/lib/chains";
 import { CHECKS } from "@/lib/checks";
+import { INSTRUMENTS } from "@/lib/instruments";
 import { getPublishedRuns } from "@/lib/published-runs";
 import { REPORTS } from "@/lib/reports";
 
@@ -172,8 +174,8 @@ export default async function Home({
 
           <p className="mt-7 max-w-[52ch] text-lg leading-relaxed text-muted">
             Numbers about the agent economy get cited as proof that it exists —
-            registration counts most of all. Nobody was checking what stands
-            behind them.{" "}
+            how many agents are registered, how many sellers take payment.
+            Nobody was checking what stands behind them.{" "}
             {/* The one clause in this paragraph that is a claim about what
                 this project DOES rather
                 than about the state of the world. Weight and full text
@@ -347,12 +349,61 @@ export default async function Home({
         </div>
       </header>
 
-      {/* One instrument, described in prose rather than listed. A list
-          reads as more than one row even when it holds a single entry, and
-          this site has one instrument — `InstrumentRow`
-          (components/InstrumentRow.tsx) is still here for the day a second
-          one ships and this section becomes an actual list, not deleted,
-          just not wired in while there is nothing to list it against. */}
+      {/* The day `InstrumentRow` was built for. This section described one
+          instrument in a paragraph for as long as there was one; there are
+          two now, so it is the list that component was written to be —
+          see its doc for the rule about what may appear in it, and
+          `lib/instruments.ts` for why the Reconciliation page is not here
+          despite being designed and wanted.
+
+          It sits directly under the hero, above the seven checks, because
+          the checks are ONE instrument's questions: a reader who meets them
+          first — as every reader did until now — reasonably concludes that
+          checking ERC-8004 registrations is the whole product. */}
+      <hr className="full-bleed-rule mt-20" />
+      <Section
+        title="Instruments"
+        aside="two · one published"
+        className="mt-14"
+        heading="display"
+        intro={
+          <>
+            Two populations, measured separately and never blended: who is{" "}
+            <em>registered</em>, and who actually <em>sells</em>. Each
+            instrument publishes its own figures with its own evidence, and
+            neither stands in for the other.
+          </>
+        }
+      >
+        <div className="mt-8 max-w-5xl">
+          {INSTRUMENTS.map((instrument) => (
+            <InstrumentRow
+              key={instrument.index}
+              index={instrument.index}
+              title={instrument.title}
+              href={instrument.href}
+              status={instrument.status}
+              /* Only the published instrument gets a figures line, and it
+                 reads the same `censusRuns` arithmetic as the hero panel
+                 above rather than a second count of its own. Instrument 02
+                 has completed a sweep, but nothing serves it yet — a row
+                 without numbers must not imply any. */
+              figures={
+                instrument.index === 1 ? (
+                  <>
+                    {population.toLocaleString("en-US")} agents ·{" "}
+                    {censusRuns.length} chains
+                    {latestSweep && <> · swept {latestSweep}</>}
+                  </>
+                ) : undefined
+              }
+            >
+              {instrument.measures}
+            </InstrumentRow>
+          ))}
+        </div>
+      </Section>
+
       {/* No `max-w-5xl` on this section: the seven-check grid below is a
           table of cells, which wants the column, and at 1440px the cap was
           holding it to 1024px inside a 1384px page — the grid ended
@@ -368,9 +419,15 @@ export default async function Home({
           on this rule instead of their own `mt-`, so the gap above a
           heading and the gap below the rule stay one number. */}
       <hr className="full-bleed-rule mt-20" />
+      {/* Titled for the instrument it belongs to, not "Instruments" — that
+          title now names the list above, and these seven cells are one of
+          its two rows expanded. While there was a single instrument the two
+          were the same thing and the heading could be either; with two they
+          cannot, and a reader meeting "Instruments" over a grid of seven
+          would count seven of them. */}
       <Section
-        title="Instruments"
-        aside="the seven rungs · ordered, except #7"
+        title="Inside the Registration Census"
+        aside="seven checks · ordered, except #7"
         className="mt-14"
         heading="display"
       >

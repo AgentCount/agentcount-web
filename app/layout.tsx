@@ -9,6 +9,7 @@ import { OutboundLink } from "@/components/OutboundLink";
 import { TallyMark } from "@/components/TallyMark";
 import { TextLink } from "@/components/TextLink";
 import { BRAND, NEWCOMER_SENTENCE } from "@/lib/brand";
+import { NAV, TOOLS } from "@/lib/nav";
 import "./globals.css";
 
 /**
@@ -125,46 +126,6 @@ export const metadata: Metadata = {
   manifest: "/site.webmanifest",
 };
 
-/**
- * Four places, ordered from the instrument outward.
- *
- * "Findings" leads because it is the product's one live instrument — the
- * homepage is the overview OF it, so the wordmark and the first nav item are
- * different doors. A future instrument earns a nav item the day it ships,
- * and the label will be the instrument's name, not "new".
- *
- * "Agents" is the list of agents. It was called "Directory", which names the
- * shape of the page rather than what is in it. The URL stays `/directory`:
- * labels are for readers, URLs are identifiers other people have linked to.
- *
- * "Data" is the archives — promoted from the footer because downloading a
- * run is the product's whole reproducibility claim made concrete, not a
- * reference detail.
- *
- * Coverage, the pre-flight checker and Method live in the footer: they are
- * what you consult while checking a claim, not what you arrive for. The
- * census hero still links /coverage where the scope claim is made.
- */
-const NAV = [
-  // Labelled "Findings", not "Census": the label must work for a reader —
-  // including one whose first language is not English — before they know any
-  // of this product's vocabulary. The URL stays `/census` because URLs are
-  // identifiers other people have linked to.
-  { href: "/census", label: "Findings" },
-  { href: "/directory", label: "Agents" },
-  { href: "/reports", label: "Reports" },
-  { href: "/data", label: "Data" },
-];
-
-/**
- * Reference, in the footer: what you consult while checking a figure, rather
- * than what you came to read.
- */
-const TOOLS = [
-  { href: "/methodology", label: "Method" },
-  { href: "/coverage", label: "Coverage" },
-  { href: "/preflight", label: "Check a file" },
-];
 
 
 /**
@@ -420,17 +381,50 @@ export default function RootLayout({
                   sentence directly above it, so the domain stands alone. */}
               <p className="mt-3 font-mono text-xs text-muted">{BRAND.domain}</p>
             </div>
+            {/* The sitemap, with each label explained — see `NAV`'s doc for
+                why the blurbs live down here rather than in the header.
+                `gap-3` rather than `gap-2`: each entry is now two lines, and
+                at the tighter gap a blurb sat as close to the NEXT label as
+                to its own.
+
+                `<dl>` rather than a stack of links: this is a list of terms
+                and their definitions, which is what the element means, and a
+                screen reader announcing them as pairs is the whole point of
+                writing them. */}
+            <div className="flex flex-col items-start gap-2">
+              <span className="label">On this site</span>
+              <dl className="flex flex-col gap-3">
+                {NAV.map((item) => (
+                  <div key={item.href}>
+                    <dt>
+                      <TextLink href={item.href} className="text-sm">
+                        {item.label}
+                      </TextLink>
+                    </dt>
+                    <dd className="max-w-[30ch] text-xs leading-relaxed text-dead">
+                      {item.blurb}
+                    </dd>
+                  </div>
+                ))}
+              </dl>
+            </div>
+
             <div className="flex flex-col items-start gap-2">
               <span className="label">Reference</span>
-              {TOOLS.map((item) => (
-                <TextLink
-                  key={item.href}
-                  href={item.href}
-                  className="text-sm"
-                >
-                  {item.label}
-                </TextLink>
-              ))}
+              <dl className="flex flex-col gap-3">
+                {TOOLS.map((item) => (
+                  <div key={item.href}>
+                    <dt>
+                      <TextLink href={item.href} className="text-sm">
+                        {item.label}
+                      </TextLink>
+                    </dt>
+                    <dd className="max-w-[30ch] text-xs leading-relaxed text-dead">
+                      {item.blurb}
+                    </dd>
+                  </div>
+                ))}
+              </dl>
             </div>
 
             {/* Source before Contact: a reader who wants to check something

@@ -55,12 +55,22 @@ export const BRAND = {
  * are, which is a better answer than a parenthetical that grows with every
  * sweep.
  *
- * "first instrument" is deliberate and is as far as the sentence goes:
- * it says the product is bigger than the census without naming, promising
- * or dating anything that has not shipped. Nothing unshipped gets marketed
- * on this site — a product that audits claims cannot open with one.
+ * The second instrument is named now that it exists, and the sentence says
+ * plainly which of the two is published — that asymmetry is the honest
+ * shape of the product today, and hiding it would make the footer's one
+ * explanatory sentence the place where this site overstates itself. It
+ * still names nothing beyond the two: the Reconciliation page is designed
+ * and wanted and appears nowhere, here or on the homepage's instrument
+ * list. Nothing unshipped gets marketed on this site — a product that
+ * audits claims cannot open with one.
+ *
+ * "on the chains it sweeps" is the registration census's scope and stays
+ * attached to it. The Seller Census does NOT carry a chain scope, and must
+ * not inherit one by sitting in the same sentence: its population is every
+ * seller in the catalogs it reads, whatever network settles the payment
+ * (METHODOLOGY §10.5). Only two of its rungs read a chain at all.
  */
-export const NEWCOMER_SENTENCE = `${BRAND.name} is an independent, open-source audit layer for the agent economy: it counts what gets claimed, checks what actually stands behind it, and publishes the evidence for both. Its first instrument checks every AI agent registered under ERC-8004 on the chains it sweeps. All code and data are public.`;
+export const NEWCOMER_SENTENCE = `${BRAND.name} is an independent, open-source audit layer for the agent economy: it counts what gets claimed, checks what actually stands behind it, and publishes the evidence for both. Its first instrument checks every AI agent registered under ERC-8004 on the chains it sweeps; its second asks whether the sellers advertising paid resources over x402 actually answer, quote and settle — method published, figures still to come. All code and data are public.`;
 
 /** `<title>` for any page but the homepage. One format, one place. */
 export function pageTitle(page: string): string {
