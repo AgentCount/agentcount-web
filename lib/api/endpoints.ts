@@ -14,6 +14,8 @@ import {
   methodologySchema,
   ratesSchema,
   runsSchema,
+  sellerRatesSchema,
+  sellerRunsSchema,
   spotCheckSchema,
   validateResponseSchema,
   type AgentDetail,
@@ -24,6 +26,8 @@ import {
   type Methodology,
   type Rates,
   type Run,
+  type SellerRates,
+  type SellerRun,
   type SpotCheck,
   type ValidateResponse,
 } from "./schemas";
@@ -324,4 +328,54 @@ export async function getMethodology(): Promise<Methodology> {
   return (await get("/api/methodology", methodologySchema, {
     revalidate: 3600,
   })) as Methodology;
+}
+
+/* ── the Seller Census (METHODOLOGY §10) ─────────────────────────────────── */
+
+/**
+ * Every seller run, newest first.
+ *
+ * `allow404` because this endpoint post-dates the deployed API: a site build
+ * that runs against an older API must render the page without its figures
+ * rather than 500. It returns `null` in that case, which callers treat as
+ * "not published yet" — the state `/sellers` already knows how to say.
+ */
+export async function listSellerRuns(): Promise<SellerRun[] | null> {
+  return get("/api/seller-runs", sellerRunsSchema, {
+    revalidate: 300,
+    allow404: true,
+  }) as Promise<SellerRun[] | null>;
+}
+
+/** Per-rung status counts for one seller run. */
+export async function getSellerRates(runId: string): Promise<SellerRates | null> {
+  return get(`/api/seller-runs/${encodeURIComponent(runId)}/rates`, sellerRatesSchema, {
+    revalidate: 300,
+    allow404: true,
+  }) as Promise<SellerRates | null>;
+}
+
+/**
+ * The newest seller run whose figures may be published, with its rates.
+ *
+ * `finished` only, and this is not a detail: the sweep of 2026-08-27 left a
+ * FAILED run in the table half an hour before the good one, and a delta that
+ * compared against it reported 2,387 sellers as having "appeared". A failed
+ * run is stamped with the moment it died, so it is indistinguishable from a
+ * complete one unless the status is read. Returns `null` when no run
+ * qualifies — absence, never zeros.
+ */
+export async function latestSellerCensus(): Promise<{
+  run: SellerRun;
+  rates: SellerRates;
+} | null> {
+  const runs = await listSellerRuns();
+  if (runs === null) return null;
+  const run = runs
+    .filter((r) => r.status === "finished")
+    .sort((a, b) => b.started_at.localeCompare(a.started_at))
+    .at(0);
+  if (run === undefined) return null;
+  const rates = await getSellerRates(run.run_id);
+  return rates === null ? null : { run, rates };
 }

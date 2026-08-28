@@ -1,6 +1,8 @@
 import { Section } from "@/components/Section";
 import { StatusTag } from "@/components/StatusTag";
 import { TextLink } from "@/components/TextLink";
+import { latestSellerCensus } from "@/lib/api/endpoints";
+import type { SellerRungRate } from "@/lib/api/schemas";
 import { BRAND } from "@/lib/brand";
 import { INSTRUMENTS } from "@/lib/instruments";
 import { SELLER_CHECKS } from "@/lib/seller-checks";
@@ -8,31 +10,51 @@ import { SELLER_CHECKS } from "@/lib/seller-checks";
 export const metadata = {
   title: "The Seller Census",
   description:
-    "The second instrument: who actually sells over x402. What it asks, what it refuses to measure, and why no figures are published here yet.",
+    "The second instrument: who actually sells over x402. Every seller the catalogs advertise, asked whether it answers, quotes a real price, and has ever been paid.",
 };
 
+// Live data, so a restarting API must not fail the whole deploy.
+export const dynamic = "force-dynamic";
+
 /**
- * Instrument 02's home, before it has any figures.
+ * Instrument 02's home.
  *
- * The page exists ahead of the numbers on purpose. The homepage now names
- * two instruments, and a named instrument that links nowhere is worse than
- * one not named at all — a reader who clicks "Seller Census" and lands on a
- * 404 learns that this site talks about things it does not have. What the
- * page can honestly carry today is the method: what a seller IS here, what
- * gets asked, and the two rungs that have never run.
+ * ## The rule this page is written around
  *
- * What it must not carry is a single figure from the completed first sweep.
- * Those rows are in production and the numbers are good, but nothing serves
- * them yet: no API route reads the seller tables, so any count printed here
- * would be a number typed by hand into a page whose whole argument is that
- * published figures come from an archived run you can recompute. It waits
- * for the endpoint.
+ * Every rate here has `pass + fail` as its denominator and nothing else,
+ * because the API computes it that way (see `routes/sellers.rs`). The
+ * statuses left out are not rounding: `refused` is an origin declining us,
+ * `error` is ours, `unprobed` is a question this sweep chose not to ask, and
+ * `skipped` is a prerequisite that did not pass. None of them is a seller
+ * failing at anything, and each is printed beside the rate it was excluded
+ * from rather than hidden in a methodology note.
+ *
+ * The page never divides. It formats what the API already computed — the
+ * same discipline `lib/api/aggregate.ts` states for the registration census,
+ * and the reason a rate cannot drift between the two surfaces that show it.
+ *
+ * ## Rung 4
+ *
+ * It has never run. It spends real money and waits on a funded wallet, so
+ * `attempted: false` comes back from the API and this page prints "never
+ * attempted" where a percentage would go. Nothing here may imply anything
+ * was bought, delivered, or not delivered.
  */
-export default function Sellers() {
+export default async function Sellers() {
   const instrument = INSTRUMENTS.find((i) => i.index === 2);
   if (instrument === undefined) {
     throw new Error("instrument 02 is missing from lib/instruments.ts");
   }
+
+  // `null` when the deployed API predates the seller endpoints, which is a
+  // real state during the window between the two repos' deploys. The page
+  // renders its method either way and simply omits the figures.
+  const census = await latestSellerCensus();
+  const byRung = new Map<number, SellerRungRate>(
+    (census?.rates.rungs ?? []).map((r) => [r.rung, r]),
+  );
+  const sweptOn = census?.run.finished_at?.slice(0, 10);
+  const num = (n: number) => n.toLocaleString("en-US");
 
   return (
     <>
@@ -42,9 +64,17 @@ export default function Sellers() {
           Who actually <em className="italic text-accent">sells?</em>
         </h1>
         <div className="mt-6 flex flex-wrap items-center gap-x-4 gap-y-2">
-          <StatusTag status={instrument.status} />
+          <StatusTag status={census === null ? "in development" : "live"} />
           <span className="font-mono text-[0.6875rem] uppercase tracking-[0.14em] text-dead">
-            method locked · first sweep run · figures not published
+            {census === null ? (
+              <>method locked · figures not published</>
+            ) : (
+              <>
+                {num(census.rates.seller_count)} sellers ·{" "}
+                {num(census.rates.host_count)} hosts
+                {sweptOn && <> · swept {sweptOn}</>}
+              </>
+            )}
           </span>
         </div>
         <p className="mt-7 max-w-[58ch] text-lg leading-relaxed text-muted">
@@ -140,6 +170,47 @@ export default function Sellers() {
                   {check.caveat}
                 </p>
               )}
+              {/* The measured result, when there is one.
+                  `attempted === false` prints words, never a percentage: a
+                  rung nobody asked has counts of zero, and "0%" here would
+                  say every seller failed to deliver what it was paid for.
+                  The excluded statuses are printed beside the rate they were
+                  kept out of — a reader who sees "33.7%" is owed the 141
+                  sellers the question never reached. */}
+              {(() => {
+                const measured = byRung.get(check.number);
+                if (measured === undefined) return null;
+                if (measured.attempted === false) {
+                  return (
+                    <p className="mt-4 border-t border-line pt-2 font-mono text-[0.6875rem] leading-relaxed text-dead">
+                      never attempted — no rate
+                    </p>
+                  );
+                }
+                const excluded = measured.counts.filter(
+                  (c) => c.status !== "pass" && c.status !== "fail",
+                );
+                return (
+                  <div className="mt-4 border-t border-line pt-3">
+                    <p className="font-mono text-[0.6875rem] uppercase tracking-[0.14em] text-dead">
+                      {num(measured.passed)} of {num(measured.judged)} judged
+                    </p>
+                    <p className="headline mt-1 text-2xl text-text">
+                      {measured.percent === null
+                        ? "—"
+                        : `${measured.percent.toFixed(1)}%`}
+                    </p>
+                    {excluded.length > 0 && (
+                      <p className="mt-2 font-mono text-[0.6875rem] leading-relaxed text-dead">
+                        excluded:{" "}
+                        {excluded
+                          .map((c) => `${num(c.count)} ${c.status}`)
+                          .join(", ")}
+                      </p>
+                    )}
+                  </div>
+                );
+              })()}
               <p className="mt-auto border-t border-line pt-2 font-mono text-[0.6875rem] text-dead">
                 internal: {check.internal}
               </p>
@@ -177,31 +248,85 @@ export default function Sellers() {
       </Section>
 
       <hr className="full-bleed-rule mt-20" />
-      <Section
-        title="Why there are no numbers here"
-        aside="yet"
-        className="mt-14"
-        heading="display"
-      >
-        <div className="grid max-w-5xl gap-x-10 gap-y-4 text-[0.96875rem] leading-relaxed text-muted md:grid-cols-2">
-          <p>
-            The method is locked, and the first full sweep has run and is
-            stored. What does not exist yet is the part that would let you
-            check the figures: no public endpoint serves the seller tables,
-            so there is nothing here to recompute a number from.
+      {census === null ? (
+        <Section
+          title="Why there are no numbers here"
+          aside="yet"
+          className="mt-14"
+          heading="display"
+        >
+          <div className="grid max-w-5xl gap-x-10 gap-y-4 text-[0.96875rem] leading-relaxed text-muted md:grid-cols-2">
+            <p>
+              The method is locked, and the first full sweep has run and is
+              stored. What is not answering right now is the endpoint that
+              serves it, so there is nothing here to recompute a number from.
+            </p>
+            <p>
+              {BRAND.name} does not print a figure whose evidence a reader
+              cannot pull — the same order every figure on this site went
+              through, and the reason the{" "}
+              <TextLink href="/methodology" tone="bright">
+                method
+              </TextLink>{" "}
+              was published before the first seller was enumerated.
+            </p>
+          </div>
+        </Section>
+      ) : (
+        <Section
+          title="Provenance"
+          aside="reproducible"
+          className="mt-14"
+          heading="display"
+          intro={
+            <>
+              Every figure above comes from one sweep, named here in full. A
+              result you cannot recompute is an opinion.
+            </>
+          }
+        >
+          <dl className="mt-6 max-w-3xl border-t border-line font-mono text-[0.8125rem]">
+            {[
+              ["run", census.run.run_id],
+              ["catalogs read", census.run.catalogs.join(", ")],
+              [
+                "rungs attempted",
+                census.run.rungs_attempted === null
+                  ? "unrecorded"
+                  : census.run.rungs_attempted.join(", "),
+              ],
+              ["settlement scanned on", census.run.network],
+              ["checker", census.run.seller_checker_version],
+              ["commit", census.run.checker_commit],
+              ["started", census.run.started_at],
+              ["finished", census.run.finished_at ?? "—"],
+              [
+                "advertised resources",
+                `${num(census.rates.resource_count)} distinct URLs (${num(
+                  census.rates.seller_resource_pairs,
+                )} seller-resource pairs)`,
+              ],
+            ].map(([term, value]) => (
+              <div
+                key={term}
+                className="flex flex-wrap items-baseline justify-between gap-x-6 border-b border-line py-2.5"
+              >
+                <dt className="text-muted">{term}</dt>
+                <dd className="break-all text-text">{value}</dd>
+              </div>
+            ))}
+          </dl>
+          {/* Rung 4 is named here too, not only on its card. The provenance
+              block is what a sceptical reader reads, and "rungs attempted"
+              above is the checkable form of the claim that nothing on this
+              page describes a purchase. */}
+          <p className="mt-6 max-w-prose text-[0.9375rem] leading-relaxed text-muted">
+            Rung 4 is absent from the attempted list, and that is the whole
+            claim: no purchase has ever been made, so no figure here describes
+            anything bought or delivered.
           </p>
-          <p>
-            {BRAND.name} does not print a figure whose evidence a reader
-            cannot pull. The counts publish when the archive and the endpoint
-            behind them do — the same order every figure on this site went
-            through, and the reason the{" "}
-            <TextLink href="/methodology" tone="bright">
-              method
-            </TextLink>{" "}
-            was published before the first seller was enumerated.
-          </p>
-        </div>
-      </Section>
+        </Section>
+      )}
     </>
   );
 }
