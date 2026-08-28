@@ -72,6 +72,75 @@ export const ratesSchema = z.object({
   rungs: z.array(rungRateSchema),
 });
 
+/* ── the Seller Census (METHODOLOGY §10) ────────────────────────────────────
+ *
+ * Its own schemas, never a widened `runSchema`. The two instruments count
+ * different populations and the failure that would discredit both is a figure
+ * that blends them, so nothing here is reachable from a census type.
+ */
+
+export const sellerRunSchema = z.object({
+  run_id: z.string(),
+  /** The SETTLEMENT scope, not the population's. Sellers are enumerated from
+   * catalogs whatever chain they settle on (§10.5); this says which chain
+   * rungs 6 and 4 could read. Rendering it as "the sellers on Base" is wrong. */
+  network: z.string(),
+  started_at: z.string(),
+  finished_at: z.string().nullable(),
+  status: z.string(),
+  /** NULL while a run is in flight. Never coalesced to 0. */
+  seller_count: z.number().nullable(),
+  /** Which rungs the sweep set out to ask. `null` predates migration 0027 and
+   * means unrecorded — a third state, never flattened into "none". */
+  rungs_attempted: z.array(z.number()).nullable(),
+  catalogs: z.array(z.string()),
+  seller_checker_version: z.string(),
+  checker_commit: z.string(),
+  rerun_command: z.string().nullable(),
+});
+export const sellerRunsSchema = z.array(sellerRunSchema);
+
+export const sellerRungRateSchema = z.object({
+  rung: z.number(),
+  name: z.string(),
+  /**
+   * Whether this sweep ASKED this rung.
+   *
+   * Read this before reading `counts`. `false` means every count is zero
+   * because nobody asked, not because every seller failed — rung 4 has never
+   * run. `null` means the run predates `rungs_attempted`. A UI that renders a
+   * percentage without consulting this will publish "0% delivered" about
+   * businesses nobody measured.
+   */
+  attempted: z.boolean().nullable(),
+  reserved: z.string().nullable(),
+  counts: z.array(rateCountSchema),
+  /**
+   * The denominator: `pass + fail`, and nothing else.
+   *
+   * METHODOLOGY §10.3 forbids publishing `error` (ours), `refused` (an origin
+   * declining us) or `unprobed` (a question this sweep chose not to ask) as a
+   * seller's failure; `skipped` is a prerequisite that did not pass. Dividing
+   * by the population instead turns all four into sellers failing.
+   */
+  judged: z.number(),
+  passed: z.number(),
+  /** Computed by the API so nothing on this site divides. `null` when nothing
+   * was judged — a rate over nobody is undefined, not 0%. */
+  percent: z.number().nullable(),
+});
+
+export const sellerRatesSchema = z.object({
+  run_id: z.string(),
+  seller_count: z.number(),
+  host_count: z.number(),
+  /** DISTINCT advertised resource URLs. Not the sum of per-seller arrays —
+   * that is `seller_resource_pairs`, and it is 51% larger. */
+  resource_count: z.number(),
+  seller_resource_pairs: z.number(),
+  rungs: z.array(sellerRungRateSchema),
+});
+
 /** The per-rung shape a directory listing carries: bare status, no evidence.
  * A rung this run never reached (short-circuited by an earlier failure, or
  * not yet implemented) is simply absent from the array — never synthesised
@@ -473,3 +542,7 @@ export type SpotFetch = z.infer<typeof spotFetchSchema>;
 export type SpotCheckRung = z.infer<typeof spotCheckRungSchema>;
 export type SpotNotChecked = z.infer<typeof spotNotCheckedSchema>;
 export type SpotCheck = z.infer<typeof spotCheckSchema>;
+
+export type SellerRun = z.infer<typeof sellerRunSchema>;
+export type SellerRates = z.infer<typeof sellerRatesSchema>;
+export type SellerRungRate = z.infer<typeof sellerRungRateSchema>;

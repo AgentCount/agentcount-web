@@ -24,11 +24,15 @@
  * ## Status is about publication, not about code
  *
  * `live` means a reader can see figures and the evidence under them. The
- * Seller Census has a locked method (METHODOLOGY §10) and a completed first
- * sweep stored in production, and it is still `in development` here, because
- * nothing of it is published yet: no API surface serves it and no page shows
- * it. An instrument that has measured something the public cannot read is
- * not yet an instrument the public has.
+ * Seller Census became `live` on 2026-08-28, when `/api/seller-runs` started
+ * serving the first sweep and `/sellers` started showing it — not when the
+ * sweep ran, and not when the method was locked. An instrument that has
+ * measured something the public cannot read is not yet an instrument the
+ * public has.
+ *
+ * The status here is the baseline claim. Surfaces that fetch the figures
+ * downgrade it when the API does not answer, rather than printing `live`
+ * over an empty row — see the homepage's instrument list and `/sellers`.
  */
 
 export type Instrument = {
@@ -70,9 +74,9 @@ export const INSTRUMENTS: readonly Instrument[] = [
     index: 2,
     title: "The Seller Census",
     href: "/sellers",
-    status: "in development",
+    status: "live",
     population: "sellers advertising paid resources over x402",
     measures:
-      "Registration says an agent exists; it says nothing about whether anyone is selling. This instrument enumerates the sellers that catalogs advertise as taking payment over x402, and asks whether each one answers, quotes a real price when asked, and has ever settled on-chain. The method is locked and the first sweep has run; the figures are not published yet.",
+      "Registration says an agent exists; it says nothing about whether anyone is selling. This instrument enumerates the sellers that catalogs advertise as taking payment over x402, and asks whether each one answers, quotes a real price when asked, and has ever been paid on-chain. Every seller that let us ask, answered — but only one in three quotes a price a buyer could actually pay.",
   },
 ];
