@@ -10,7 +10,7 @@ import { StatusTag } from "@/components/StatusTag";
 import { TallyMark } from "@/components/TallyMark";
 import { TextLink } from "@/components/TextLink";
 import { aggregateFinding, canonicalRuns, totalAgents } from "@/lib/api/aggregate";
-import { getFindings, listRuns } from "@/lib/api/endpoints";
+import { getFindings, latestSellerCensus, listRuns } from "@/lib/api/endpoints";
 import type { Findings } from "@/lib/api/schemas";
 import { BRAND } from "@/lib/brand";
 import { chainDisplayName } from "@/lib/chains";
@@ -60,10 +60,19 @@ export default async function Home({
     return <CensusView sp={sp} />;
   }
 
-  // The same population arithmetic as the census page, over the same
-  // canonical runs — the overview quotes the instrument, it does not have
-  // numbers of its own.
-  const [allRuns, published] = await Promise.all([listRuns(), getPublishedRuns()]);
+  // Both instruments, fetched in parallel — the overview quotes them, it has
+  // no numbers of its own. The registration side is the same population
+  // arithmetic as the census page, over the same canonical runs.
+  //
+  // `latestSellerCensus()` returns `null` when the deployed API predates the
+  // seller endpoints, which is a real state in the window between the two
+  // repos' deploys. Instrument 02's row is downgraded then, rather than
+  // printing "live" over an empty one.
+  const [allRuns, published, sellerCensus] = await Promise.all([
+    listRuns(),
+    getPublishedRuns(),
+    latestSellerCensus(),
+  ]);
   const censusRuns = canonicalRuns(allRuns, new Set(published.map((r) => r.run_id)));
   if (censusRuns.length === 0) {
     throw new Error("no completed run is available yet");
@@ -363,7 +372,13 @@ export default async function Home({
       <hr className="full-bleed-rule mt-20" />
       <Section
         title="Instruments"
-        aside="two · one published"
+        /* Derived, not typed: this label was "one published" for the two
+           hours between the Seller Census getting a page and getting an
+           endpoint, and a hand-written count is exactly the sort of string
+           that stays wrong for a year after it stops being true. */
+        aside={
+          sellerCensus === null ? "two · one published" : "two · both published"
+        }
         className="mt-14"
         heading="display"
         intro={
@@ -382,7 +397,13 @@ export default async function Home({
               index={instrument.index}
               title={instrument.title}
               href={instrument.href}
-              status={instrument.status}
+              /* Downgraded when the figures are not reachable — see
+                 `lib/instruments.ts` on status meaning publication. */
+              status={
+                instrument.index === 2 && sellerCensus === null
+                  ? "in development"
+                  : instrument.status
+              }
               /* Only the published instrument gets a figures line, and it
                  reads the same `censusRuns` arithmetic as the hero panel
                  above rather than a second count of its own. Instrument 02
@@ -394,6 +415,16 @@ export default async function Home({
                     {population.toLocaleString("en-US")} agents ·{" "}
                     {censusRuns.length} chains
                     {latestSweep && <> · swept {latestSweep}</>}
+                  </>
+                ) : instrument.index === 2 && sellerCensus !== null ? (
+                  <>
+                    {sellerCensus.rates.seller_count.toLocaleString("en-US")}{" "}
+                    sellers ·{" "}
+                    {sellerCensus.rates.host_count.toLocaleString("en-US")}{" "}
+                    hosts
+                    {sellerCensus.run.finished_at && (
+                      <> · swept {sellerCensus.run.finished_at.slice(0, 10)}</>
+                    )}
                   </>
                 ) : undefined
               }

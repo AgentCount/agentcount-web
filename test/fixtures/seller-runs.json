@@ -1,0 +1,23 @@
+[
+  {
+    "run_id": "76c63469-c33a-4607-864a-3c95b48449b8",
+    "network": "eip155:8453",
+    "started_at": "2026-08-27T09:15:47.529781Z",
+    "finished_at": "2026-08-27T09:21:01.050912Z",
+    "status": "finished",
+    "seller_count": 2387,
+    "rungs_attempted": [
+      1,
+      2,
+      3,
+      6,
+      7
+    ],
+    "catalogs": [
+      "bazaar"
+    ],
+    "seller_checker_version": "0.1.0",
+    "checker_commit": "unknown",
+    "rerun_command": null
+  }
+]

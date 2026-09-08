@@ -73,6 +73,14 @@ function startStubApi(): Promise<Server> {
     // in-flight run the live API has no example of.
     if (/^\/api\/runs\/[^/]+\/delta$/.test(path))
       return send(fixture("delta-method-changed"));
+    // The Seller Census. Absent until 2026-09-08, which is how `/` came to
+    // 500 in CI: the stub answers 500 for a route it does not know, the
+    // homepage awaited the seller fetch beside the census one, and the whole
+    // page went down with it. The endpoints are stubbed now, and
+    // `latestSellerCensus` no longer lets either failure escape.
+    if (path === "/api/seller-runs") return send(fixture("seller-runs"));
+    if (/^\/api\/seller-runs\/[^/]+\/rates$/.test(path))
+      return send(fixture("seller-rates"));
     if (path === "/api/agents") return send(fixture("agents"));
     // Cross-run search. The fixture carries three groups — one with more
     // matches than it returns rows for, and one with none — so the page's
@@ -148,6 +156,9 @@ const ROUTES: { path: string; expect: number; card: boolean }[] = [
   { path: "/reports/2026-07-census", expect: 200, card: true },
   { path: "/reports/linkage", expect: 200, card: true },
   { path: "/data", expect: 200, card: true },
+  // Instrument 02. Shipped in #51 without a smoke route, so nothing checked
+  // that it rendered at all.
+  { path: "/sellers", expect: 200, card: true },
   // The subscribe form's landing page, in both its shapes. `card: false`
   // because it is `noindex` — a page nobody should ever arrive at from a
   // search result has no business having a share image.
