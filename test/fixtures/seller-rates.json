@@ -1,0 +1,130 @@
+{
+  "run_id": "76c63469-c33a-4607-864a-3c95b48449b8",
+  "seller_count": 2387,
+  "host_count": 1601,
+  "resource_count": 14739,
+  "seller_resource_pairs": 22289,
+  "rungs": [
+    {
+      "rung": 1,
+      "name": "listed",
+      "attempted": true,
+      "reserved": null,
+      "counts": [
+        {
+          "status": "pass",
+          "count": 2387
+        }
+      ],
+      "judged": 2387,
+      "passed": 2387,
+      "percent": 100.0
+    },
+    {
+      "rung": 2,
+      "name": "reachable",
+      "attempted": true,
+      "reserved": null,
+      "counts": [
+        {
+          "status": "error",
+          "count": 3
+        },
+        {
+          "status": "pass",
+          "count": 2244
+        },
+        {
+          "status": "refused",
+          "count": 138
+        }
+      ],
+      "judged": 2244,
+      "passed": 2244,
+      "percent": 100.0
+    },
+    {
+      "rung": 3,
+      "name": "quotes",
+      "attempted": true,
+      "reserved": null,
+      "counts": [
+        {
+          "status": "fail",
+          "count": 1486
+        },
+        {
+          "status": "pass",
+          "count": 754
+        },
+        {
+          "status": "skipped",
+          "count": 141
+        }
+      ],
+      "judged": 2240,
+      "passed": 754,
+      "percent": 33.660714285714285
+    },
+    {
+      "rung": 4,
+      "name": "delivers",
+      "attempted": false,
+      "reserved": "spends real money; runs once the shopper wallet is funded",
+      "counts": [],
+      "judged": 0,
+      "passed": 0,
+      "percent": null
+    },
+    {
+      "rung": 6,
+      "name": "settled",
+      "attempted": true,
+      "reserved": null,
+      "counts": [
+        {
+          "status": "fail",
+          "count": 86
+        },
+        {
+          "status": "pass",
+          "count": 1651
+        },
+        {
+          "status": "unprobed",
+          "count": 650
+        }
+      ],
+      "judged": 1737,
+      "passed": 1651,
+      "percent": 95.048934945308
+    },
+    {
+      "rung": 7,
+      "name": "consistent",
+      "attempted": true,
+      "reserved": null,
+      "counts": [
+        {
+          "status": "fail",
+          "count": 92
+        },
+        {
+          "status": "pass",
+          "count": 528
+        },
+        {
+          "status": "skipped",
+          "count": 1625
+        },
+        {
+          "status": "unprobed",
+          "count": 134
+        }
+      ],
+      "judged": 620,
+      "passed": 528,
+      "percent": 85.16129032258064
+    }
+  ]
+}

@@ -369,13 +369,35 @@ export async function latestSellerCensus(): Promise<{
   run: SellerRun;
   rates: SellerRates;
 } | null> {
-  const runs = await listSellerRuns();
-  if (runs === null) return null;
-  const run = runs
-    .filter((r) => r.status === "finished")
-    .sort((a, b) => b.started_at.localeCompare(a.started_at))
-    .at(0);
-  if (run === undefined) return null;
-  const rates = await getSellerRates(run.run_id);
-  return rates === null ? null : { run, rates };
+  try {
+    const runs = await listSellerRuns();
+    if (runs === null) return null;
+    const run = runs
+      .filter((r) => r.status === "finished")
+      .sort((a, b) => b.started_at.localeCompare(a.started_at))
+      .at(0);
+    if (run === undefined) return null;
+    const rates = await getSellerRates(run.run_id);
+    return rates === null ? null : { run, rates };
+  } catch (error) {
+    // A second instrument must not be able to take down the first.
+    //
+    // `allow404` covers an API that predates these routes, which was the only
+    // failure this function was written for. It does not cover an API that
+    // answers 500, times out, or refuses the connection — and the homepage
+    // awaits this inside the same `Promise.all` as the registration census,
+    // so any of those took the whole page down with it. CI caught it (the
+    // stub API answers 500 for routes it does not know, and `/` went with
+    // it), but production would have too: this API scales to zero and its
+    // cold start already exceeds one client timeout.
+    //
+    // Swallowed rather than rethrown, and narrowly: the caller renders
+    // instrument 02 as unpublished, which is what a reader sees anyway when
+    // the figures cannot be fetched. The error is logged so an operator can
+    // tell "not published" from "not reachable" — a distinction this project
+    // insists on everywhere else, and one a page cannot draw for a reader who
+    // has no way to act on it.
+    console.error("seller census unavailable, rendering as unpublished:", error);
+    return null;
+  }
 }
