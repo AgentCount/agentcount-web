@@ -543,6 +543,35 @@ export type SpotCheckRung = z.infer<typeof spotCheckRungSchema>;
 export type SpotNotChecked = z.infer<typeof spotNotCheckedSchema>;
 export type SpotCheck = z.infer<typeof spotCheckSchema>;
 
+export const sellerDeltaSchema = z.object({
+  run_id: z.string(),
+  previous_run_id: z.string(),
+  network: z.string(),
+  sellers_before: z.number(),
+  sellers_after: z.number(),
+  appeared: z.number(),
+  disappeared: z.number(),
+  came_back: z.number(),
+  /** Stopped answering. NOT `disappeared`, which is a seller the catalogs
+   * stopped listing — one is a business that went away, the other is one we
+   * stopped being told about. */
+  went_dark: z.number(),
+  /** Excluded from churn and shown beside it, never folded in: `refused` is
+   * an origin declining us, `error` is ours, `unprobed` a question the sweep
+   * chose not to ask. A seller we could not reach is not one that left. */
+  excluded_refused: z.number(),
+  excluded_error: z.number(),
+  excluded_unprobed: z.number(),
+  /** The method moved between these two runs. Churn across a catalog
+   * addition is not churn in the world, and the row has to say so. */
+  method_changed: z.boolean(),
+  checker_before: z.string(),
+  checker_after: z.string(),
+  computed_at: z.string(),
+});
+export const sellerDeltasSchema = z.array(sellerDeltaSchema);
+
 export type SellerRun = z.infer<typeof sellerRunSchema>;
 export type SellerRates = z.infer<typeof sellerRatesSchema>;
 export type SellerRungRate = z.infer<typeof sellerRungRateSchema>;
+export type SellerDelta = z.infer<typeof sellerDeltaSchema>;

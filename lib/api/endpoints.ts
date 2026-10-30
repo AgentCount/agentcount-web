@@ -14,6 +14,7 @@ import {
   methodologySchema,
   ratesSchema,
   runsSchema,
+  sellerDeltasSchema,
   sellerRatesSchema,
   sellerRunsSchema,
   spotCheckSchema,
@@ -26,6 +27,7 @@ import {
   type Methodology,
   type Rates,
   type Run,
+  type SellerDelta,
   type SellerRates,
   type SellerRun,
   type SpotCheck,
@@ -398,6 +400,26 @@ export async function latestSellerCensus(): Promise<{
     // insists on everywhere else, and one a page cannot draw for a reader who
     // has no way to act on it.
     console.error("seller census unavailable, rendering as unpublished:", error);
+    return null;
+  }
+}
+
+/**
+ * Every week of seller churn, oldest first.
+ *
+ * `null` when the API predates these routes — the page then shows the
+ * current sweep without its history, rather than failing. `allow404` and the
+ * try/catch both matter: a 404 is an older API, anything else is one that is
+ * struggling, and neither is a reason for the rest of the page to disappear.
+ */
+export async function listSellerDeltas(): Promise<SellerDelta[] | null> {
+  try {
+    return (await get("/api/seller-deltas", sellerDeltasSchema, {
+      revalidate: 300,
+      allow404: true,
+    })) as SellerDelta[] | null;
+  } catch (error) {
+    console.error("seller deltas unavailable:", error);
     return null;
   }
 }
