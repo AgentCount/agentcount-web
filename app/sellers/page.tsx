@@ -1,11 +1,12 @@
 import { Section } from "@/components/Section";
 import { StatusTag } from "@/components/StatusTag";
 import { TextLink } from "@/components/TextLink";
-import { latestSellerCensus } from "@/lib/api/endpoints";
+import { latestSellerCensus, listSellerDeltas } from "@/lib/api/endpoints";
 import type { SellerRungRate } from "@/lib/api/schemas";
 import { BRAND } from "@/lib/brand";
 import { INSTRUMENTS } from "@/lib/instruments";
 import { SELLER_CHECKS } from "@/lib/seller-checks";
+import { SellerChurn } from "./SellerChurn";
 
 export const metadata = {
   title: "The Seller Census",
@@ -49,7 +50,13 @@ export default async function Sellers() {
   // `null` when the deployed API predates the seller endpoints, which is a
   // real state during the window between the two repos' deploys. The page
   // renders its method either way and simply omits the figures.
-  const census = await latestSellerCensus();
+  // Both in parallel: the current sweep and the weeks behind it. Neither is
+  // allowed to take the other down — `listSellerDeltas` returns null rather
+  // than throwing, so a page with figures but no history is still a page.
+  const [census, deltas] = await Promise.all([
+    latestSellerCensus(),
+    listSellerDeltas(),
+  ]);
   const byRung = new Map<number, SellerRungRate>(
     (census?.rates.rungs ?? []).map((r) => [r.rung, r]),
   );
@@ -246,6 +253,29 @@ export default async function Sellers() {
           </p>
         </div>
       </Section>
+
+      {deltas !== null && deltas.length > 0 && (
+        <>
+          <hr className="full-bleed-rule mt-20" />
+          <Section
+            title="What changed"
+            aside={`${deltas.length} week${deltas.length === 1 ? "" : "s"} · week over week`}
+            className="mt-14"
+            heading="display"
+            intro={
+              <>
+                The figure a single crawl cannot produce. Anyone can count the
+                sellers advertising paid resources today; only a census that
+                has asked the same question every week, kept every answer, and
+                judged them all by one locked method can say how many of them
+                are different from last week&rsquo;s.
+              </>
+            }
+          >
+            <SellerChurn deltas={deltas} />
+          </Section>
+        </>
+      )}
 
       <hr className="full-bleed-rule mt-20" />
       {census === null ? (

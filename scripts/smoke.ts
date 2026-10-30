@@ -79,6 +79,9 @@ function startStubApi(): Promise<Server> {
     // page went down with it. The endpoints are stubbed now, and
     // `latestSellerCensus` no longer lets either failure escape.
     if (path === "/api/seller-runs") return send(fixture("seller-runs"));
+    // The churn series. Added with the section that renders it: the stub
+    // answers 500 for routes it does not know, and /sellers awaits this.
+    if (path === "/api/seller-deltas") return send(fixture("seller-deltas"));
     if (/^\/api\/seller-runs\/[^/]+\/rates$/.test(path))
       return send(fixture("seller-rates"));
     if (path === "/api/agents") return send(fixture("agents"));
